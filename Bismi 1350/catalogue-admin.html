@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+
+<html lang="pt">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,maximum-scale=1" name="viewport"/>
+<title>Bismi Treats — Website Admin Panel</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--yellow:#FFD600;--yellow-light:#FFFDE7;--yellow-dark:#F9A825;--black:#111111;--text:#1a1a1a;--text2:#666666;--white:#FFFFFF;--bg:#F8F8F8;--card:#FFFFFF;--border:#E0E0E0;--border2:#BDBDBD;--success:#2E7D32;--danger:#C62828;--info:#1565C0;--shadow:0 2px 12px rgba(0,0,0,0.08);--shadow-lg:0 8px 32px rgba(0,0,0,0.12)}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+.login-screen{position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 30% 20%,rgba(255,214,0,0.2) 0%,transparent 60%),radial-gradient(ellipse 50% 35% at 80% 80%,rgba(255,180,0,0.15) 0%,transparent 55%),#F5F5F0;display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
+.login-card{background:var(--white);border-radius:20px;padding:32px;width:100%;max-width:360px;box-shadow:var(--shadow-lg)}
+.login-logo{text-align:center;margin-bottom:24px}
+.login-logo-icon{width:72px;height:72px;background:rgba(255,214,0,0.85);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 12px}
+.login-logo h1{font-size:1.3rem;font-weight:800;color:var(--black)}
+.login-logo p{font-size:.78rem;color:var(--text2);margin-top:2px}
+.login-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg);color:var(--text);font-size:.9rem;outline:none;font-family:inherit;margin-bottom:10px;transition:border-color .2s}
+.login-input:focus{border-color:var(--yellow)}
+.login-btn{width:100%;padding:12px;background:rgba(255,214,0,0.9);color:var(--black);border:none;border-radius:9px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
+.login-btn:hover{background:var(--yellow-dark)}
+.login-error{color:var(--danger);font-size:.8rem;text-align:center;margin-top:8px;display:none}
+.header{background:var(--white);border-bottom:3px solid rgba(255,214,0,0.85);position:sticky;top:0;z-index:100;box-shadow:var(--shadow)}
+.header-inner{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:56px;max-width:1200px;margin:0 auto}
+.header-brand{display:flex;align-items:center;gap:10px;cursor:pointer}
+.header-logo{width:36px;height:36px;background:rgba(255,214,0,0.85);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;overflow:hidden}
+.header-logo img{width:100%;height:100%;object-fit:cover;border-radius:9px}
+.header-title{font-size:.95rem;font-weight:800;color:var(--black)}
+.header-sub{font-size:.6rem;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.header-right{display:flex;align-items:center;gap:8px}
+.hdr-btn{background:var(--bg);border:1.5px solid var(--border);color:var(--text2);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:.8rem;font-weight:600;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .2s}
+.hdr-btn:hover{border-color:var(--yellow);color:var(--black);background:rgba(255,214,0,0.08)}
+.hdr-btn.primary{background:rgba(255,214,0,0.85);border-color:transparent;color:var(--black)}
+.hdr-btn.primary:hover{background:var(--yellow-dark)}
+.hdr-icon-btn{background:var(--bg);border:1.5px solid var(--border);color:var(--text2);width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:all .2s}
+.hdr-icon-btn:hover{border-color:var(--danger);color:var(--danger)}
+.layout{display:flex;min-height:calc(100vh - 56px);max-width:1200px;margin:0 auto}
+.sidebar{width:220px;background:var(--white);border-right:1px solid var(--border);padding:12px 0;flex-shrink:0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto}
+.sidebar-label{font-size:.62rem;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;padding:8px 18px 4px}
+.nav-btn{display:flex;align-items:center;gap:9px;width:100%;padding:9px 16px;border:none;background:none;color:var(--text2);border-radius:0;cursor:pointer;font-size:.84rem;font-weight:600;font-family:inherit;transition:all .2s;text-align:left}
+.nav-btn:hover{background:rgba(255,214,0,0.1);color:var(--black)}
+.nav-btn.active{background:rgba(255,214,0,0.85);color:var(--black);font-weight:700}
+.nav-btn i{width:16px;text-align:center;font-size:.85rem}
+.nav-divider{height:1px;background:var(--border);margin:6px 0}
+.main{flex:1;padding:20px;overflow-y:auto;min-width:0}
+.page{display:none}
+.page.active{display:block}
+.page-title{font-size:1.2rem;font-weight:800;color:var(--black);margin-bottom:4px;display:flex;align-items:center;gap:10px}
+.page-sub{font-size:.82rem;color:var(--text2);margin-bottom:20px}
+.section-card{background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow)}
+.section-card-header{background:var(--bg);padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.section-card-title{font-size:.88rem;font-weight:700;color:var(--black);display:flex;align-items:center;gap:8px}
+.section-card-body{padding:16px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+.stat-val{font-size:1.8rem;font-weight:900;color:var(--black);font-family:Georgia,serif}
+.stat-label{font-size:.72rem;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin-top:2px}
+.stat-icon{font-size:1.2rem;margin-bottom:6px}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:.72rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:.86rem;outline:none;font-family:inherit;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--yellow)}
+.form-group textarea{resize:vertical;min-height:60px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:600;font-size:.84rem;font-family:inherit;border:none;display:inline-flex;align-items:center;gap:7px;transition:all .2s}
+.btn-primary{background:rgba(255,214,0,0.9);color:var(--black)}
+.btn-primary:hover{background:var(--yellow-dark)}
+.btn-secondary{background:var(--white);border:1.5px solid var(--border);color:var(--text)}
+.btn-secondary:hover{border-color:var(--yellow);color:var(--black);background:rgba(255,214,0,0.05)}
+.btn-danger{background:#FFEBEE;border:1.5px solid #FFCDD2;color:var(--danger)}
+.btn-danger:hover{background:var(--danger);color:white;border-color:var(--danger)}
+.btn-sm{padding:5px 12px;font-size:.76rem}
+.btn-xs{padding:3px 8px;font-size:.7rem}
+.cake-item{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.cake-item-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cake-item-num{width:28px;height:28px;background:rgba(255,214,0,0.85);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--black);font-size:.78rem;font-weight:800;flex-shrink:0}
+.cake-item-name{font-weight:700;color:var(--black);font-size:.9rem;flex:1;margin:0 10px}
+.cake-item-actions{display:flex;gap:6px;align-items:center}
+.photo-upload-area{border:2px dashed var(--border2);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg);position:relative}
+.photo-upload-area:hover{border-color:var(--yellow);background:rgba(255,214,0,0.04)}
+.photo-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.photo-upload-area i{font-size:1.5rem;color:var(--yellow-dark);margin-bottom:6px;display:block}
+.photo-upload-area p{font-size:.78rem;color:var(--text2)}
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin-top:10px}
+.photo-thumb{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1.5px solid var(--border)}
+.photo-thumb img{width:100%;height:100%;object-fit:cover}
+.photo-thumb-del{position:absolute;top:3px;right:3px;background:rgba(198,40,40,0.9);color:white;border:none;width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:.65rem;display:flex;align-items:center;justify-content:center}
+.flavour-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.flavour-chip-admin{display:flex;align-items:center;gap:6px;background:var(--white);border:1.5px solid var(--border);border-radius:20px;padding:5px 10px;font-size:.8rem}
+.flavour-chip-admin button{background:none;border:none;color:var(--danger);cursor:pointer;font-size:.75rem;padding:0;line-height:1}
+.add-flavour-row{display:flex;gap:8px;align-items:center}
+.add-flavour-row input{flex:1;padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-size:.84rem;outline:none;font-family:inherit}
+.add-flavour-row input:focus{border-color:var(--yellow)}
+.badge-select{display:flex;gap:8px;flex-wrap:wrap}
+.badge-opt{padding:5px 12px;border:1.5px solid var(--border);border-radius:20px;cursor:pointer;font-size:.78rem;font-weight:600;background:var(--white);color:var(--text2);transition:all .2s}
+.badge-opt.active{background:rgba(255,214,0,0.85);border-color:rgba(255,214,0,0.5);color:var(--black)}
+.customer-table{width:100%;border-collapse:collapse;font-size:.84rem}
+.customer-table th{background:var(--bg);padding:10px 12px;text-align:left;font-size:.72rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--border)}
+.customer-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.customer-table tr:hover td{background:rgba(255,214,0,0.04)}
+.customer-table tr:last-child td{border-bottom:none}
+.pass-field{display:flex;align-items:center;gap:6px}
+.pass-dots{font-size:.9rem;letter-spacing:2px;color:var(--text2)}
+.pass-show-btn{background:none;border:none;color:var(--text2);cursor:pointer;font-size:.78rem;padding:2px 6px;border-radius:4px;transition:all .2s}
+.pass-show-btn:hover{background:rgba(255,214,0,0.15);color:var(--black)}
+.customer-actions{display:flex;gap:4px}
+.hero-preview{background:linear-gradient(160deg,rgba(255,214,0,0.15) 0%,var(--bg) 60%);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;margin-bottom:14px}
+.hero-preview-title{font-size:1.4rem;font-weight:800;color:var(--black);margin-bottom:4px}
+.hero-preview-sub{font-size:.82rem;color:var(--text2)}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--success);color:white;padding:10px 18px;border-radius:10px;font-size:.84rem;font-weight:600;z-index:9999;display:none;align-items:center;gap:8px;box-shadow:var(--shadow-lg)}
+.toast.show{display:flex}
+.toast.error{background:var(--danger)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
+.modal-overlay.show{display:flex}
+.modal{background:var(--white);border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+.modal-header{background:var(--bg);padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:1;border-radius:14px 14px 0 0}
+.modal-title{font-size:.95rem;font-weight:700;color:var(--black);display:flex;align-items:center;gap:8px}
+.modal-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:1.1rem}
+.modal-body{padding:18px}
+.modal-footer{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;background:var(--bg);border-radius:0 0 14px 14px}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+@media(max-width:640px){.sidebar{display:none}.main{padding:14px}.form-row{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+<div class="login-card">
+<div class="login-logo">
+<div class="login-logo-icon">🎂</div>
+<h1>Bismi Treats</h1>
+<p>Website Admin Panel</p>
+</div>
+<input class="login-input" id="loginUser" placeholder="Utilizador" type="text" value="admin"/>
+<div style="position:relative">
+<input class="login-input" id="loginPass" placeholder="Palavra-passe" style="padding-right:40px" type="password"/>
+<button onclick="toggleLoginPass()" style="position:absolute;right:12px;top:50%;transform:translateY(-60%);background:none;border:none;color:var(--text2);cursor:pointer;font-size:.9rem"><i class="fas fa-eye" id="loginEye"></i></button>
+</div>
+<button class="login-btn" onclick="doAdminLogin()"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+<div class="login-error" id="loginError">❌ Credenciais incorretas</div>
+</div>
+</div>
+<!-- HEADER -->
+<div class="header">
+<div class="header-inner">
+<div class="header-brand" onclick="window.open('catalogue.html','_blank')">
+<div class="header-logo" id="adminLogo">🎂</div>
+<div><div class="header-title">Bismi Treats</div><div class="header-sub">Website Admin Panel</div></div>
+</div>
+<div class="header-right">
+<button class="hdr-btn primary" onclick="window.open('catalogue.html','_blank')"><i class="fas fa-eye"></i> Ver Website</button>
+<button class="hdr-btn" onclick="window.location.href='admin.html'"><i class="fas fa-arrow-left"></i> Sistema</button>
+<button class="hdr-icon-btn" onclick="adminLogout()" title="Sair"><i class="fas fa-sign-out-alt"></i></button>
+</div>
+</div>
+</div>
+<!-- LAYOUT -->
+<div class="layout">
+<div class="sidebar">
+<div class="sidebar-label">Catálogo</div>
+<button class="nav-btn active" onclick="showPage('cakes',this)"><i class="fas fa-birthday-cake"></i> Bolos</button>
+<button class="nav-btn" onclick="showPage('accessories',this)"><i class="fas fa-gift"></i> Acessórios</button>
+<button class="nav-btn" onclick="showPage('flavours',this)"><i class="fas fa-leaf"></i> Recheios</button>
+<div class="nav-divider"></div>
+<div class="sidebar-label">Website</div>
+<button class="nav-btn" onclick="showPage('hero',this)"><i class="fas fa-home"></i> Hero / Banner</button>
+<button class="nav-btn" onclick="showPage('announcement',this)"><i class="fas fa-bullhorn"></i> Anúncio</button>
+<button class="nav-btn" onclick="showPage('business',this)"><i class="fas fa-store"></i> Info do Negócio</button>
+<div class="nav-divider"></div>
+<div class="sidebar-label">Utilizadores</div>
+<button class="nav-btn" onclick="showPage('customers',this)"><i class="fas fa-users"></i> Clientes</button>
+<div class="nav-divider"></div>
+<div class="sidebar-label">Sistema</div>
+<button class="nav-btn" onclick="showPage('settings',this)"><i class="fas fa-cog"></i> Definições</button>
+</div>
+<div class="main">
+<!-- CAKES -->
+<div class="page active" id="page-cakes">
+<div class="page-title"><i class="fas fa-birthday-cake" style="color:var(--yellow-dark)"></i> Gestão de Bolos</div>
+<div class="page-sub">Edite os bolos do catálogo — nome, preço, descrição, fotos e badge.</div>
+<div class="stats-grid" id="cakeStats"></div>
+<button class="btn btn-primary" onclick="openCakeModal(null)" style="margin-bottom:16px"><i class="fas fa-plus"></i> Adicionar Bolo</button>
+<div id="cakesList"></div>
+</div>
+<!-- ACCESSORIES -->
+<div class="page" id="page-accessories">
+<div class="page-title"><i class="fas fa-gift" style="color:var(--yellow-dark)"></i> Acessórios</div>
+<div class="page-sub">Gerencie os acessórios disponíveis no catálogo.</div>
+<button class="btn btn-primary" onclick="openAccModal(null)" style="margin-bottom:16px"><i class="fas fa-plus"></i> Adicionar Acessório</button>
+<div id="accessoriesList"></div>
+</div>
+<!-- FLAVOURS -->
+<div class="page" id="page-flavours">
+<div class="page-title"><i class="fas fa-leaf" style="color:var(--yellow-dark)"></i> Recheios / Sabores</div>
+<div class="page-sub">Adicione ou remova sabores disponíveis no catálogo.</div>
+<div class="section-card">
+<div class="section-card-header">
+<div class="section-card-title"><i class="fas fa-list"></i> Sabores Disponíveis</div>
+<button class="btn btn-primary btn-sm" onclick="saveFlavours()"><i class="fas fa-save"></i> Guardar</button>
+</div>
+<div class="section-card-body">
+<div class="flavour-list" id="flavourList"></div>
+<div class="add-flavour-row">
+<input id="newFlavourEmoji" placeholder="🍓" style="width:60px;text-align:center"/>
+<input id="newFlavourName" placeholder="Nome do sabor"/>
+<button class="btn btn-primary btn-sm" onclick="addFlavour()"><i class="fas fa-plus"></i> Adicionar</button>
+</div>
+</div>
+</div>
+</div>
+<!-- HERO -->
+<div class="page" id="page-hero">
+<div class="page-title"><i class="fas fa-home" style="color:var(--yellow-dark)"></i> Hero / Banner</div>
+<div class="page-sub">Edite o texto principal e subtítulo do banner do catálogo.</div>
+<div class="section-card">
+<div class="section-card-header">
+<div class="section-card-title"><i class="fas fa-edit"></i> Texto do Banner</div>
+<button class="btn btn-primary btn-sm" onclick="saveHero()"><i class="fas fa-save"></i> Guardar</button>
+</div>
+<div class="section-card-body">
+<div class="hero-preview"><div class="hero-preview-title" id="heroPreviewTitle">Bismi Treats</div><div class="hero-preview-sub" id="heroPreviewSub">Luxury and taste in one bite</div></div>
+<div class="form-row">
+<div class="form-group"><label>Título (PT)</label><input id="heroTitlePt" oninput="updateHeroPreview()" type="text"/></div>
+<div class="form-group"><label>Título (EN)</label><input id="heroTitleEn" type="text"/></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Subtítulo (PT)</label><input id="heroSubPt" oninput="updateHeroPreview()" type="text"/></div>
+<div class="form-group"><label>Subtítulo (EN)</label><input id="heroSubEn" type="text"/></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Badge</label><input id="heroBadge" type="text"/></div>
+<div class="form-group"><label>Reviews</label><input id="heroReviews" type="text"/></div>
+</div>
+</div>
+</div>
+</div>
+<!-- ANNOUNCEMENT -->
+<div class="page" id="page-announcement">
+<div class="page-title"><i class="fas fa-bullhorn" style="color:var(--yellow-dark)"></i> Anúncio / Banner</div>
+<div class="page-sub">Mostre uma mensagem de destaque no topo do catálogo.</div>
+<div class="section-card">
+<div class="section-card-header">
+<div class="section-card-title"><i class="fas fa-edit"></i> Configurar Anúncio</div>
+<button class="btn btn-primary btn-sm" onclick="saveAnnouncement()"><i class="fas fa-save"></i> Guardar</button>
+</div>
+<div class="section-card-body">
+<div class="form-group">
+<label>Estado</label>
+<label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.88rem;font-weight:600;color:var(--text)"><input id="annEnabled" style="width:18px;height:18px;accent-color:var(--yellow);cursor:pointer" type="checkbox"/> Mostrar anúncio no catálogo</label>
+</div>
+<div class="form-group"><label>Mensagem</label><input id="annText" oninput="updateAnnPreview()" placeholder="🎉 Promoção especial — 10% de desconto esta semana!" type="text"/></div>
+<div style="margin-top:10px;padding:10px 14px;border-radius:10px;background:rgba(255,214,0,0.85);color:var(--black);font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:8px"><i class="fas fa-eye"></i> Pré-visualização: <span id="annPreview" style="opacity:.8">—</span></div>
+<div style="margin-top:10px;font-size:.76rem;color:var(--text2)">💡 Sugestões: 🎉 Eid Mubarak — Encomende já! | 🎂 Novo sabor disponível! | 🚚 Entregas gratuitas esta semana!</div>
+</div>
+</div>
+</div>
+<!-- BUSINESS -->
+<div class="page" id="page-business">
+<div class="page-title"><i class="fas fa-store" style="color:var(--yellow-dark)"></i> Informações do Negócio</div>
+<div class="page-sub">Atualize os contactos e informações que aparecem no catálogo.</div>
+<div class="section-card">
+<div class="section-card-header">
+<div class="section-card-title"><i class="fas fa-address-card"></i> Contactos &amp; Logo</div>
+<button class="btn btn-primary btn-sm" onclick="saveBusiness()"><i class="fas fa-save"></i> Guardar</button>
+</div>
+<div class="section-card-body">
+<div class="form-row">
+<div class="form-group"><label>Telefone / WhatsApp</label><input id="bizPhone" placeholder="934453710" type="tel"/></div>
+<div class="form-group"><label>Email</label><input id="bizEmail" placeholder="bismitreats.pt@gmail.com" type="email"/></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Instagram</label><input id="bizInstagram" placeholder="@bismitreats.pt" type="text"/></div>
+<div class="form-group"><label>Website</label><input id="bizWebsite" placeholder="bismitreats.com" type="text"/></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Link Google Reviews</label><input id="bizGoogleLink" placeholder="https://g.page/r/..." type="text"/></div>
+<div class="form-group"><label>Tagline</label><input id="bizTagline" placeholder="Luxury and taste in one bite" type="text"/></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Horário de Entregas</label><input id="bizHours" placeholder="18:00 – 22:00" type="text"/></div>
+<div class="form-group"><label>Aviso Mínimo (horas)</label><input id="bizMinNotice" placeholder="24" type="number"/></div>
+</div>
+<div class="form-group"><label>Mensagem de Rodapé</label><input id="bizFooter" placeholder="Feito com amor e carinho pela Bismi Treats" type="text"/></div>
+<div class="form-group">
+<label>Logo do Website</label>
+<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+<div id="logoPreviewCircle" style="width:64px;height:64px;border-radius:50%;overflow:hidden;background:rgba(255,214,0,0.85);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0"><span id="logoPreviewEmoji">🎂</span></div>
+<div style="flex:1">
+<div class="photo-upload-area" style="padding:10px"><input accept="image/*" onchange="handleLogoUpload(this)" type="file"/><i class="fas fa-camera" style="font-size:1rem;margin-bottom:3px"></i><p style="font-size:.75rem">Clique para carregar logo</p></div>
+<button class="btn btn-danger btn-sm" onclick="removeLogo()" style="margin-top:6px"><i class="fas fa-times"></i> Remover Logo</button>
+
+<!-- HERO IMAGE UPLOAD -->
+<div class="form-group" style="margin-top:16px">
+<label><i class="fas fa-image" style="color:var(--primary)"></i> Imagem do Banner (Hero)</label>
+<div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap">
+  <div style="flex:1;min-width:200px">
+    <input id="bizHeroImg" placeholder="URL da imagem ou carregue abaixo..." type="text" style="width:100%;margin-bottom:8px" oninput="updateHeroPreview()"/>
+    <label for="bizHeroUpload" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--primary);color:white;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600">
+      <i class="fas fa-upload"></i> Carregar Imagem
+    </label>
+    <input id="bizHeroUpload" type="file" accept="image/*" style="display:none" onchange="handleHeroUpload(this)"/>
+    <button onclick="removeHeroImg()" style="margin-left:8px;padding:8px 14px;background:#fee2e2;color:#c0544a;border:1px solid #fca5a5;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600"><i class="fas fa-times"></i> Remover</button>
+  </div>
+  <div id="heroImgPreview" style="display:none;flex-shrink:0">
+    <img id="heroImgPreviewImg" src="" alt="Hero Preview" style="width:160px;height:90px;object-fit:cover;border-radius:8px;border:2px solid var(--border)"/>
+  </div>
+</div>
+<div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px">💡 Recomendado: imagem horizontal, mínimo 800×300px</div>
+</div>
+
+<!-- BUTTON COLOUR PICKER -->
+<div class="form-group" style="margin-top:16px">
+<label><i class="fas fa-palette" style="color:var(--primary)"></i> Cor dos Botões (Hex)</label>
+<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+  <input type="color" id="bizButtonColorPicker" value="#FFD600" style="width:48px;height:38px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;padding:2px" oninput="syncColorInput(this.value)"/>
+  <input type="text" id="bizButtonColor" placeholder="#FFD600" maxlength="7" style="width:110px" oninput="syncColorPicker(this.value)" onkeyup="syncColorPicker(this.value)"/>
+  <div id="bizColorPreview" style="width:80px;height:38px;border-radius:8px;border:1.5px solid var(--border);background:#FFD600;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:#333">Preview</div>
+  <button onclick="applyButtonColor()" style="padding:8px 16px;background:var(--primary);color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:600"><i class="fas fa-check"></i> Aplicar</button>
+  <button onclick="resetButtonColor()" style="padding:8px 14px;background:var(--bg);border:1.5px solid var(--border);color:var(--text);border-radius:8px;cursor:pointer;font-size:0.82rem">Reset</button>
+</div>
+<div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px">💡 Esta cor aplica-se a todos os botões do catálogo (Order, Cart, etc.)</div>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- CUSTOMERS -->
+<div class="page" id="page-customers">
+<div class="page-title"><i class="fas fa-users" style="color:var(--yellow-dark)"></i> Gestão de Clientes</div>
+<div class="page-sub">Veja e gerencie todas as contas de clientes. Pode ver e alterar palavras-passe.</div>
+<div class="stats-grid" id="customerStats"></div>
+<div class="section-card">
+<div class="section-card-header">
+<div class="section-card-title"><i class="fas fa-list"></i> Contas de Clientes</div>
+<div style="display:flex;gap:8px">
+<input id="customerSearch" oninput="renderCustomers()" placeholder="Pesquisar..." style="padding:6px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.82rem;outline:none;font-family:inherit;width:160px;transition:border-color .2s" type="text"/>
+<button class="btn btn-primary btn-sm" onclick="openAddCustomerModal()"><i class="fas fa-plus"></i> Adicionar</button>
+</div>
+</div>
+<div class="section-card-body" style="padding:0;overflow-x:auto">
+<table class="customer-table">
+<thead><tr><th>Nome</th><th>Email</th><th>Telefone</th><th>Palavra-passe</th><th>Membro desde</th><th>Ações</th></tr></thead>
+<tbody id="customerTableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- SETTINGS -->
+<div class="page" id="page-settings">
+<div class="page-title"><i class="fas fa-cog" style="color:var(--yellow-dark)"></i> Definições</div>
+<div class="page-sub">Gerencie a conta de administrador e dados do sistema.</div>
+<div class="section-card">
+<div class="section-card-header"><div class="section-card-title"><i class="fas fa-key"></i> Alterar Palavra-passe Admin</div></div>
+<div class="section-card-body">
+<div class="form-row">
+<div class="form-group"><label>Nova Palavra-passe</label><input id="newAdminPass" placeholder="Nova palavra-passe" type="password"/></div>
+<div class="form-group"><label>Confirmar</label><input id="newAdminPass2" placeholder="Confirmar" type="password"/></div>
+</div>
+<button class="btn btn-primary" onclick="changeAdminPass()"><i class="fas fa-save"></i> Alterar Palavra-passe</button>
+</div>
+</div>
+<div class="section-card">
+<div class="section-card-header"><div class="section-card-title"><i class="fas fa-database"></i> Dados do Catálogo</div></div>
+<div class="section-card-body">
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<button class="btn btn-secondary" onclick="exportData()"><i class="fas fa-download"></i> Exportar Dados</button>
+<button class="btn btn-secondary" onclick="document.getElementById('importFile').click()"><i class="fas fa-upload"></i> Importar Dados</button>
+<input accept=".json" id="importFile" onchange="importData(this)" style="display:none" type="file"/>
+<button class="btn btn-danger" onclick="resetData()"><i class="fas fa-trash"></i> Repor Dados de Fábrica</button>
+</div>
+<div style="margin-top:12px;font-size:.78rem;color:var(--text2)">⚠️ Repor dados irá apagar todas as personalizações e restaurar os valores originais.</div>
+</div>
+</div>
+<div class="section-card">
+<div class="section-card-header"><div class="section-card-title"><i class="fas fa-users"></i> Dados de Clientes</div></div>
+<div class="section-card-body">
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<button class="btn btn-secondary" onclick="exportCustomers()"><i class="fas fa-download"></i> Exportar Clientes</button>
+<button class="btn btn-danger" onclick="clearAllCustomers()"><i class="fas fa-trash"></i> Apagar Todos os Clientes</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg"></span></div>
+<!-- CAKE MODAL -->
+<div class="modal-overlay" id="cakeModal" onclick="if(event.target===this)closeCakeModal()">
+<div class="modal">
+<div class="modal-header"><div class="modal-title"><i class="fas fa-birthday-cake"></i> <span id="cakeModalTitle">Editar Bolo</span></div><button class="modal-close" onclick="closeCakeModal()"><i class="fas fa-times"></i></button></div>
+<div class="modal-body">
+<input id="editCakeId" type="hidden"/>
+<div class="form-row"><div class="form-group"><label>Nome (PT)</label><input id="editCakeName" type="text"/></div><div class="form-group"><label>Nome (EN)</label><input id="editCakeNameEn" type="text"/></div></div>
+<div class="form-row"><div class="form-group"><label>Preço por kg (€)</label><input id="editCakePrice" min="0" step="0.01" type="number"/></div><div class="form-group"><label>Categoria</label><select id="editCakeCategory"><option value="sponge">Sponge Cake</option><option value="special">Especial</option></select></div></div>
+<div class="form-group"><label>Descrição (PT)</label><textarea id="editCakeDesc" rows="2"></textarea></div>
+<div class="form-group"><label>Descrição (EN)</label><textarea id="editCakeDescEn" rows="2"></textarea></div>
+<div class="form-group"><label>Badge</label><div class="badge-select" id="badgeSelect"><div class="badge-opt active" data-val="" onclick="selectBadge(this)">Nenhum</div><div class="badge-opt" data-val="popular" onclick="selectBadge(this)">⭐ Popular</div><div class="badge-opt" data-val="new" onclick="selectBadge(this)">🆕 Novo</div><div class="badge-opt" data-val="special" onclick="selectBadge(this)">✨ Especial</div></div></div>
+<div class="form-group"><label>Fotos do Bolo</label><div class="photo-upload-area" id="cakePhotoUpload"><input accept="image/*" multiple="" onchange="handleCakePhotos(this)" type="file"/><i class="fas fa-camera"></i><p>Clique para adicionar fotos<br/><span style="font-size:.7rem;color:var(--text2)">JPG, PNG, WEBP — múltiplas fotos permitidas</span></p></div><div class="photo-grid" id="cakePhotoGrid"></div></div>
+</div>
+<div class="modal-footer"><button class="btn btn-secondary" onclick="closeCakeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveCake()"><i class="fas fa-save"></i> Guardar Bolo</button></div>
+</div>
+</div>
+<!-- ACCESSORY MODAL -->
+<div class="modal-overlay" id="accModal" onclick="if(event.target===this)closeAccModal()">
+<div class="modal">
+<div class="modal-header"><div class="modal-title"><i class="fas fa-gift"></i> <span id="accModalTitle">Editar Acessório</span></div><button class="modal-close" onclick="closeAccModal()"><i class="fas fa-times"></i></button></div>
+<div class="modal-body">
+<input id="editAccId" type="hidden"/>
+<div class="form-row"><div class="form-group"><label>Nome (PT)</label><input id="editAccName" type="text"/></div><div class="form-group"><label>Nome (EN)</label><input id="editAccNameEn" type="text"/></div></div>
+<div class="form-group"><label>Preço (€)</label><input id="editAccPrice" min="0" step="0.01" type="number"/></div>
+<div class="form-group"><label>Descrição (PT)</label><textarea id="editAccDesc" rows="2"></textarea></div>
+<div class="form-group"><label>Descrição (EN)</label><textarea id="editAccDescEn" rows="2"></textarea></div>
+<div class="form-group"><label>Foto do Acessório</label><div class="photo-upload-area" style="padding:10px"><input accept="image/*" multiple="" onchange="handleAccPhotos(this)" type="file"/><i class="fas fa-camera" style="font-size:1rem;margin-bottom:3px"></i><p style="font-size:.75rem">Clique para adicionar foto(s)</p></div><div class="photo-grid" id="accPhotoGrid" style="margin-top:8px"></div></div>
+</div>
+<div class="modal-footer"><button class="btn btn-secondary" onclick="closeAccModal()">Cancelar</button><button class="btn btn-primary" onclick="saveAccessory()"><i class="fas fa-save"></i> Guardar</button></div>
+</div>
+</div>
+<!-- CUSTOMER MODAL -->
+<div class="modal-overlay" id="customerModal" onclick="if(event.target===this)closeCustomerModal()">
+<div class="modal">
+<div class="modal-header"><div class="modal-title"><i class="fas fa-user-edit"></i> <span id="customerModalTitle">Editar Cliente</span></div><button class="modal-close" onclick="closeCustomerModal()"><i class="fas fa-times"></i></button></div>
+<div class="modal-body">
+<input id="editCustomerOrigEmail" type="hidden"/>
+<div class="form-row">
+<div class="form-group"><label>Nome</label><input id="editCustomerName" placeholder="Nome completo" type="text"/></div>
+<div class="form-group"><label>Telefone</label><input id="editCustomerPhone" placeholder="9XXXXXXXX" type="tel"/></div>
+</div>
+<div class="form-group"><label>Email</label><input id="editCustomerEmailField" placeholder="email@exemplo.com" type="email"/></div>
+<div class="form-group">
+<label>Nova Palavra-passe <span style="font-size:.7rem;color:var(--text2);font-weight:400">(deixe em branco para manter)</span></label>
+<div style="position:relative"><input id="editCustomerPass" placeholder="Nova palavra-passe" style="width:100%;padding:9px 40px 9px 12px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:.86rem;outline:none;font-family:inherit;transition:border-color .2s" type="password"/><button id="editPassEye" onclick="toggleEditPass()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text2);cursor:pointer;font-size:.85rem"><i class="fas fa-eye"></i></button></div>
+</div>
+<div id="customerEditError" style="display:none;background:#FFEBEE;border:1px solid #FFCDD2;border-radius:8px;padding:8px 12px;color:var(--danger);font-size:.8rem;margin-top:8px"></div>
+</div>
+<div class="modal-footer"><button class="btn btn-secondary" onclick="closeCustomerModal()">Cancelar</button><button class="btn btn-primary" onclick="saveCustomer()"><i class="fas fa-save"></i> Guardar</button></div>
+</div>
+</div>
+<script>
+var ADMIN_KEY='bismiAdminCreds';
+var DATA_KEY='bismiCatalogueData';
+var CUST_KEY='bismiCustomers';
+
+var DEFAULT_DATA={
+  cakes:[
+    {id:'sponge-choc',num:1,name:'Chocolate Sponge Cake',nameEn:'Chocolate Sponge Cake',price:19.99,category:'sponge',badge:'popular',desc:'O nosso clássico Sponge Cake de Chocolate.',descEn:'Our classic Chocolate Sponge Cake.',photos:[]},
+    {id:'sponge-van',num:2,name:'Sponge Cake Vanilla',nameEn:'Vanilla Sponge Cake',price:19.99,category:'sponge',badge:'',desc:'Delicado e aromático.',descEn:'Delicate and aromatic.',photos:[]},
+    {id:'sponge-norm',num:3,name:'Sponge Cake Normal',nameEn:'Classic Sponge Cake',price:19.99,category:'sponge',badge:'',desc:'O clássico Sponge Cake.',descEn:'The classic Sponge Cake.',photos:[]},
+    {id:'redvelvet',num:4,name:'Red Velvet',nameEn:'Red Velvet',price:24.99,category:'special',badge:'new',desc:'O icónico Red Velvet.',descEn:'The iconic Red Velvet.',photos:[]},
+    {id:'tres-leches',num:5,name:'Tres Leches',nameEn:'Tres Leches',price:19.99,category:'special',badge:'popular',desc:'Embebido em três tipos de leite.',descEn:'Soaked in three types of milk.',photos:[]},
+    {id:'design-6',num:6,name:'Morango Especial',nameEn:'Special Strawberry',price:19.99,category:'sponge',badge:'',desc:'Bolo especial com morango.',descEn:'Special strawberry cake.',photos:[]},
+    {id:'design-7',num:7,name:'Caramel Dream',nameEn:'Caramel Dream',price:19.99,category:'special',badge:'',desc:'Bolo de caramel dourado.',descEn:'Golden caramel cake.',photos:[]},
+    {id:'design-8',num:8,name:'Rainbow Cake',nameEn:'Rainbow Cake',price:19.99,category:'sponge',badge:'',desc:'Bolo colorido arco-íris.',descEn:'Colourful rainbow cake.',photos:[]},
+    {id:'design-9',num:9,name:'Mango Tropical',nameEn:'Tropical Mango',price:24.99,category:'special',badge:'new',desc:'Bolo tropical de manga.',descEn:'Tropical mango cake.',photos:[]},
+    {id:'design-10',num:10,name:'Citrus Delight',nameEn:'Citrus Delight',price:19.99,category:'sponge',badge:'popular',desc:'Bolo de limão e laranja.',descEn:'Lemon and orange cake.',photos:[]}
+  ],
+  accessories:[
+    {id:'candles',name:'Velas de Aniversário',nameEn:'Birthday Candles',price:2.99,desc:'Conjunto de velas coloridas.',descEn:'Set of colourful birthday candles.',photos:[]},
+    {id:'topper-hb',name:'Topper Happy Birthday',nameEn:'Happy Birthday Topper',price:3.99,desc:'Topper decorativo.',descEn:'Decorative cake topper.',photos:[]},
+    {id:'num-candles',name:'Velas Numéricas',nameEn:'Number Candles',price:4.99,desc:'Velas em forma de número.',descEn:'Number-shaped candles.',photos:[]},
+    {id:'topper-cust',name:'Topper Personalizado',nameEn:'Custom Topper',price:5.99,desc:'Topper com nome ou mensagem.',descEn:'Topper with custom name.',photos:[]},
+    {id:'sparklers',name:'Sparklers / Faíscas',nameEn:'Sparklers',price:3.49,desc:'Faíscas decorativas.',descEn:'Decorative sparklers.',photos:[]},
+    {id:'ribbon',name:'Laço Decorativo',nameEn:'Decorative Ribbon',price:1.99,desc:'Laço elegante.',descEn:'Elegant ribbon.',photos:[]},
+    {id:'flowers',name:'Flores Comestíveis',nameEn:'Edible Flowers',price:4.49,desc:'Flores comestíveis.',descEn:'Edible flowers.',photos:[]},
+    {id:'box',name:'Caixa Premium',nameEn:'Premium Box',price:3.99,desc:'Caixa de apresentação premium.',descEn:'Premium presentation box.',photos:[]}
+  ],
+  flavours:[
+    {v:'morango',e:'🍓',n:'Morango'},{v:'chocolate',e:'🍫',n:'Chocolate'},{v:'choc-branco',e:'🍫',n:'Choc. Branco'},
+    {v:'limao',e:'🍋',n:'Limão'},{v:'limao-verde',e:'🍋‍🟩',n:'Limão Verde'},{v:'laranja',e:'🍊',n:'Laranja'},
+    {v:'kiwi',e:'🥝',n:'Kiwi'},{v:'coco',e:'🥥',n:'Coco'},{v:'ananas',e:'🍍',n:'Ananás'},
+    {v:'cereja',e:'🍒',n:'Cereja'},{v:'manga',e:'🥭',n:'Manga'},{v:'framboesa',e:'🍓',n:'Framboesa'},
+    {v:'caramel',e:'🍮',n:'Caramel'},{v:'frutos-v',e:'🍇',n:'Frutos Vermelhos'}
+  ],
+  hero:{titlePt:'Bismi Treats',titleEn:'Bismi Treats',subPt:'Luxury and taste in one bite — Escolha o seu bolo perfeito',subEn:'Luxury and taste in one bite — Choose your perfect cake',badge:'Como Encomendar?',reviews:'90+ Reviews'},
+  business:{phone:'934453710',email:'bismitreats.pt@gmail.com',instagram:'@bismitreats.pt',website:'bismitreats.com',googleLink:'https://g.page/r/CS1eY1P4V0IxEBM/review',tagline:'Luxury and taste in one bite',hours:'18:00 – 22:00',minNotice:24,footer:'Feito com amor e carinho pela Bismi Treats'},
+  announcement:{text:'',enabled:false}
+};
+
+function getAdminCreds(){try{return JSON.parse(localStorage.getItem(ADMIN_KEY)||'null');}catch(e){return null;}}
+function saveAdminCreds(c){localStorage.setItem(ADMIN_KEY,JSON.stringify(c));}
+function getData(){try{return JSON.parse(localStorage.getItem(DATA_KEY)||'null')||JSON.parse(JSON.stringify(DEFAULT_DATA));}catch(e){return JSON.parse(JSON.stringify(DEFAULT_DATA));}}
+function saveData(d){localStorage.setItem(DATA_KEY,JSON.stringify(d));}
+function getCustomers(){try{return JSON.parse(localStorage.getItem(CUST_KEY)||'[]');}catch(e){return[];}}
+function saveCustomers(a){localStorage.setItem(CUST_KEY,JSON.stringify(a));}
+
+function doAdminLogin(){
+  var user=document.getElementById('loginUser').value.trim();
+  var pass=document.getElementById('loginPass').value;
+  var creds=getAdminCreds()||{user:'Tahmidul',pass:btoa('78674233')};
+  if(user===creds.user&&btoa(pass)===creds.pass){
+    sessionStorage.setItem('bismiWebAdmin','1');
+    document.getElementById('loginScreen').style.display='none';
+    initAdmin();
+  }else{
+    document.getElementById('loginError').style.display='block';
+    setTimeout(function(){document.getElementById('loginError').style.display='none';},3000);
+  }
+  fetch('/api/catalogue',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).catch(function(){});
+}
+function adminLogout(){sessionStorage.removeItem('bismiWebAdmin');location.reload();}
+function toggleLoginPass(){var inp=document.getElementById('loginPass');var eye=document.getElementById('loginEye');inp.type=inp.type==='password'?'text':'password';eye.className=inp.type==='password'?'fas fa-eye':'fas fa-eye-slash';}
+document.getElementById('loginPass').addEventListener('keydown',function(e){if(e.key==='Enter')doAdminLogin();});
+
+function initAdmin(){
+  renderCakes();renderAccessories();renderFlavours();
+  loadHero();loadBusiness();loadAnnouncement();
+  renderCustomers();renderCustomerStats();renderCakeStats();
+  renderAvailabilityList();renderBlockedDates();
+  var d=getData();
+  if(d.business&&d.business.logoImg){var l=document.getElementById('adminLogo');if(l)l.innerHTML='<img src="'+d.business.logoImg+'" style="width:100%;height:100%;object-fit:cover;border-radius:9px"/>';}
+}
+window.addEventListener('DOMContentLoaded',function(){if(sessionStorage.getItem('bismiWebAdmin')){document.getElementById('loginScreen').style.display='none';initAdmin();}});
+
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('page-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+}
+
+function showToast(msg,type){
+  var t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.className='toast show'+(type?' '+type:'');
+  setTimeout(function(){t.className='toast';},3000);
+}
+
+function renderCakeStats(){
+  var d=getData();
+  var total=d.cakes.length;
+  var withPhotos=d.cakes.filter(function(c){return c.photos&&c.photos.length>0;}).length;
+  var popular=d.cakes.filter(function(c){return c.badge==='popular';}).length;
+  document.getElementById('cakeStats').innerHTML=
+    '<div class="stat-card"><div class="stat-icon">🎂</div><div class="stat-val">'+total+'</div><div class="stat-label">Total de Bolos</div></div>'
+    +'<div class="stat-card"><div class="stat-icon">📸</div><div class="stat-val">'+withPhotos+'</div><div class="stat-label">Com Fotos</div></div>'
+    +'<div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-val">'+popular+'</div><div class="stat-label">Populares</div></div>';
+}
+
+var editingCakePhotos=[];
+function renderCakes(){
+  var d=getData();
+  var list=document.getElementById('cakesList');
+  if(!d.cakes.length){list.innerHTML='<div style="color:var(--text2);text-align:center;padding:20px">Nenhum bolo adicionado.</div>';return;}
+  list.innerHTML=d.cakes.map(function(c,i){
+    var photoHtml=c.photos&&c.photos.length?'<img src="'+c.photos[0]+'" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--border);flex-shrink:0"/>':'<div style="width:56px;height:56px;background:rgba(255,214,0,0.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">🎂</div>';
+    var badgeHtml=c.badge?'<span style="font-size:.68rem;background:rgba(255,214,0,0.85);color:var(--black);padding:2px 8px;border-radius:20px;font-weight:700">'+c.badge+'</span>':'';
+    return '<div class="cake-item"><div class="cake-item-header"><div class="cake-item-num">'+(c.num||i+1)+'</div><div class="cake-item-name">'+c.name+'</div><div class="cake-item-actions">'+badgeHtml+'<button class="btn btn-secondary btn-sm" onclick="openCakeModal(\''+c.id+'\')"><i class="fas fa-edit"></i> Editar</button><button class="btn btn-danger btn-sm" onclick="deleteCake(\''+c.id+'\')"><i class="fas fa-trash"></i></button></div></div><div style="display:flex;gap:12px;align-items:flex-start">'+photoHtml+'<div style="flex:1;min-width:0"><div style="font-size:.78rem;color:var(--text2);margin-bottom:4px">'+c.desc+'</div><div style="display:flex;gap:10px;font-size:.78rem"><span style="font-weight:700;color:var(--black)">€'+(c.price||0).toFixed(2)+'/kg</span><span style="color:var(--text2)">'+c.category+'</span><span style="color:var(--text2)">'+(c.photos?c.photos.length:0)+' foto(s)</span></div></div></div></div>';
+  }).join('');
+}
+function openCakeModal(id){
+  var d=getData();var cake=id?d.cakes.find(function(c){return c.id===id;}):null;
+  editingCakePhotos=cake?[].concat(cake.photos||[]):[];
+  document.getElementById('cakeModalTitle').textContent=cake?'Editar Bolo':'Novo Bolo';
+  document.getElementById('editCakeId').value=id||'';
+  document.getElementById('editCakeName').value=cake?cake.name:'';
+  document.getElementById('editCakeNameEn').value=cake?cake.nameEn:'';
+  document.getElementById('editCakePrice').value=cake?cake.price:19.99;
+  document.getElementById('editCakeCategory').value=cake?cake.category:'sponge';
+  if(document.getElementById('editCakeMinSize'))document.getElementById('editCakeMinSize').value=cake&&cake.minSize?cake.minSize:'';
+  if(document.getElementById('editCakeAvailable'))document.getElementById('editCakeAvailable').value=cake&&cake.available===false?'false':'true';
+  document.getElementById('editCakeDesc').value=cake?cake.desc:'';
+  document.getElementById('editCakeDescEn').value=cake?cake.descEn:'';
+  document.querySelectorAll('.badge-opt').forEach(function(b){b.classList.toggle('active',b.dataset.val===(cake?cake.badge||'':''));});
+  renderCakePhotoGrid();
+  document.getElementById('cakeModal').classList.add('show');
+}
+function closeCakeModal(){document.getElementById('cakeModal').classList.remove('show');}
+function selectBadge(el){document.querySelectorAll('.badge-opt').forEach(function(b){b.classList.remove('active');});el.classList.add('active');}
+function handleCakePhotos(input){Array.from(input.files).forEach(function(file){var reader=new FileReader();reader.onload=function(e){editingCakePhotos.push(e.target.result);renderCakePhotoGrid();};reader.readAsDataURL(file);});input.value='';}
+function renderCakePhotoGrid(){document.getElementById('cakePhotoGrid').innerHTML=editingCakePhotos.map(function(src,i){return '<div class="photo-thumb"><img src="'+src+'" alt="foto"/><button class="photo-thumb-del" onclick="removeCakePhoto('+i+')"><i class="fas fa-times"></i></button></div>';}).join('');}
+function removeCakePhoto(i){editingCakePhotos.splice(i,1);renderCakePhotoGrid();}
+function saveCake(){
+  var d=getData();var id=document.getElementById('editCakeId').value;
+  var badge=document.querySelector('.badge-opt.active')?document.querySelector('.badge-opt.active').dataset.val:'';
+  var cakeData={id:id||'cake-'+Date.now(),num:id?(d.cakes.find(function(c){return c.id===id;})||{}).num||d.cakes.length+1:d.cakes.length+1,name:document.getElementById('editCakeName').value.trim(),nameEn:document.getElementById('editCakeNameEn').value.trim(),price:parseFloat(document.getElementById('editCakePrice').value)||19.99,
+    minSize:document.getElementById('editCakeMinSize')?document.getElementById('editCakeMinSize').value||'':'',category:document.getElementById('editCakeCategory').value,badge:badge,desc:document.getElementById('editCakeDesc').value.trim(),descEn:document.getElementById('editCakeDescEn').value.trim(),photos:[].concat(editingCakePhotos)};
+  if(!cakeData.name){showToast('Por favor insira o nome do bolo.','error');return;}
+  if(id){var idx=d.cakes.findIndex(function(c){return c.id===id;});if(idx>-1)d.cakes[idx]=cakeData;}else d.cakes.push(cakeData);
+  saveData(d);closeCakeModal();renderCakes();renderCakeStats();showToast('✅ Bolo guardado!');
+}
+function deleteCake(id){if(!confirm('Tem a certeza que quer apagar este bolo?'))return;var d=getData();d.cakes=d.cakes.filter(function(c){return c.id!==id;});saveData(d);renderCakes();renderCakeStats();showToast('🗑️ Bolo apagado.');}
+
+var editingAccPhotos=[];
+function renderAccessories(){
+  var d=getData();var list=document.getElementById('accessoriesList');
+  if(!d.accessories.length){list.innerHTML='<div style="color:var(--text2);text-align:center;padding:20px">Nenhum acessório adicionado.</div>';return;}
+  list.innerHTML='<div style="display:flex;flex-direction:column;gap:8px">'+d.accessories.map(function(a){
+    var photoHtml=a.photos&&a.photos.length?'<img src="'+a.photos[0]+'" style="width:44px;height:44px;object-fit:cover;border-radius:8px;border:1px solid var(--border);flex-shrink:0"/>':'<div style="width:44px;height:44px;background:rgba(255,214,0,0.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0"><i class="fas fa-gift" style="color:var(--yellow-dark)"></i></div>';
+    return '<div style="display:flex;align-items:center;gap:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px">'+photoHtml+'<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:.86rem;color:var(--black)">'+a.name+'</div><div style="font-size:.78rem;color:var(--text2)">€'+(a.price||0).toFixed(2)+' · '+a.desc+'</div></div><div style="display:flex;gap:6px;flex-shrink:0"><button class="btn btn-secondary btn-sm" onclick="openAccModal(\''+a.id+'\')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-sm" onclick="deleteAccessory(\''+a.id+'\')"><i class="fas fa-trash"></i></button></div></div>';
+  }).join('')+'</div>';
+}
+function openAccModal(id){
+  var d=getData();var acc=id?d.accessories.find(function(a){return a.id===id;}):null;
+  editingAccPhotos=acc?[].concat(acc.photos||[]):[];
+  document.getElementById('accModalTitle').textContent=acc?'Editar Acessório':'Novo Acessório';
+  document.getElementById('editAccId').value=id||'';
+  document.getElementById('editAccName').value=acc?acc.name:'';
+  document.getElementById('editAccNameEn').value=acc?acc.nameEn:'';
+  document.getElementById('editAccPrice').value=acc?acc.price:0;
+  document.getElementById('editAccDesc').value=acc?acc.desc:'';
+  document.getElementById('editAccDescEn').value=acc?acc.descEn:'';
+  renderAccPhotoGrid();document.getElementById('accModal').classList.add('show');
+}
+function closeAccModal(){document.getElementById('accModal').classList.remove('show');}
+function handleAccPhotos(input){Array.from(input.files).forEach(function(file){var reader=new FileReader();reader.onload=function(e){editingAccPhotos.push(e.target.result);renderAccPhotoGrid();};reader.readAsDataURL(file);});input.value='';}
+function renderAccPhotoGrid(){var grid=document.getElementById('accPhotoGrid');if(!grid)return;grid.innerHTML=editingAccPhotos.map(function(src,i){return '<div class="photo-thumb"><img src="'+src+'" alt="foto"/><button class="photo-thumb-del" onclick="removeAccPhoto('+i+')"><i class="fas fa-times"></i></button></div>';}).join('');}
+function removeAccPhoto(i){editingAccPhotos.splice(i,1);renderAccPhotoGrid();}
+function saveAccessory(){
+  var d=getData();var id=document.getElementById('editAccId').value;
+  var accData={id:id||'acc-'+Date.now(),name:document.getElementById('editAccName').value.trim(),nameEn:document.getElementById('editAccNameEn').value.trim(),price:parseFloat(document.getElementById('editAccPrice').value)||0,desc:document.getElementById('editAccDesc').value.trim(),descEn:document.getElementById('editAccDescEn').value.trim(),photos:[].concat(editingAccPhotos)};
+  if(!accData.name){showToast('Por favor insira o nome do acessório.','error');return;}
+  if(id){var idx=d.accessories.findIndex(function(a){return a.id===id;});if(idx>-1)d.accessories[idx]=accData;}else d.accessories.push(accData);
+  saveData(d);closeAccModal();renderAccessories();showToast('✅ Acessório guardado!');
+}
+function deleteAccessory(id){if(!confirm('Apagar este acessório?'))return;var d=getData();d.accessories=d.accessories.filter(function(a){return a.id!==id;});saveData(d);renderAccessories();showToast('🗑️ Acessório apagado.');}
+
+function renderFlavours(){
+  var d=getData();
+  document.getElementById('flavourList').innerHTML=d.flavours.map(function(f,i){return '<div class="flavour-chip-admin"><span>'+f.e+'</span><span>'+f.n+'</span><button onclick="removeFlavour('+i+')" title="Remover"><i class="fas fa-times"></i></button></div>';}).join('');
+}
+function addFlavour(){
+  var emoji=document.getElementById('newFlavourEmoji').value.trim()||'🍓';
+  var name=document.getElementById('newFlavourName').value.trim();
+  if(!name){showToast('Por favor insira o nome do sabor.','error');return;}
+  var d=getData();var v=name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  d.flavours.push({v:v,e:emoji,n:name});saveData(d);renderFlavours();
+  document.getElementById('newFlavourEmoji').value='';document.getElementById('newFlavourName').value='';
+  showToast('✅ Sabor adicionado!');
+}
+function removeFlavour(i){var d=getData();d.flavours.splice(i,1);saveData(d);renderFlavours();showToast('🗑️ Sabor removido.');}
+function saveFlavours(){showToast('✅ Sabores guardados!');}
+
+function loadHero(){
+  var d=getData();var h=d.hero||{};
+  document.getElementById('heroTitlePt').value=h.titlePt||'Bismi Treats';
+  document.getElementById('heroTitleEn').value=h.titleEn||'Bismi Treats';
+  document.getElementById('heroSubPt').value=h.subPt||'Luxury and taste in one bite';
+  document.getElementById('heroSubEn').value=h.subEn||'Luxury and taste in one bite';
+  document.getElementById('heroBadge').value=h.badge||'Como Encomendar?';
+  document.getElementById('heroReviews').value=h.reviews||'90+ Reviews';
+  updateHeroPreview();
+}
+function updateHeroPreview(){document.getElementById('heroPreviewTitle').textContent=document.getElementById('heroTitlePt').value||'Bismi Treats';document.getElementById('heroPreviewSub').textContent=document.getElementById('heroSubPt').value||'Luxury and taste in one bite';}
+function saveHero(){
+  var d=getData();
+  d.hero={titlePt:document.getElementById('heroTitlePt').value.trim(),titleEn:document.getElementById('heroTitleEn').value.trim(),subPt:document.getElementById('heroSubPt').value.trim(),subEn:document.getElementById('heroSubEn').value.trim(),badge:document.getElementById('heroBadge').value.trim(),reviews:document.getElementById('heroReviews').value.trim()};
+  saveData(d);showToast('✅ Banner atualizado!');
+}
+
+function loadAnnouncement(){
+  var d=getData();var ann=d.announcement||{text:'',enabled:false};
+  document.getElementById('annEnabled').checked=ann.enabled||false;
+  document.getElementById('annText').value=ann.text||'';
+  updateAnnPreview();
+}
+function updateAnnPreview(){var txt=document.getElementById('annText')?document.getElementById('annText').value:'';var prev=document.getElementById('annPreview');if(prev)prev.textContent=txt||'—';}
+function saveAnnouncement(){
+  var d=getData();
+  d.announcement={text:document.getElementById('annText').value.trim(),enabled:document.getElementById('annEnabled').checked};
+  saveData(d);showToast('✅ Anúncio guardado!');
+}
+
+function loadBusiness(){
+  var d=getData();var b=d.business||{};
+  document.getElementById('bizPhone').value=b.phone||'934453710';
+  document.getElementById('bizEmail').value=b.email||'bismitreats.pt@gmail.com';
+  document.getElementById('bizInstagram').value=b.instagram||'@bismitreats.pt';
+  document.getElementById('bizWebsite').value=b.website||'bismitreats.com';
+  document.getElementById('bizGoogleLink').value=b.googleLink||'https://g.page/r/CS1eY1P4V0IxEBM/review';
+  document.getElementById('bizTagline').value=b.tagline||'Luxury and taste in one bite';
+  document.getElementById('bizHours').value=b.hours||'18:00 – 22:00';
+  document.getElementById('bizMinNotice').value=b.minNotice||24;
+  document.getElementById('bizFooter').value=b.footer||'Feito com amor e carinho pela Bismi Treats';
+  updateLogoPreview(b.logoImg||null);
+  if(b.heroImg){document.getElementById('bizHeroImg').value='(imagem carregada)';var preview=document.getElementById('heroImgPreview');var img=document.getElementById('heroImgPreviewImg');if(preview&&img){img.src=b.heroImg;preview.style.display='block';}}
+  try{loadBusinessColorPicker();}catch(e){}
+}
+function saveBusiness(){
+  var d=getData();
+  var logoImg=d.business?d.business.logoImg:null;
+  var heroImg=document.getElementById('bizHeroImg').value.trim()||( d.business?d.business.heroImg:null)||null;
+  d.business={phone:document.getElementById('bizPhone').value.trim(),email:document.getElementById('bizEmail').value.trim(),instagram:document.getElementById('bizInstagram').value.trim(),website:document.getElementById('bizWebsite').value.trim(),googleLink:document.getElementById('bizGoogleLink').value.trim(),tagline:document.getElementById('bizTagline').value.trim(),hours:document.getElementById('bizHours').value.trim(),minNotice:parseInt(document.getElementById('bizMinNotice').value)||24,footer:document.getElementById('bizFooter').value.trim(),logoImg:logoImg,heroImg:heroImg,buttonColor:(document.getElementById('bizButtonColor')?document.getElementById('bizButtonColor').value.trim()||'#FFD600':'#FFD600')};
+  saveData(d);showToast('✅ Informações guardadas!');
+}
+function handleLogoUpload(input){var file=input.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){var d=getData();if(!d.business)d.business={};d.business.logoImg=e.target.result;saveData(d);updateLogoPreview(e.target.result);showToast('✅ Logo atualizado!');};reader.readAsDataURL(file);input.value='';}
+function handleHeroUpload(input){
+  var file=input.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var d=getData();if(!d.business)d.business={};
+    d.business.heroImg=e.target.result;saveData(d);
+    document.getElementById('bizHeroImg').value='';
+    var preview=document.getElementById('heroImgPreview');
+    var img=document.getElementById('heroImgPreviewImg');
+    if(preview&&img){img.src=e.target.result;preview.style.display='block';}
+    showToast('✅ Imagem do hero atualizada!');
+  };
+  reader.readAsDataURL(file);input.value='';
+}
+function removeLogo(){var d=getData();if(d.business)delete d.business.logoImg;saveData(d);updateLogoPreview(null);showToast('🗑️ Logo removido.');}
+function updateLogoPreview(src){var circle=document.getElementById('logoPreviewCircle');if(!circle)return;if(src)circle.innerHTML='<img src="'+src+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>';else circle.innerHTML='<span id="logoPreviewEmoji">🎂</span>';}
+
+function renderCustomerStats(){
+  var customers=getCustomers();
+  var total=customers.length;
+  var recent=customers.filter(function(c){return c.lastLogin&&(new Date()-new Date(c.lastLogin))<7*24*60*60*1000;}).length;
+  document.getElementById('customerStats').innerHTML=
+    '<div class="stat-card"><div class="stat-icon">👤</div><div class="stat-val">'+total+'</div><div class="stat-label">Total de Clientes</div></div>'
+    +'<div class="stat-card"><div class="stat-icon">🟢</div><div class="stat-val">'+recent+'</div><div class="stat-label">Ativos (7 dias)</div></div>';
+}
+function renderCustomers(){
+  var customers=getCustomers();
+  var search=(document.getElementById('customerSearch')||{}).value||'';
+  if(search)customers=customers.filter(function(c){return (c.name||'').toLowerCase().includes(search.toLowerCase())||(c.email||'').toLowerCase().includes(search.toLowerCase());});
+  var tbody=document.getElementById('customerTableBody');if(!tbody)return;
+  if(customers.length===0){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text2)">Nenhum cliente registado ainda.</td></tr>';return;}
+  tbody.innerHTML=customers.map(function(c,i){
+    var joined=c.joinedAt?new Date(c.joinedAt).toLocaleDateString('pt-PT'):'—';
+    var passDisplay='<div class="pass-field"><span class="pass-dots" id="pass-'+i+'">••••••••</span><button class="pass-show-btn" onclick="togglePass('+i+',\''+encodeURIComponent(c.password||'')+'\')"><i class="fas fa-eye"></i></button></div>';
+    return '<tr><td><div style="font-weight:700;color:var(--black)">'+c.name+'</div></td><td style="color:var(--text2)">'+c.email+'</td><td style="color:var(--text2)">'+(c.phone||'—')+'</td><td>'+passDisplay+'</td><td style="color:var(--text2)">'+joined+'</td><td><div class="customer-actions"><button class="btn btn-secondary btn-xs" onclick="openEditCustomerModal(\''+encodeURIComponent(c.email)+'\')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-xs" onclick="deleteCustomer(\''+encodeURIComponent(c.email)+'\')"><i class="fas fa-trash"></i></button></div></td></tr>';
+  }).join('');
+}
+function togglePass(idx,encodedPass){
+  var el=document.getElementById('pass-'+idx);if(!el)return;
+  if(el.textContent==='••••••••'){
+    try{var decoded=atob(decodeURIComponent(encodedPass));el.textContent=decoded;}catch(e){el.textContent='(erro)';}
+    el.style.color='var(--black)';el.style.fontFamily='monospace';el.style.fontSize='.82rem';
+  }else{el.textContent='••••••••';el.style.color='var(--text2)';el.style.fontFamily='';el.style.fontSize='';}
+}
+function openEditCustomerModal(encodedEmail){
+  var email=decodeURIComponent(encodedEmail);
+  var customers=getCustomers();var c=customers.find(function(x){return x.email===email;});if(!c)return;
+  document.getElementById('customerModalTitle').textContent='Editar Cliente';
+  document.getElementById('editCustomerOrigEmail').value=email;
+  document.getElementById('editCustomerName').value=c.name||'';
+  document.getElementById('editCustomerPhone').value=c.phone||'';
+  document.getElementById('editCustomerEmailField').value=c.email||'';
+  document.getElementById('editCustomerPass').value='';
+  document.getElementById('customerEditError').style.display='none';
+  document.getElementById('customerModal').classList.add('show');
+}
+function openAddCustomerModal(){
+  document.getElementById('customerModalTitle').textContent='Adicionar Cliente';
+  document.getElementById('editCustomerOrigEmail').value='';
+  document.getElementById('editCustomerName').value='';
+  document.getElementById('editCustomerPhone').value='';
+  document.getElementById('editCustomerEmailField').value='';
+  document.getElementById('editCustomerPass').value='';
+  document.getElementById('customerEditError').style.display='none';
+  document.getElementById('customerModal').classList.add('show');
+}
+function closeCustomerModal(){document.getElementById('customerModal').classList.remove('show');}
+function toggleEditPass(){var inp=document.getElementById('editCustomerPass');var eye=document.getElementById('editPassEye');inp.type=inp.type==='password'?'text':'password';eye.innerHTML=inp.type==='password'?'<i class="fas fa-eye"></i>':'<i class="fas fa-eye-slash"></i>';}
+function saveCustomer(){
+  var origEmail=document.getElementById('editCustomerOrigEmail').value;
+  var name=document.getElementById('editCustomerName').value.trim();
+  var email=document.getElementById('editCustomerEmailField').value.trim().toLowerCase();
+  var phone=document.getElementById('editCustomerPhone').value.trim();
+  var pass=document.getElementById('editCustomerPass').value;
+  var errEl=document.getElementById('customerEditError');
+  if(!name||!email){errEl.textContent='Por favor preencha nome e email.';errEl.style.display='block';return;}
+  var customers=getCustomers();
+  if(origEmail){
+    var idx=customers.findIndex(function(c){return c.email===origEmail;});
+    if(idx>-1){customers[idx].name=name;customers[idx].email=email;customers[idx].phone=phone;if(pass){if(pass.length<6){errEl.textContent='A palavra-passe deve ter pelo menos 6 caracteres.';errEl.style.display='block';return;}customers[idx].password=btoa(pass);}}
+  }else{
+    if(!pass){errEl.textContent='Por favor insira uma palavra-passe.';errEl.style.display='block';return;}
+    if(pass.length<6){errEl.textContent='A palavra-passe deve ter pelo menos 6 caracteres.';errEl.style.display='block';return;}
+    if(customers.find(function(c){return c.email===email;})){errEl.textContent='Este email já está registado.';errEl.style.display='block';return;}
+    customers.push({name:name,email:email,phone:phone,password:btoa(pass),joinedAt:new Date().toISOString(),lastLogin:null});
+  }
+  saveCustomers(customers);closeCustomerModal();renderCustomers();renderCustomerStats();showToast('✅ Cliente guardado!');
+}
+function deleteCustomer(encodedEmail){
+  var email=decodeURIComponent(encodedEmail);
+  if(!confirm('Apagar este cliente?'))return;
+  saveCustomers(getCustomers().filter(function(c){return c.email!==email;}));
+  renderCustomers();renderCustomerStats();showToast('🗑️ Cliente apagado.');
+}
+function exportCustomers(){var blob=new Blob([JSON.stringify(getCustomers(),null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bismi-customers-'+new Date().toISOString().split('T')[0]+'.json';a.click();showToast('✅ Clientes exportados!');}
+function clearAllCustomers(){if(!confirm('Tem a certeza? Todos os clientes serão apagados.'))return;localStorage.removeItem('bismiCustomers');renderCustomers();renderCustomerStats();showToast('✅ Todos os clientes apagados.');}
+
+function changeAdminPass(){
+  var p1=document.getElementById('newAdminPass').value;var p2=document.getElementById('newAdminPass2').value;
+  if(!p1||p1.length<4){showToast('Palavra-passe deve ter pelo menos 4 caracteres.','error');return;}
+  if(p1!==p2){showToast('As palavras-passe não coincidem.','error');return;}
+  saveAdminCreds({user:'admin',pass:btoa(p1)});
+  document.getElementById('newAdminPass').value='';document.getElementById('newAdminPass2').value='';
+  showToast('✅ Palavra-passe alterada!');
+}
+function exportData(){var blob=new Blob([JSON.stringify(getData(),null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bismi-catalogue-data-'+new Date().toISOString().split('T')[0]+'.json';a.click();showToast('✅ Dados exportados!');}
+function importData(input){var file=input.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){try{var d=JSON.parse(e.target.result);if(!d.cakes||!d.accessories){showToast('Ficheiro inválido.','error');return;}saveData(d);initAdmin();showToast('✅ Dados importados!');}catch(err){showToast('Erro ao importar ficheiro.','error');}};reader.readAsText(file);input.value='';}
+function resetData(){if(!confirm('Tem a certeza? Todos os dados personalizados serão apagados.'))return;localStorage.removeItem(DATA_KEY);initAdmin();showToast('✅ Dados repostos.');}
+
+// ── AVAILABILITY ───────────────────────────────────────────
+var AVAIL_KEY='bismiAvailability';
+var BLOCKED_KEY='bismiBlockedDates';
+function getAvailability(){try{return JSON.parse(localStorage.getItem(AVAIL_KEY)||'{}');}catch(e){return {};}}
+function getBlockedDates(){try{return JSON.parse(localStorage.getItem(BLOCKED_KEY)||'[]');}catch(e){return[];}}
+
+function renderAvailabilityList(){
+  var d=getData();
+  var avail=getAvailability();
+  var el=document.getElementById('availabilityList');if(!el)return;
+  el.innerHTML='';
+  d.cakes.forEach(function(c){
+    var isAvail=avail[c.id]!==false;
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)';
+    var photoHtml=c.photos&&c.photos.length?'<img src="'+c.photos[0]+'" style="width:36px;height:36px;object-fit:cover;border-radius:7px;border:1px solid var(--border)"/>':'<div style="width:36px;height:36px;background:rgba(255,214,0,0.2);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:1rem">🎂</div>';
+    var statusColor=isAvail?'var(--success)':'var(--danger)';
+    var statusText=isAvail?'Disponível':'Indisponível';
+    row.innerHTML='<div style="display:flex;align-items:center;gap:10px">'+photoHtml+'<div><div style="font-weight:700;font-size:.86rem;color:var(--black)">'+c.name+'</div><div style="font-size:.72rem;color:var(--text2)">€'+c.price.toFixed(2)+'/kg</div></div></div>'
+      +'<label style="display:flex;align-items:center;gap:8px;cursor:pointer"><span id="avail-label-'+c.id+'" style="font-size:.78rem;color:'+statusColor+'">'+statusText+'</span><input type="checkbox" id="avail-'+c.id+'" '+(isAvail?'checked':'')+' style="width:18px;height:18px;accent-color:var(--yellow);cursor:pointer"/></label>';
+    var cb=row.querySelector('input[type=checkbox]');
+    var span=row.querySelector('span');
+    if(cb&&span){
+      cb.addEventListener('change',function(){
+        span.textContent=this.checked?'Disponível':'Indisponível';
+        span.style.color=this.checked?'var(--success)':'var(--danger)';
+      });
+    }
+    el.appendChild(row);
+  });
+}
+function updateAvailLabel(cb,id){
+  var span=document.getElementById('avail-label-'+id);
+  if(span){span.textContent=cb.checked?'Disponível':'Indisponível';span.style.color=cb.checked?'var(--success)':'var(--danger)';}
+}
+function renderBlockedDates(){
+  var dates=getBlockedDates();
+  var el=document.getElementById('blockedDatesList');if(!el)return;
+  el.innerHTML='';
+  if(!dates.length){
+    el.innerHTML='<div style="color:var(--text2);font-size:.82rem">Nenhuma data bloqueada.</div>';
+    return;
+  }
+  dates.forEach(function(d){
+    var formatted=new Date(d+'T00:00:00').toLocaleDateString('pt-PT');
+    var chip=document.createElement('div');
+    chip.style.cssText='display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:.82rem;font-weight:600;color:var(--text)';
+    chip.innerHTML='<i class="fas fa-calendar-times" style="color:var(--danger);font-size:.78rem"></i>'+formatted;
+    var btn=document.createElement('button');
+    btn.style.cssText='background:none;border:none;color:var(--danger);cursor:pointer;font-size:.78rem;padding:0;margin-left:4px';
+    btn.innerHTML='<i class="fas fa-times"></i>';
+    (function(date){btn.addEventListener('click',function(){removeBlockedDate(date);});}(d));
+    chip.appendChild(btn);
+    el.appendChild(chip);
+  });
+}
+function addBlockedDate(){
+  var inp=document.getElementById('newBlockedDate');
+  if(!inp||!inp.value)return;
+  var dates=getBlockedDates();
+  if(dates.indexOf(inp.value)<0){dates.push(inp.value);dates.sort();}
+  localStorage.setItem(BLOCKED_KEY,JSON.stringify(dates));
+  inp.value='';renderBlockedDates();
+}
+function removeBlockedDate(d){
+  var dates=getBlockedDates().filter(function(x){return x!==d;});
+  localStorage.setItem(BLOCKED_KEY,JSON.stringify(dates));renderBlockedDates();
+}
+function saveBlockedDates(){showToast('✅ Datas bloqueadas guardadas!');}
+
+
+function handleHeroUpload(input){
+  if(!input.files||!input.files[0])return;
+  var file=input.files[0];
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var dataUrl=e.target.result;
+    document.getElementById('bizHeroImg').value='(imagem carregada)';
+    var preview=document.getElementById('heroImgPreview');
+    var img=document.getElementById('heroImgPreviewImg');
+    if(preview&&img){img.src=dataUrl;preview.style.display='block';}
+    // Store in data
+    var d=getData();
+    if(!d.business)d.business={};
+    d.business.heroImg=dataUrl;
+    saveData(d);
+    showToast('✅ Imagem do banner guardada!');
+    // Apply to catalogue if open
+    applyHeroToPage(dataUrl);
+  };
+  reader.readAsDataURL(file);
+}
+function updateHeroPreview(){
+  var url=document.getElementById('bizHeroImg').value.trim();
+  if(!url||url==='(imagem carregada)')return;
+  var preview=document.getElementById('heroImgPreview');
+  var img=document.getElementById('heroImgPreviewImg');
+  if(preview&&img){img.src=url;preview.style.display='block';}
+}
+function removeHeroImg(){
+  document.getElementById('bizHeroImg').value='';
+  var preview=document.getElementById('heroImgPreview');
+  if(preview)preview.style.display='none';
+  var d=getData();
+  if(d.business)d.business.heroImg=null;
+  saveData(d);
+  showToast('Imagem do banner removida');
+}
+function applyHeroToPage(url){
+  // Try to update catalogue page if in same origin
+  try{
+    var frames=window.parent?window.parent.document.querySelectorAll('iframe'):[];
+    frames.forEach(function(f){try{var img=f.contentDocument.querySelector('.hero-img');if(img)img.src=url;}catch(e){}});
+  }catch(e){}
+}
+function syncColorInput(val){
+  document.getElementById('bizButtonColor').value=val;
+  document.getElementById('bizColorPreview').style.background=val;
+}
+function syncColorPicker(val){
+  if(/^#[0-9A-Fa-f]{6}$/.test(val)){
+    document.getElementById('bizButtonColorPicker').value=val;
+    document.getElementById('bizColorPreview').style.background=val;
+  }
+}
+function applyButtonColor(){
+  var val=document.getElementById('bizButtonColor').value.trim();
+  if(!/^#[0-9A-Fa-f]{6}$/.test(val)){showToast('Cor inválida. Use formato #RRGGBB','error');return;}
+  var d=getData();
+  if(!d.business)d.business={};
+  d.business.buttonColor=val;
+  saveData(d);
+  showToast('✅ Cor dos botões guardada! Recarregue o catálogo para ver.');
+}
+function resetButtonColor(){
+  document.getElementById('bizButtonColor').value='#FFD600';
+  document.getElementById('bizButtonColorPicker').value='#FFD600';
+  document.getElementById('bizColorPreview').style.background='#FFD600';
+  var d=getData();
+  if(!d.business)d.business={};
+  d.business.buttonColor='#FFD600';
+  saveData(d);
+  showToast('Cor reposta para o padrão (#FFD600)');
+}
+function loadBusinessColorPicker(){
+  var d=getData();
+  var color=(d.business&&d.business.buttonColor)||'#FFD600';
+  document.getElementById('bizButtonColor').value=color;
+  document.getElementById('bizButtonColorPicker').value=color;
+  document.getElementById('bizColorPreview').style.background=color;
+}
+</script>
+</body>
+</html>

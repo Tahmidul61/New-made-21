@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+
+<html id="htmlRoot" lang="pt">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bismi Treats — Order / Encomenda</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FFFDF7;--card:#FFFFFF;--card2:#FAEDCD;
+  --accent:#D4A373;--accent2:#CB997E;--accent-dark:#b5845a;
+  --text:#3A3A3A;--text2:#7a6a58;--border:#e8d9c0;--border2:#d4c4a8;
+  --success:#6a9e6a;--warning:#c9853a;--danger:#c0544a;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Georgia,sans-serif;min-height:100vh;padding-bottom:80px}
+
+/* ── HEADER ── */
+.page-header{background:var(--card);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:50;box-shadow:0 1px 12px rgba(212,163,115,0.12)}
+.header-brand{display:flex;align-items:center;gap:10px}
+.header-logo{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.header-name{font-family:Georgia,serif;font-size:1.1rem;font-weight:700;color:var(--accent-dark)}
+.header-tagline{font-size:0.65rem;color:var(--text2);letter-spacing:.04em;text-transform:uppercase}
+.header-right{display:flex;align-items:center;gap:10px}
+.lang-switcher{display:flex;gap:3px;background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:3px}
+.lang-btn{background:none;border:none;padding:4px 9px;border-radius:5px;cursor:pointer;font-size:0.75rem;font-weight:600;color:var(--text2);transition:all .2s;font-family:inherit}
+.lang-btn.active{background:var(--accent);color:white}
+.login-btn{background:none;border:1px solid var(--border);color:var(--text2);padding:6px 12px;border-radius:7px;cursor:pointer;font-size:0.78rem;font-weight:600;font-family:inherit;display:flex;align-items:center;gap:5px;transition:all .2s}
+.login-btn:hover{border-color:var(--accent);color:var(--accent-dark)}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,#FAEDCD,#FFFDF7,#f5e4c0);padding:28px 20px 20px;text-align:center;border-bottom:1px solid var(--border)}
+.hero-title{font-family:Georgia,serif;font-size:1.5rem;color:var(--accent-dark);margin-bottom:4px}
+.hero-sub{color:var(--text2);font-size:0.85rem;margin-bottom:12px}
+.hero-badges{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.hero-badge{background:white;border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:0.75rem;color:var(--text2);display:flex;align-items:center;gap:5px}
+.hero-badge i{color:var(--accent)}
+
+/* ── PROGRESS BAR ── */
+.progress-bar{background:var(--card);border-bottom:1px solid var(--border);padding:12px 20px;position:sticky;top:60px;z-index:40}
+.progress-steps{display:flex;align-items:center;justify-content:center;gap:0;max-width:500px;margin:0 auto}
+.progress-step{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
+.progress-step:not(:last-child)::after{content:'';position:absolute;top:14px;left:50%;width:100%;height:2px;background:var(--border);z-index:0}
+.progress-step.done:not(:last-child)::after{background:var(--accent)}
+.step-circle{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:white;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:var(--text2);z-index:1;transition:all .3s}
+.progress-step.active .step-circle{border-color:var(--accent);background:var(--accent);color:white}
+.progress-step.done .step-circle{border-color:var(--accent);background:var(--accent);color:white}
+.step-label{font-size:0.62rem;color:var(--text2);margin-top:4px;text-align:center;letter-spacing:.02em}
+.progress-step.active .step-label{color:var(--accent-dark);font-weight:600}
+
+/* ── CONTAINER ── */
+.container{max-width:580px;margin:0 auto;padding:20px 16px}
+
+/* ── FORM CARD ── */
+.form-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 2px 16px rgba(212,163,115,0.1);margin-bottom:14px;transition:all .3s}
+.form-card-header{background:linear-gradient(135deg,var(--card2),#f5e4c0);padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.form-card-header h3{font-size:0.88rem;font-weight:700;color:var(--accent-dark);display:flex;align-items:center;gap:7px;flex:1}
+.card-step-badge{background:var(--accent);color:white;width:20px;height:20px;border-radius:50%;font-size:0.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.card-check{color:var(--success);font-size:0.9rem;display:none}
+.form-card.completed .card-check{display:block}
+.form-card-body{padding:16px}
+
+/* ── FORM ELEMENTS ── */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.form-row.single{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:0.72rem;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.form-group input,.form-group select,.form-group textarea{
+  background:var(--card2);border:1.5px solid var(--border);color:var(--text);
+  padding:11px 13px;border-radius:9px;font-size:0.88rem;outline:none;
+  transition:border-color .2s,box-shadow .2s;font-family:'Segoe UI',Georgia,sans-serif;width:100%;
+  -webkit-appearance:none;appearance:none
+}
+.form-group select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a6a58' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(212,163,115,0.15)}
+.form-group input.error,.form-group select.error{border-color:var(--danger);box-shadow:0 0 0 3px rgba(192,84,74,0.1)}
+.field-error{font-size:0.72rem;color:var(--danger);margin-top:3px;display:none}
+.form-group textarea{resize:vertical;min-height:65px;line-height:1.5}
+.field-hint{font-size:0.72rem;color:var(--text2);margin-top:3px;line-height:1.4}
+
+/* ── FLAVOUR SELECTOR ── */
+.flavour-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-top:6px}
+.flavour-btn{background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:10px 6px;cursor:pointer;text-align:center;transition:all .2s;font-family:inherit}
+.flavour-btn:hover{border-color:var(--accent);transform:translateY(-1px)}
+.flavour-btn.selected{background:linear-gradient(135deg,#D4A37325,#FAEDCD);border-color:var(--accent);box-shadow:0 2px 8px rgba(212,163,115,0.25)}
+.flavour-emoji{font-size:1.5rem;display:block;margin-bottom:4px}
+.flavour-name{font-size:0.72rem;color:var(--text);font-weight:600;line-height:1.2}
+.flavour-btn.selected .flavour-name{color:var(--accent-dark)}
+
+/* ── CAKE TYPE CARDS ── */
+.cake-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.cake-type-card{background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:all .2s;text-align:center}
+.cake-type-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.cake-type-card.selected{background:linear-gradient(135deg,#D4A37325,#FAEDCD);border-color:var(--accent);box-shadow:0 2px 8px rgba(212,163,115,0.25)}
+.cake-type-name{font-size:0.82rem;font-weight:700;color:var(--text);margin-bottom:3px}
+.cake-type-price{font-size:0.72rem;color:var(--accent-dark);font-weight:600}
+.cake-type-card.selected .cake-type-name{color:var(--accent-dark)}
+
+/* ── SIZE GUIDE ── */
+.size-guide{background:linear-gradient(135deg,#D4A37312,#FAEDCD);border:1.5px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.size-guide-title{font-size:0.8rem;font-weight:700;color:var(--accent-dark);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.people-selector{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.people-input-wrap{display:flex;align-items:center;gap:8px;background:white;border:1.5px solid var(--border);border-radius:9px;padding:6px 12px;flex:1}
+.people-input-wrap i{color:var(--accent)}
+.people-input{border:none;background:none;font-size:1rem;font-weight:700;color:var(--text);width:60px;outline:none;font-family:inherit;text-align:center}
+.people-btn{background:var(--accent);color:white;border:none;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.people-btn:hover{background:var(--accent-dark)}
+.size-suggestion{display:none;background:white;border:1.5px solid var(--accent);border-radius:10px;padding:12px}
+.size-suggestion-title{font-size:0.75rem;color:var(--text2);margin-bottom:8px;font-weight:600}
+.size-options{display:flex;gap:8px;flex-wrap:wrap}
+.size-option-btn{padding:8px 14px;border-radius:8px;border:1.5px solid var(--border);background:var(--card2);cursor:pointer;font-size:0.8rem;font-weight:600;color:var(--text);transition:all .2s;font-family:inherit;text-align:center}
+.size-option-btn:hover{border-color:var(--accent);color:var(--accent-dark)}
+.size-option-btn.recommended{border-color:var(--accent);background:linear-gradient(135deg,#D4A37320,#FAEDCD);color:var(--accent-dark)}
+.size-option-btn.comfortable{border-color:#6a9e6a;background:#6a9e6a12;color:#4a7e4a}
+.size-badge{font-size:0.62rem;display:block;margin-top:2px;font-weight:400}
+
+/* ── DELIVERY TOGGLE ── */
+.toggle-group{display:flex;gap:6px}
+.toggle-group label{flex:1;text-align:center;padding:10px 8px;border:1.5px solid var(--border);border-radius:9px;cursor:pointer;font-size:0.83rem;transition:all .2s;background:var(--card2);color:var(--text);font-weight:500}
+.toggle-group input[type=radio]{display:none}
+.toggle-group input[type=radio]:checked+label{background:var(--accent);border-color:var(--accent);color:white;font-weight:600}
+
+/* ── TIME SLOTS ── */
+.time-slots-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:6px;margin-top:8px}
+.time-slot-btn{background:var(--card2);border:1.5px solid var(--border);border-radius:8px;padding:8px 4px;cursor:pointer;font-size:0.8rem;font-weight:600;color:var(--text);text-align:center;transition:all .2s;font-family:inherit}
+.time-slot-btn:hover{border-color:var(--accent);color:var(--accent-dark)}
+.time-slot-btn.selected{background:var(--accent);border-color:var(--accent);color:white}
+
+/* ── PAYMENT METHOD CARDS ── */
+.payment-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:6px}
+.payment-card{background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:12px 8px;cursor:pointer;text-align:center;transition:all .2s}
+.payment-card:hover{border-color:var(--accent)}
+.payment-card.selected{background:linear-gradient(135deg,#D4A37325,#FAEDCD);border-color:var(--accent)}
+.payment-icon{font-size:1.4rem;margin-bottom:4px}
+.payment-name{font-size:0.75rem;font-weight:600;color:var(--text)}
+.payment-card.selected .payment-name{color:var(--accent-dark)}
+.payment-info{background:linear-gradient(135deg,#6a9e6a10,#6a9e6a08);border:1.5px solid #6a9e6a30;border-radius:9px;padding:10px 13px;margin-top:8px;font-size:0.82rem;color:#4a7e4a;display:none;line-height:1.5}
+
+/* ── PRICE DISPLAY ── */
+.price-display{background:linear-gradient(135deg,#D4A37315,#CB997E10);border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-top:10px;display:none;text-align:center}
+.price-range{font-size:1.25rem;font-weight:700;color:var(--accent-dark);font-family:Georgia,serif}
+.price-breakdown{font-size:0.74rem;color:var(--text2);margin-top:5px;line-height:1.5}
+
+/* ── EXPRESS WARNING ── */
+.express-warning{background:linear-gradient(135deg,#c9853a12,#c9853a08);border:1.5px solid #c9853a30;border-radius:9px;padding:11px 13px;margin-top:8px;font-size:0.82rem;color:#a06020;line-height:1.6}
+.express-warning a{color:var(--accent-dark);font-weight:600;text-decoration:none}
+
+/* ── NOTICE BOX ── */
+.notice-box{background:linear-gradient(135deg,#5a85b012,#5a85b008);border:1.5px solid #5a85b030;border-radius:9px;padding:10px 13px;margin-bottom:12px;font-size:0.8rem;color:#3a6590;line-height:1.5;display:flex;align-items:flex-start;gap:8px}
+.notice-box i{margin-top:2px;flex-shrink:0}
+
+/* ── PHOTO UPLOAD ── */
+.photo-upload-area{border:1.5px dashed var(--border);border-radius:9px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;background:var(--card2)}
+.photo-upload-area:hover{border-color:var(--accent);background:linear-gradient(135deg,#D4A37310,#FAEDCD)}
+.photo-upload-area i{font-size:1.5rem;color:var(--accent);margin-bottom:6px;display:block}
+.photo-upload-area p{font-size:0.82rem;color:var(--text2)}
+.photo-preview-wrap{position:relative;display:inline-block;width:100%}
+.photo-preview-img{width:100%;max-height:180px;object-fit:cover;border-radius:9px;border:1.5px solid var(--border)}
+.photo-remove-btn{position:absolute;top:6px;right:6px;background:#c0544a;color:white;border:none;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:0.75rem;display:flex;align-items:center;justify-content:center}
+
+/* ── STICKY SUBMIT ── */
+.sticky-submit{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);padding:12px 16px;z-index:100;box-shadow:0 -4px 20px rgba(212,163,115,0.15)}
+.btn-submit{background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border:none;padding:15px;border-radius:11px;font-size:0.95rem;font-weight:700;cursor:pointer;width:100%;transition:all .2s;font-family:inherit;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(212,163,115,0.3)}
+.btn-submit:hover{opacity:.92;transform:translateY(-1px)}
+.btn-secondary{background:white;border:1.5px solid var(--border);color:var(--text);padding:12px 20px;border-radius:10px;cursor:pointer;font-weight:600;font-size:0.88rem;transition:all .2s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent-dark)}
+.btn-whatsapp{background:#25d366;color:white;border:none;padding:13px 20px;border-radius:10px;cursor:pointer;font-weight:600;font-size:0.9rem;transition:all .2s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn-whatsapp:hover{background:#1da851}
+.btn-calendar{background:linear-gradient(135deg,#5a85b018,#5a85b010);border:1.5px solid #5a85b030;color:#3a6590;padding:12px 20px;border-radius:10px;cursor:pointer;font-weight:600;font-size:0.88rem;transition:all .2s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn-calendar:hover{background:#5a85b0;color:white;border-color:#5a85b0}
+.btn-save-image{background:linear-gradient(135deg,#6a9e6a18,#6a9e6a10);border:1.5px solid #6a9e6a30;color:#4a7e4a;padding:12px 20px;border-radius:10px;cursor:pointer;font-weight:600;font-size:0.88rem;transition:all .2s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn-save-image:hover{background:#6a9e6a;color:white;border-color:#6a9e6a}
+
+/* ── SUCCESS SCREEN ── */
+.success-screen{display:none}
+.success-hero{background:linear-gradient(135deg,var(--accent-dark),var(--accent2));color:white;padding:28px 20px;text-align:center;border-radius:14px;margin-bottom:14px}
+.success-icon{font-size:3.5rem;margin-bottom:10px}
+.success-title{font-family:Georgia,serif;font-size:1.4rem;font-weight:700;margin-bottom:6px}
+.success-ref{background:rgba(255,255,255,0.2);border-radius:8px;padding:6px 14px;display:inline-block;font-size:0.85rem;margin-bottom:8px;font-weight:600}
+.success-sub{opacity:.85;font-size:0.85rem;line-height:1.6}
+.summary-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px}
+.summary-header{background:linear-gradient(135deg,var(--card2),#f5e4c0);padding:11px 16px;border-bottom:1px solid var(--border);font-size:0.85rem;font-weight:700;color:var(--accent-dark)}
+.summary-body{padding:14px}
+.summary-row{display:flex;justify-content:space-between;align-items:flex-start;padding:5px 0;border-bottom:1px dotted var(--border);font-size:0.83rem;gap:10px}
+.summary-row:last-child{border-bottom:none}
+.summary-label{color:var(--text2);flex-shrink:0}
+.summary-value{color:var(--text);font-weight:600;text-align:right}
+.action-buttons{display:flex;flex-direction:column;gap:9px;padding-bottom:80px}
+.copied-toast{background:#6a9e6a;color:white;padding:9px 16px;border-radius:8px;font-size:0.82rem;text-align:center;display:none;margin-top:4px}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(58,40,20,.55);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px}
+.modal-overlay.active{display:flex}
+.modal{background:var(--card);border:1.5px solid var(--border);border-radius:16px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(212,163,115,0.3)}
+.modal-header{padding:15px 18px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,var(--card2),#f5e4c0);border-radius:14px 14px 0 0}
+.modal-header h3{font-size:0.95rem;font-weight:700;color:var(--accent-dark)}
+.modal-body{padding:18px;display:flex;flex-direction:column;gap:11px}
+.modal-footer{padding:11px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;background:#faf8f4;border-radius:0 0 14px 14px}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;font-family:inherit}
+.btn-cancel{background:white;border:1.5px solid var(--border);color:var(--text);padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;font-family:inherit}
+.error-msg{color:#c0544a;font-size:0.82rem;display:none}
+.form-input{background:var(--card2);border:1.5px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-size:0.88rem;outline:none;font-family:inherit;width:100%}
+.form-input:focus{border-color:var(--accent)}
+
+/* ── FOOTER ── */
+.page-footer{text-align:center;padding:20px;color:var(--text2);font-size:0.78rem;border-top:1px solid var(--border);margin-top:8px}
+.page-footer a{color:var(--accent-dark);text-decoration:none}
+
+/* ── ADMIN BTN ── */
+.admin-link-btn{position:fixed;bottom:80px;right:16px;background:var(--card);border:1.5px solid var(--border);color:var(--text2);width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.9rem;box-shadow:0 2px 12px rgba(212,163,115,0.2);transition:all .2s;z-index:99}
+.admin-link-btn:hover{background:var(--accent);color:white;border-color:var(--accent)}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--card2)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+<!-- HEADER -->
+<div class="page-header">
+<div class="header-brand">
+<div class="header-logo">🎂</div>
+<div>
+<div class="header-name">Bismi Treats</div>
+<div class="header-tagline" data-en="Luxury and taste in one bite" data-pt="Luxury and taste in one bite">Luxury and taste in one bite</div>
+</div>
+</div>
+<div class="header-right">
+<div class="lang-switcher">
+<button class="lang-btn active" id="langPT" onclick="setLang('pt')">🇵🇹 PT</button>
+<button class="lang-btn" id="langEN" onclick="setLang('en')">🇬🇧 EN</button>
+</div>
+<button class="login-btn" id="loginTopBtn"><i class="fas fa-user"></i> <span data-en="Login" data-pt="Login">Login</span></button>
+</div>
+</div>
+<!-- HERO -->
+<div class="hero">
+<div class="hero-title" data-en="Place Your Order" data-pt="Faça a sua Encomenda">Faça a sua Encomenda</div>
+<div class="hero-sub" data-en="Fill in the form and we'll get in touch to confirm" data-pt="Preencha o formulário e entraremos em contacto para confirmar">Preencha o formulário e entraremos em contacto para confirmar</div>
+<div class="hero-badges">
+<div class="hero-badge"><i class="fas fa-star" style="color:#f4c430"></i> <span data-en="5 Stars Google" data-pt="5 Estrelas Google">5 Estrelas Google</span></div>
+<div class="hero-badge"><i class="fas fa-clock"></i> <span data-en="Ready 1h before" data-pt="Pronto 1h antes">Pronto 1h antes</span></div>
+<div class="hero-badge"><i class="fas fa-shield-alt"></i> <span data-en="Secure order" data-pt="Encomenda segura">Encomenda segura</span></div>
+</div>
+</div>
+<!-- PROGRESS BAR -->
+<div class="progress-bar">
+<div class="progress-steps">
+<div class="progress-step active" id="pstep1">
+<div class="step-circle">1</div>
+<div class="step-label" data-en="Customer" data-pt="Cliente">Cliente</div>
+</div>
+<div class="progress-step" id="pstep2">
+<div class="step-circle">2</div>
+<div class="step-label" data-en="Cake" data-pt="Bolo">Bolo</div>
+</div>
+<div class="progress-step" id="pstep3">
+<div class="step-circle">3</div>
+<div class="step-label" data-en="Delivery" data-pt="Entrega">Entrega</div>
+</div>
+<div class="progress-step" id="pstep4">
+<div class="step-circle">4</div>
+<div class="step-label" data-en="Payment" data-pt="Pagamento">Pagamento</div>
+</div>
+</div>
+</div>
+<div class="container">
+<div id="orderFormSection">
+<form id="customerOrderForm" novalidate="">
+<!-- STEP 1: CUSTOMER INFO -->
+<div class="form-card" id="card1">
+<div class="form-card-header" onclick="toggleCard(1)">
+<h3><span class="card-step-badge">1</span> <span data-en="Customer Information" data-pt="Informações do Cliente">Informações do Cliente</span></h3>
+<i class="fas fa-check-circle card-check"></i>
+<i class="fas fa-chevron-down" id="chevron1" style="color:var(--text2);font-size:0.8rem;transition:transform .3s"></i>
+</div>
+<div class="form-card-body" id="cardbody1">
+<div class="form-row">
+<div class="form-group">
+<label data-en="Full Name *" data-pt="Nome Completo *">Nome Completo *</label>
+<input data-en-placeholder="Your name" data-pt-placeholder="O seu nome" id="cName" placeholder="O seu nome" type="text"/>
+<div class="field-error" data-en="Please enter your name" data-pt="Por favor insira o seu nome" id="err-cName">Por favor insira o seu nome</div>
+</div>
+<div class="form-group">
+<label data-en="Phone" data-pt="Telefone">Telefone</label>
+<input id="cPhone" placeholder="9XXXXXXXX" type="tel"/>
+</div>
+</div>
+<div class="form-row single">
+<div class="form-group">
+<label data-en="Tax ID (optional)" data-pt="NIF (opcional)">NIF (opcional)</label>
+<input id="cNif" maxlength="9" placeholder="XXXXXXXXX" type="text"/>
+</div>
+</div>
+</div>
+</div>
+<!-- STEP 2: CAKE DETAILS -->
+<div class="form-card" id="card2">
+<div class="form-card-header" onclick="toggleCard(2)">
+<h3><span class="card-step-badge">2</span> <span data-en="Cake Details" data-pt="Detalhes do Bolo">Detalhes do Bolo</span></h3>
+<i class="fas fa-check-circle card-check"></i>
+<i class="fas fa-chevron-down" id="chevron2" style="color:var(--text2);font-size:0.8rem;transition:transform .3s"></i>
+</div>
+<div class="form-card-body" id="cardbody2">
+<!-- CAKE TYPE -->
+<div class="form-group" style="margin-bottom:14px">
+<label data-en="Cake Type *" data-pt="Tipo de Bolo *">Tipo de Bolo *</label>
+<div class="cake-type-grid" id="cakeTypeGrid">
+<div class="cake-type-card" data-price="19.99" data-value="sponge-chocolate" onclick="selectCakeType(this)">
+<div class="cake-type-name">Chocolate Sponge</div>
+<div class="cake-type-price">€19.99/kg</div>
+</div>
+<div class="cake-type-card" data-price="19.99" data-value="sponge-vanilla" onclick="selectCakeType(this)">
+<div class="cake-type-name">Sponge Vanilla</div>
+<div class="cake-type-price">€19.99/kg</div>
+</div>
+<div class="cake-type-card" data-price="19.99" data-value="sponge-normal" onclick="selectCakeType(this)">
+<div class="cake-type-name">Sponge Normal</div>
+<div class="cake-type-price">€19.99/kg</div>
+</div>
+<div class="cake-type-card" data-price="24.99" data-value="redvelvet" onclick="selectCakeType(this)">
+<div class="cake-type-name">Red Velvet</div>
+<div class="cake-type-price">€24.99/kg</div>
+</div>
+<div class="cake-type-card" data-price="19.99" data-value="tres-leches" onclick="selectCakeType(this)" style="grid-column:span 2">
+<div class="cake-type-name">Tres Leches <span data-en="(min. 1.5kg)" data-pt="(mín. 1.5kg)" style="font-size:0.7rem;color:var(--text2)">(mín. 1.5kg)</span></div>
+<div class="cake-type-price">€19.99/kg</div>
+</div>
+</div>
+<input id="cCakeType" type="hidden"/>
+<div class="field-error" data-en="Please select cake type" data-pt="Por favor selecione o tipo de bolo" id="err-cCakeType">Por favor selecione o tipo de bolo</div>
+</div>
+<!-- BASE FLAVOUR -->
+<div class="form-group" style="margin-bottom:14px">
+<label data-en="Base Flavour *" data-pt="Sabor Base *">Sabor Base *</label>
+<div class="flavour-grid" id="baseFlavourGrid">
+<div class="flavour-btn" data-value="morango" onclick="selectFlavour('base',this)"><span class="flavour-emoji">🍓</span><span class="flavour-name">Morango</span></div>
+<div class="flavour-btn" data-value="chocolate" onclick="selectFlavour('base',this)"><span class="flavour-emoji">🍫</span><span class="flavour-name">Chocolate</span></div>
+<div class="flavour-btn" data-value="chocolate-branco" onclick="selectFlavour('base',this)"><span class="flavour-emoji">🍫</span><span class="flavour-name">Choc. Branco</span></div>
+<div class="flavour-btn" data-value="limao" onclick="selectFlavour('base',this)"><span class="flavour-emoji">🍋</span><span class="flavour-name">Limão</span></div>
+<div class="flavour-btn" data-value="limao-verde" onclick="selectFlavour('base',this)"><span class="flavour-emoji">🍋‍🟩</span><span class="flavour-name">Limão Verde</span></div>
+<div class="flavour-btn" data-value="laranja" onclick="selectFlavour('base',this)"><span class="flavour-emoji">🍊</span><span class="flavour-name">Laranja</span></div>
+<div class="flavour-btn" data-value="kiwi" onclick="selectFlavour('base',this)"><span class="flavour-emoji">🥝</span><span class="flavour-name">Kiwi</span></div>
+<div class="flavour-btn" data-value="coco" onclick="selectFlavour('base',this)"><span class="flavour-emoji">🥥</span><span class="flavour-name">Coco</span></div>
+<div class="flavour-btn" data-value="ananas" onclick="selectFlavour('base',this)"><span class="flavour-emoji">🍍</span><span class="flavour-name">Ananás</span></div>
+<div class="flavour-btn" data-value="cereja" onclick="selectFlavour('base',this)"><span class="flavour-emoji">🍒</span><span class="flavour-name">Cereja</span></div>
+<div class="flavour-btn" data-value="manga" onclick="selectFlavour('base',this)"><span class="flavour-emoji">🥭</span><span class="flavour-name">Manga</span></div>
+<div class="flavour-btn" data-value="framboesa" onclick="selectFlavour('base',this)"><span class="flavour-emoji">🫐</span><span class="flavour-name">Framboesa</span></div>
+<div class="flavour-btn" data-value="caramel" onclick="selectFlavour('base',this)"><span class="flavour-emoji">🍮</span><span class="flavour-name">Caramel</span></div>
+<div class="flavour-btn" data-value="frutos-vermelhos" onclick="selectFlavour('base',this)"><span class="flavour-emoji">🍇</span><span class="flavour-name">Frutos Vermelhos</span></div>
+</div>
+<input id="cBaseFlavor" type="hidden"/>
+<div class="field-error" data-en="Please select a flavour" data-pt="Por favor selecione o sabor" id="err-cBaseFlavor">Por favor selecione o sabor</div>
+</div>
+<!-- COMBINATION -->
+<div id="cCombinationSection" style="display:none;margin-bottom:14px">
+<div class="form-group">
+<label data-en="Combination with (optional)" data-pt="Combinação com (opcional)">Combinação com (opcional)</label>
+<div class="flavour-grid" id="combFlavourGrid">
+<div class="flavour-btn" data-value="" onclick="selectFlavour('comb',this)"><span class="flavour-emoji">❌</span><span class="flavour-name" data-en="None" data-pt="Nenhuma">Nenhuma</span></div>
+<div class="flavour-btn" data-value="morango" onclick="selectFlavour('comb',this)"><span class="flavour-emoji">🍓</span><span class="flavour-name">Morango</span></div>
+<div class="flavour-btn" data-value="chocolate" onclick="selectFlavour('comb',this)"><span class="flavour-emoji">🍫</span><span class="flavour-name">Chocolate</span></div>
+<div class="flavour-btn" data-value="chocolate-branco" onclick="selectFlavour('comb',this)"><span class="flavour-emoji">🍫</span><span class="flavour-name">Choc. Branco</span></div>
+<div class="flavour-btn" data-value="limao" onclick="selectFlavour('comb',this)"><span class="flavour-emoji">🍋</span><span class="flavour-name">Limão</span></div>
+<div class="flavour-btn" data-value="laranja" onclick="selectFlavour('comb',this)"><span class="flavour-emoji">🍊</span><span class="flavour-name">Laranja</span></div>
+<div class="flavour-btn" data-value="kiwi" onclick="selectFlavour('comb',this)"><span class="flavour-emoji">🥝</span><span class="flavour-name">Kiwi</span></div>
+<div class="flavour-btn" data-value="coco" onclick="selectFlavour('comb',this)"><span class="flavour-emoji">🥥</span><span class="flavour-name">Coco</span></div>
+<div class="flavour-btn" data-value="ananas" onclick="selectFlavour('comb',this)"><span class="flavour-emoji">🍍</span><span class="flavour-name">Ananás</span></div>
+<div class="flavour-btn" data-value="cereja" onclick="selectFlavour('comb',this)"><span class="flavour-emoji">🍒</span><span class="flavour-name">Cereja</span></div>
+<div class="flavour-btn" data-value="manga" onclick="selectFlavour('comb',this)"><span class="flavour-emoji">🥭</span><span class="flavour-name">Manga</span></div>
+<div class="flavour-btn" data-value="framboesa" onclick="selectFlavour('comb',this)"><span class="flavour-emoji">🫐</span><span class="flavour-name">Framboesa</span></div>
+</div>
+<input id="cCombinationFlavor" type="hidden"/>
+</div>
+</div>
+<!-- EXTRA FILLING -->
+<div class="form-group" style="margin-bottom:14px">
+<label data-en="Extra Filling (+€1.99) — optional" data-pt="Recheio Extra (+€1.99) — opcional">Recheio Extra (+€1.99) — opcional</label>
+<div class="flavour-grid" id="extraFillingGrid">
+<div class="flavour-btn selected" data-value="" onclick="selectFlavour('extra',this)"><span class="flavour-emoji">🚫</span><span class="flavour-name" data-en="No extra" data-pt="Sem extra">Sem extra</span></div>
+<div class="flavour-btn" data-value="morango" onclick="selectFlavour('extra',this)"><span class="flavour-emoji">🍓</span><span class="flavour-name">Morango</span></div>
+<div class="flavour-btn" data-value="chocolate" onclick="selectFlavour('extra',this)"><span class="flavour-emoji">🍫</span><span class="flavour-name">Chocolate</span></div>
+<div class="flavour-btn" data-value="chocolate-branco" onclick="selectFlavour('extra',this)"><span class="flavour-emoji">🍫</span><span class="flavour-name">Choc. Branco</span></div>
+<div class="flavour-btn" data-value="limao" onclick="selectFlavour('extra',this)"><span class="flavour-emoji">🍋</span><span class="flavour-name">Limão</span></div>
+<div class="flavour-btn" data-value="laranja" onclick="selectFlavour('extra',this)"><span class="flavour-emoji">🍊</span><span class="flavour-name">Laranja</span></div>
+<div class="flavour-btn" data-value="kiwi" onclick="selectFlavour('extra',this)"><span class="flavour-emoji">🥝</span><span class="flavour-name">Kiwi</span></div>
+<div class="flavour-btn" data-value="coco" onclick="selectFlavour('extra',this)"><span class="flavour-emoji">🥥</span><span class="flavour-name">Coco</span></div>
+<div class="flavour-btn" data-value="ananas" onclick="selectFlavour('extra',this)"><span class="flavour-emoji">🍍</span><span class="flavour-name">Ananás</span></div>
+<div class="flavour-btn" data-value="cereja" onclick="selectFlavour('extra',this)"><span class="flavour-emoji">🍒</span><span class="flavour-name">Cereja</span></div>
+<div class="flavour-btn" data-value="manga" onclick="selectFlavour('extra',this)"><span class="flavour-emoji">🥭</span><span class="flavour-name">Manga</span></div>
+<div class="flavour-btn" data-value="framboesa" onclick="selectFlavour('extra',this)"><span class="flavour-emoji">🫐</span><span class="flavour-name">Framboesa</span></div>
+<div class="flavour-btn" data-value="caramel" onclick="selectFlavour('extra',this)"><span class="flavour-emoji">🍮</span><span class="flavour-name">Caramel</span></div>
+<div class="flavour-btn" data-value="frutos-vermelhos" onclick="selectFlavour('extra',this)"><span class="flavour-emoji">🍇</span><span class="flavour-name">Frutos Vermelhos</span></div>
+</div>
+<input id="cExtraFilling" type="hidden" value=""/>
+</div>
+<!-- CAKE MESSAGE -->
+<div class="form-row single" style="margin-bottom:12px">
+<div class="form-group">
+<label data-en="Message on Cake (optional)" data-pt="Mensagem no Bolo (opcional)">Mensagem no Bolo (opcional)</label>
+<input data-en-placeholder="Ex: Happy Birthday Maria!" data-pt-placeholder="Ex: Feliz Aniversário Maria!" id="cCakeMessage" placeholder="Ex: Feliz Aniversário Maria!" type="text"/>
+</div>
+</div>
+<!-- CHEF NOTES -->
+<div class="form-row single" style="margin-bottom:12px">
+<div class="form-group">
+<label data-en="Note for the Chef (optional)" data-pt="Nota para o Chef (opcional)">Nota para o Chef (opcional)</label>
+<textarea data-en-placeholder="Special colours, decorations, allergies, etc." data-pt-placeholder="Cores especiais, decorações, alergias, etc." id="cChefNotes" placeholder="Cores especiais, decorações, alergias, etc."></textarea>
+</div>
+</div>
+<!-- REFERENCE PHOTO -->
+<div class="form-row single">
+<div class="form-group">
+<label data-en="Reference Photo (optional)" data-pt="Foto de Referência (opcional)">Foto de Referência (opcional)</label>
+<div id="cPhotoPreviewArea" style="display:none;margin-bottom:8px">
+<div class="photo-preview-wrap">
+<img alt="Ref" class="photo-preview-img" id="cPhotoPreview" src=""/>
+<button class="photo-remove-btn" id="cRemovePhotoBtn" type="button"><i class="fas fa-times"></i></button>
+</div>
+</div>
+<label class="photo-upload-area" for="cPhotoInput" id="cPhotoLabel">
+<i class="fas fa-camera"></i>
+<p data-en="Tap to add reference photo for the chef" data-pt="Toque para adicionar foto de referência para o chef">Toque para adicionar foto de referência para o chef</p>
+</label>
+<input accept="image/*" id="cPhotoInput" style="display:none" type="file"/>
+<div class="field-hint" data-en="Inspiration photo, desired design, etc." data-pt="Foto de inspiração, design pretendido, etc.">Foto de inspiração, design pretendido, etc.</div>
+</div>
+</div>
+</div>
+</div>
+<!-- STEP 3: WEIGHT & SIZE -->
+<div class="form-card" id="card3">
+<div class="form-card-header" onclick="toggleCard(3)">
+<h3><span class="card-step-badge">3</span> <span data-en="Cake Size" data-pt="Tamanho do Bolo">Tamanho do Bolo</span></h3>
+<i class="fas fa-check-circle card-check"></i>
+<i class="fas fa-chevron-down" id="chevron3" style="color:var(--text2);font-size:0.8rem;transition:transform .3s"></i>
+</div>
+<div class="form-card-body" id="cardbody3">
+<!-- WEIGHT SELECT FIRST -->
+<div class="form-group" style="margin-bottom:12px">
+<label data-en="Select Size *" data-pt="Selecionar Tamanho *">Selecionar Tamanho *</label>
+<select id="cMinWeight">
+<option data-en="Select size..." data-pt="Selecionar tamanho..." value="">Selecionar tamanho...</option>
+<option value="1.0">1.0 → 1.3 kg</option>
+<option value="1.3">1.3 → 1.6 kg</option>
+<option value="1.6">1.6 → 1.9 kg</option>
+<option value="1.9">1.9 → 2.2 kg</option>
+<option value="2.2">2.2 → 2.5 kg</option>
+<option value="2.5">2.5 → 2.8 kg</option>
+<option value="2.8">2.8 → 3.1 kg</option>
+<option value="3.1">3.1 → 3.4 kg</option>
+<option value="3.4">3.4 → 3.7 kg</option>
+<option value="3.7">3.7 → 4.0 kg</option>
+<option value="4.0">4.0 → 4.3 kg</option>
+<option value="4.3">4.3 → 4.6 kg</option>
+<option value="4.6">4.6 → 4.9 kg</option>
+<option value="4.9">4.9 → 5.2 kg</option>
+</select>
+<div class="field-error" data-en="Please select a size" data-pt="Por favor selecione o tamanho" id="err-cMinWeight">Por favor selecione o tamanho</div>
+</div>
+<div class="price-display" id="cPriceDisplay">
+<div class="price-range">€<span id="cMinPrice">0</span> — €<span id="cMaxPrice">0</span></div>
+<div class="price-breakdown" id="cPriceBreakdown"></div>
+</div>
+<!-- SIZE CALCULATOR TOGGLE -->
+<div style="margin-top:10px">
+<button id="sizeCalcToggleBtn" onclick="toggleSizeCalc()" style="background:none;border:none;color:var(--accent-dark);font-size:0.8rem;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit;padding:0;text-decoration:underline;text-underline-offset:3px" type="button">
+<i class="fas fa-users" style="font-size:0.75rem"></i>
+<span data-en="Select size by number of people" data-pt="Selecionar tamanho por número de pessoas">Selecionar tamanho por número de pessoas</span>
+</button>
+<!-- SIZE GUIDE (hidden by default) -->
+<div class="size-guide" id="sizeGuidePanel" style="display:none;margin-top:10px">
+<div class="people-selector">
+<button class="people-btn" onclick="changePeople(-1)" type="button"><i class="fas fa-minus"></i></button>
+<div class="people-input-wrap">
+<i class="fas fa-users"></i>
+<input class="people-input" id="peopleCount" max="100" min="1" oninput="updateSizeSuggestion()" type="number" value="10"/>
+<span data-en="people" data-pt="pessoas" style="font-size:0.8rem;color:var(--text2)">pessoas</span>
+</div>
+<button class="people-btn" onclick="changePeople(1)" type="button"><i class="fas fa-plus"></i></button>
+</div>
+<div class="size-suggestion" id="sizeSuggestion" style="margin-top:10px">
+<div class="size-suggestion-title" data-en="Suggested size for your group:" data-pt="Tamanho sugerido para o número de pessoas:">Tamanho sugerido para o número de pessoas:</div>
+<div class="size-options" id="sizeOptions"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- STEP 4: DELIVERY -->
+<div class="form-card" id="card4">
+<div class="form-card-header" onclick="toggleCard(4)">
+<h3><span class="card-step-badge">4</span> <span data-en="Delivery" data-pt="Entrega">Entrega</span></h3>
+<i class="fas fa-check-circle card-check"></i>
+<i class="fas fa-chevron-down" id="chevron4" style="color:var(--text2);font-size:0.8rem;transition:transform .3s"></i>
+</div>
+<div class="form-card-body" id="cardbody4">
+<div class="notice-box">
+<i class="fas fa-info-circle"></i>
+<span data-en="Orders need at least 24h notice. Your cake will be ready 1 hour before your chosen time." data-pt="As encomendas precisam de pelo menos 24h de antecedência. O seu bolo estará pronto 1 hora antes da hora escolhida.">As encomendas precisam de pelo menos 24h de antecedência. O seu bolo estará pronto 1 hora antes da hora escolhida.</span>
+</div>
+<div class="form-row single" style="margin-bottom:12px">
+<div class="form-group">
+<label data-en="Delivery Type" data-pt="Tipo de Entrega">Tipo de Entrega</label>
+<div class="toggle-group">
+<input id="cPickupRadio" name="cDeliveryType" type="radio" value="pickup"/>
+<label data-en="🏪 Pick-up" data-pt="🏪 Recolha" for="cPickupRadio">🏪 Recolha</label>
+<input id="cDeliveryRadio" name="cDeliveryType" type="radio" value="delivery"/>
+<label data-en="🚚 Delivery" data-pt="🚚 Entrega" for="cDeliveryRadio">🚚 Entrega</label>
+</div>
+</div>
+</div>
+<div class="form-row single" id="cAddressSection" style="display:none;margin-bottom:12px">
+<div class="form-group">
+<label data-en="Delivery Address" data-pt="Morada de Entrega">Morada de Entrega</label>
+<input data-en-placeholder="Street, number, city..." data-pt-placeholder="Rua, número, cidade..." id="cAddress" placeholder="Rua, número, cidade..." type="text"/>
+</div>
+</div>
+<div class="form-row single" style="margin-bottom:12px">
+<div class="form-group">
+<label data-en="Scheduling" data-pt="Agendamento">Agendamento</label>
+<div class="toggle-group">
+<input id="cScheduledRadio" name="cDeliveryOption" type="radio" value="scheduled"/>
+<label data-en="📅 Scheduled" data-pt="📅 Agendada" for="cScheduledRadio">📅 Agendada</label>
+<input id="cExpressRadio" name="cDeliveryOption" type="radio" value="express"/>
+<label data-en="⚡ Express" data-pt="⚡ Expresso" for="cExpressRadio">⚡ Expresso</label>
+</div>
+</div>
+</div>
+<div id="cScheduledSection" style="display:none">
+<div class="form-row">
+<div class="form-group">
+<label data-en="Date (min. 24h)" data-pt="Data (mín. 24h)">Data (mín. 24h)</label>
+<input id="cOrderDate" type="date"/>
+</div>
+<div class="form-group">
+<label data-en="Time" data-pt="Hora">Hora</label>
+<div class="time-slots-grid" id="timeSlotGrid"></div>
+<input id="cOrderTime" type="hidden"/>
+<div class="field-error" data-en="Please select a time" data-pt="Por favor selecione uma hora" id="err-cOrderTime">Por favor selecione uma hora</div>
+</div>
+</div>
+</div>
+<div id="cExpressSection" style="display:none">
+<div class="express-warning">
+            ⚡ <strong data-en="Express Delivery" data-pt="Entrega Expresso">Entrega Expresso</strong><br/>
+<span data-en="Minimum preparation time: 5–6 hours. Please confirm availability with us before submitting." data-pt="Tempo mínimo de preparação: 5–6 horas. Por favor confirme disponibilidade connosco antes de submeter.">Tempo mínimo de preparação: 5–6 horas. Por favor confirme disponibilidade connosco antes de submeter.</span><br/>
+<a href="https://wa.me/351934453710" target="_blank">👉 <span data-en="Confirm on WhatsApp" data-pt="Confirmar no WhatsApp">Confirmar no WhatsApp</span></a>
+</div>
+<div class="form-group" style="margin-top:10px">
+<label data-en="Preferred Time" data-pt="Hora Pretendida">Hora Pretendida</label>
+<div class="time-slots-grid" id="expressTimeSlotGrid"></div>
+<input id="cExpressTime" type="hidden"/>
+</div>
+</div>
+</div>
+</div>
+<!-- STEP 5: PAYMENT -->
+<div class="form-card" id="card5">
+<div class="form-card-header" onclick="toggleCard(5)">
+<h3><span class="card-step-badge">5</span> <span data-en="Payment" data-pt="Pagamento">Pagamento</span></h3>
+<i class="fas fa-check-circle card-check"></i>
+<i class="fas fa-chevron-down" id="chevron5" style="color:var(--text2);font-size:0.8rem;transition:transform .3s"></i>
+</div>
+<div class="payment-card" data-value="MBWay" onclick="selectPayment(this)">
+<div class="payment-icon">📱</div>
+<div class="payment-name">MBWay</div>
+</div>
+<div class="payment-card" data-value="Transferência" onclick="selectPayment(this)">
+<div class="payment-icon">🏦</div>
+<div class="payment-name" data-en="Bank Transfer" data-pt="Transferência">Transferência</div>
+</div>
+<div class="payment-card" data-value="Dinheiro" onclick="selectPayment(this)">
+<div class="payment-icon">💵</div>
+<div class="payment-name" data-en="Cash" data-pt="Dinheiro">Dinheiro</div>
+</div>
+</div>
+<input id="cPaymentMethod" type="hidden"/>
+<div class="field-error" data-en="Please select payment method" data-pt="Por favor selecione o método de pagamento" id="err-cPaymentMethod">Por favor selecione o método de pagamento</div>
+<div id="cPaymentInfo" style="display:none"></div>
+</form></div>
+<div style="margin-top:12px;padding:10px 12px;background:var(--card2);border-radius:8px;font-size:0.75rem;color:var(--text2);display:flex;align-items:center;gap:6px">
+<i class="fas fa-shield-alt" style="color:var(--accent)"></i>
+<span data-en="Your data is safe. We respond within 2 hours during business hours." data-pt="Os seus dados estão seguros. Respondemos em até 2 horas durante o horário de funcionamento.">Os seus dados estão seguros. Respondemos em até 2 horas durante o horário de funcionamento.</span>
+</div>
+</div>
+<!-- TERMS -->
+<div style="display:flex;align-items:flex-start;gap:10px;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:70px">
+<input id="cTerms" style="width:18px;height:18px;accent-color:var(--accent);flex-shrink:0;margin-top:2px" type="checkbox"/>
+<label data-en="I confirm the information provided is correct and agree to the order terms." data-pt="Confirmo que as informações fornecidas estão corretas e concordo com os termos da encomenda." for="cTerms" style="font-size:0.82rem;color:var(--text2);cursor:pointer">Confirmo que as informações fornecidas estão corretas e concordo com os termos da encomenda.</label>
+</div>
+<div class="field-error" data-en="Please confirm the terms" data-pt="Por favor confirme os termos" id="err-cTerms" style="margin-bottom:8px;text-align:center">Por favor confirme os termos</div>
+<!-- SUCCESS SCREEN -->
+<div class="success-screen" id="successScreen">
+<div class="success-hero">
+<div class="success-icon">🎂</div>
+<div class="success-title" data-en="Order Sent!" data-pt="Encomenda Enviada!">Encomenda Enviada!</div>
+<div class="success-ref" id="successRef">#000</div>
+<div class="success-sub" data-en="Thank you! We'll confirm your order on WhatsApp within 2 hours. Your cake will be ready 1 hour before your chosen time. 🎂" data-pt="Obrigado! Confirmaremos a sua encomenda no WhatsApp em até 2 horas. O seu bolo estará pronto 1 hora antes da hora escolhida. 🎂">Obrigado! Confirmaremos a sua encomenda no WhatsApp em até 2 horas. O seu bolo estará pronto 1 hora antes da hora escolhida. 🎂</div>
+</div>
+<div class="summary-card">
+<div class="summary-header">📋 <span data-en="Order Summary" data-pt="Resumo da Encomenda">Resumo da Encomenda</span></div>
+<div class="summary-body" id="orderSummaryBox"></div>
+</div>
+<div class="action-buttons">
+<button class="btn-submit" id="copyOrderBtn"><i class="fas fa-copy"></i> <span data-en="Copy Summary" data-pt="Copiar Resumo">Copiar Resumo</span></button>
+<div class="copied-toast" data-en="✅ Copied! Paste it in Bismi Treats WhatsApp." data-pt="✅ Copiado! Cole no WhatsApp da Bismi Treats." id="copiedToast">✅ Copiado! Cole no WhatsApp da Bismi Treats.</div>
+<button class="btn-whatsapp" id="openWhatsAppBtn"><i class="fab fa-whatsapp"></i> <span data-en="Message Bismi Treats" data-pt="Mensagem Bismi Treats">Mensagem Bismi Treats</span></button>
+<button class="btn-save-image" id="saveReceiptImageBtn"><i class="fas fa-image"></i> <span data-en="Save Receipt as Image" data-pt="Guardar Recibo como Imagem">Guardar Recibo como Imagem</span></button>
+<button class="btn-calendar" id="addToCalendarBtn"><i class="fas fa-calendar-plus"></i> <span data-en="Add to Calendar" data-pt="Adicionar ao Calendário">Adicionar ao Calendário</span></button>
+<button class="btn-secondary" id="newOrderBtn"><i class="fas fa-plus"></i> <span data-en="New Order" data-pt="Nova Encomenda">Nova Encomenda</span></button>
+</div>
+</div>
+<div class="page-footer">
+  ❤️ <strong>Bismi Treats</strong> — <span data-en="Luxury and taste in one bite" data-pt="Luxury and taste in one bite">Luxury and taste in one bite</span><br/>
+<a href="tel:934453710">📞 934453710</a> · <a href="mailto:bismitreats.pt@gmail.com">✉️ bismitreats.pt@gmail.com</a> · <a href="https://instagram.com/bismitreats.pt" target="_blank">📸 @bismitreats.pt</a> · <a href="https://bismitreats.com" target="_blank">🌐 bismitreats.com</a>
+</div>
+<!-- STICKY SUBMIT -->
+<div class="sticky-submit" id="stickySubmit">
+<button class="btn-submit" id="stickySubmitBtn" type="button">
+<i class="fas fa-paper-plane"></i>
+<span data-en="Send Order" data-pt="Enviar Encomenda">Enviar Encomenda</span>
+</button>
+</div>
+<!-- ADMIN BUTTON -->
+<button class="admin-link-btn" id="adminAccessBtn" title="Admin"><i class="fas fa-cog"></i></button>
+<!-- ADMIN LOGIN MODAL -->
+<div class="modal-overlay" id="adminLoginModal">
+<div class="modal">
+<div class="modal-header"><h3>🔒 <span data-en="Administrative Access" data-pt="Acesso Administrativo">Acesso Administrativo</span></h3></div>
+<div class="modal-body">
+<div class="form-group"><label data-en="Username" data-pt="Utilizador">Utilizador</label><input class="form-input" id="adminUser" type="text" value="admin"/></div>
+<div class="form-group"><label data-en="Password" data-pt="Palavra-passe">Palavra-passe</label><input class="form-input" data-en-placeholder="Password" data-pt-placeholder="Palavra-passe" id="adminPass" placeholder="Palavra-passe" type="password"/></div>
+<div class="error-msg" data-en="❌ Incorrect credentials." data-pt="❌ Credenciais incorretas." id="loginError">❌ Credenciais incorretas.</div>
+</div>
+<div class="modal-footer">
+<button class="btn-cancel" data-en="Cancel" data-pt="Cancelar" id="cancelLoginBtn">Cancelar</button>
+<button class="btn-primary" data-en="Login" data-pt="Entrar" id="confirmLoginBtn">Entrar</button>
+</div>
+</div>
+</div>
+<!-- CALENDAR CHOICE MODAL -->
+<div class="modal-overlay" id="calendarChoiceModal">
+<div class="modal">
+<div class="modal-header"><h3>📅 <span data-en="Add to Calendar" data-pt="Adicionar ao Calendário">Adicionar ao Calendário</span></h3></div>
+<div class="modal-body">
+<button onclick="addCustomerToCalendar('google')" style="width:100%;padding:14px;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-size:0.9rem;font-weight:600;font-family:inherit;display:flex;align-items:center;gap:10px;margin-bottom:8px"><i class="fab fa-google" style="color:#4285f4;font-size:1.2rem"></i> Google Calendar</button>
+<button onclick="addCustomerToCalendar('outlook')" style="width:100%;padding:14px;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-size:0.9rem;font-weight:600;font-family:inherit;display:flex;align-items:center;gap:10px"><i class="fab fa-microsoft" style="color:#0078d4;font-size:1.2rem"></i> Outlook Calendar</button>
+</div>
+</div>
+</div>
+<script>
+// ─── CONSTANTS ───────────────────────────────────────────────
+const FLAVOR_NAMES = {
+  'morango':'Morango 🍓','chocolate':'Chocolate 🍫','chocolate-branco':'Chocolate Branco 🍫',
+  'limao':'Limão 🍋','limao-verde':'Limão Verde 🍋‍🟩','laranja':'Laranja 🍊',
+  'kiwi':'Kiwi 🥝','coco':'Coco 🥥','ananas':'Ananás 🍍','cereja':'Cereja 🍒',
+  'manga':'Manga 🥭','framboesa':'Framboesa 🫐','caramel':'Caramel','frutos-vermelhos':'Frutos Vermelhos'
+};
+const CAKE_TYPE_NAMES = {
+  'sponge-chocolate':'Chocolate Sponge Cake','sponge-vanilla':'Sponge Cake Vanilla',
+  'sponge-normal':'Sponge Cake Normal','redvelvet':'Red Velvet','tres-leches':'Tres Leches'
+};
+const CAKE_PRICES = {'sponge-chocolate':19.99,'sponge-vanilla':19.99,'sponge-normal':19.99,'redvelvet':24.99,'tres-leches':19.99};
+// Size brackets: [min, max]
+const SIZE_BRACKETS = [[1.0,1.3],[1.3,1.6],[1.6,1.9],[1.9,2.2],[2.2,2.5],[2.5,2.8],[2.8,3.1],[3.1,3.4],[3.4,3.7],[3.7,4.0],[4.0,4.3],[4.3,4.6],[4.6,4.9],[4.9,5.2]];
+const GRAMS_PER_PERSON = 0.135;
+
+function getFlavorName(v){ return FLAVOR_NAMES[v]||v||'—'; }
+function getCakeName(v){ return CAKE_TYPE_NAMES[v]||v||'—'; }
+function today(){ return new Date().toISOString().split('T')[0]; }
+function minOrderDate(){
+  const d=new Date(); d.setDate(d.getDate()+1);
+  return d.toISOString().split('T')[0];
+}
+
+// ─── LANGUAGE ────────────────────────────────────────────────
+let currentLang = localStorage.getItem('bismiLang') || (navigator.language.startsWith('pt')?'pt':'en');
+function setLang(lang){
+  currentLang=lang;
+  localStorage.setItem('bismiLang',lang);
+  document.getElementById('langPT').classList.toggle('active',lang==='pt');
+  document.getElementById('langEN').classList.toggle('active',lang==='en');
+  document.querySelectorAll('[data-pt]').forEach(el=>{
+    if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') return;
+    const txt=el.getAttribute('data-'+lang);
+    if(txt) el.textContent=txt;
+  });
+  document.querySelectorAll('[data-pt-placeholder]').forEach(el=>{
+    const ph=el.getAttribute('data-'+lang+'-placeholder');
+    if(ph) el.placeholder=ph;
+  });
+  updateSizeSuggestion();
+  updateCustomerPrice();
+}
+
+// ─── PROGRESS BAR ────────────────────────────────────────────
+function updateProgress(){
+  const steps = [
+    document.getElementById('cName').value.trim() !== '',
+    document.getElementById('cCakeType').value !== '' && document.getElementById('cBaseFlavor').value !== '',
+    document.getElementById('cMinWeight').value !== '',
+    document.querySelector('input[name="cDeliveryOption"]:checked') !== null,
+    document.getElementById('cPaymentMethod').value !== ''
+  ];
+  for(let i=1;i<=4;i++){
+    const el=document.getElementById('pstep'+i);
+    if(!el) continue;
+    if(steps.slice(0,i).every(Boolean)){ el.classList.add('done'); el.classList.remove('active'); }
+    else if(steps.slice(0,i-1).every(Boolean)){ el.classList.add('active'); el.classList.remove('done'); }
+    else { el.classList.remove('active','done'); }
+  }
+}
+
+// ─── CARD TOGGLE ─────────────────────────────────────────────
+function toggleCard(n){
+  const body=document.getElementById('cardbody'+n);
+  const chevron=document.getElementById('chevron'+n);
+  if(!body) return;
+  const isOpen=body.style.display!=='none';
+  body.style.display=isOpen?'none':'block';
+  if(chevron) chevron.style.transform=isOpen?'rotate(-90deg)':'rotate(0deg)';
+}
+
+// ─── CAKE TYPE SELECTOR ──────────────────────────────────────
+function selectCakeType(el){
+  document.querySelectorAll('.cake-type-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('cCakeType').value=el.dataset.value;
+  document.getElementById('err-cCakeType').style.display='none';
+  updateCustomerPrice();
+  updateProgress();
+}
+
+// ─── FLAVOUR SELECTOR ────────────────────────────────────────
+function selectFlavour(type, el){
+  const gridId = type==='base'?'baseFlavourGrid':type==='comb'?'combFlavourGrid':'extraFillingGrid';
+  const inputId = type==='base'?'cBaseFlavor':type==='comb'?'cCombinationFlavor':'cExtraFilling';
+  document.querySelectorAll('#'+gridId+' .flavour-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById(inputId).value=el.dataset.value;
+  if(type==='base'){
+    const v=el.dataset.value;
+    document.getElementById('cCombinationSection').style.display=(v==='chocolate'||v==='chocolate-branco')?'block':'none';
+    document.getElementById('err-cBaseFlavor').style.display='none';
+    updateProgress();
+  }
+  updateCustomerPrice();
+}
+
+// ─── SIZE GUIDE ──────────────────────────────────────────────
+function changePeople(delta){
+  const input=document.getElementById('peopleCount');
+  const val=Math.max(1,Math.min(100,parseInt(input.value||10)+delta));
+  input.value=val;
+  updateSizeSuggestion();
+}
+function getSuggestedBrackets(people){
+  const minKg=people*GRAMS_PER_PERSON;
+  // Find minimum bracket (first bracket where min >= minKg)
+  let minIdx=SIZE_BRACKETS.findIndex(b=>b[0]>=minKg);
+  if(minIdx===-1) minIdx=SIZE_BRACKETS.length-1;
+  // Comfortable = one size up
+  const comfIdx=Math.min(minIdx+1,SIZE_BRACKETS.length-1);
+  return {minIdx,comfIdx};
+}
+
+function applySizeFromGuide(minW){
+  document.getElementById('cMinWeight').value=minW.toFixed(1);
+  document.getElementById('err-cMinWeight').style.display='none';
+  updateCustomerPrice();
+  updateProgress();
+  // Scroll to weight section
+  document.getElementById('cMinWeight').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+// ─── PRICE CALC ──────────────────────────────────────────────
+function updateCustomerPrice(){
+  const minW=parseFloat(document.getElementById('cMinWeight').value||0);
+  const cakeType=document.getElementById('cCakeType').value;
+  const extraFilling=document.getElementById('cExtraFilling').value;
+  const display=document.getElementById('cPriceDisplay');
+  if(!minW||!cakeType){ display.style.display='none'; return; }
+  const maxW=(minW+0.3).toFixed(1);
+  const ppkg=CAKE_PRICES[cakeType]||19.99;
+  const extraFillPrice=extraFilling?1.99:0;
+  const minPrice=(minW*ppkg+extraFillPrice).toFixed(2);
+  const maxPrice=(parseFloat(maxW)*ppkg+extraFillPrice).toFixed(2);
+  display.style.display='block';
+  document.getElementById('cMinPrice').textContent=minPrice;
+  document.getElementById('cMaxPrice').textContent=maxPrice;
+  const bd=currentLang==='en'
+    ?`${minW}–${maxW}kg × €${ppkg}/kg${extraFillPrice>0?' + €'+extraFillPrice.toFixed(2)+' extra filling':''}`
+    :`${minW}–${maxW}kg × €${ppkg}/kg${extraFillPrice>0?' + €'+extraFillPrice.toFixed(2)+' recheio extra':''}`;
+  document.getElementById('cPriceBreakdown').textContent=bd;
+}
+
+// ─── PAYMENT SELECTOR ────────────────────────────────────────
+function selectPayment(el){
+  document.querySelectorAll('.payment-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('cPaymentMethod').value=el.dataset.value;
+  document.getElementById('cPaymentInfo').style.display='block';
+  document.getElementById('err-cPaymentMethod').style.display='none';
+  updateProgress();
+}
+
+// ─── TIME SLOTS ──────────────────────────────────────────────
+function generateTimeSlots(){
+  const slots=[];
+  for(let h=18;h<22;h++){
+    slots.push(`${String(h).padStart(2,'0')}:00`);
+    slots.push(`${String(h).padStart(2,'0')}:30`);
+  }
+  slots.push('22:00');
+  return slots;
+}
+function renderTimeSlots(gridId, hiddenId){
+  const grid=document.getElementById(gridId);
+  if(!grid) return;
+  const slots=generateTimeSlots();
+  const current=document.getElementById(hiddenId)?.value||'';
+  grid.innerHTML=slots.map(s=>`<button type="button" class="time-slot-btn ${s===current?'selected':''}" onclick="selectTimeSlot('${gridId}','${hiddenId}','${s}')">${s}</button>`).join('');
+}
+function selectTimeSlot(gridId, hiddenId, time){
+  document.querySelectorAll('#'+gridId+' .time-slot-btn').forEach(b=>b.classList.remove('selected'));
+  event.target.classList.add('selected');
+  document.getElementById(hiddenId).value=time;
+  document.getElementById('err-cOrderTime').style.display='none';
+  updateProgress();
+}
+
+// ─── DELIVERY EVENTS ─────────────────────────────────────────
+document.querySelectorAll('input[name="cDeliveryType"]').forEach(r=>{
+  r.addEventListener('change',e=>{
+    document.getElementById('cAddressSection').style.display=e.target.value==='delivery'?'block':'none';
+  });
+});
+document.querySelectorAll('input[name="cDeliveryOption"]').forEach(r=>{
+  r.addEventListener('change',e=>{
+    document.getElementById('cScheduledSection').style.display=e.target.value==='scheduled'?'block':'none';
+    document.getElementById('cExpressSection').style.display=e.target.value==='express'?'block':'none';
+    if(e.target.value==='scheduled'){ renderTimeSlots('timeSlotGrid','cOrderTime'); }
+    if(e.target.value==='express'){ renderTimeSlots('expressTimeSlotGrid','cExpressTime'); }
+    updateProgress();
+  });
+});
+
+// Min date = tomorrow (24h notice)
+document.getElementById('cOrderDate').min=minOrderDate();
+document.getElementById('cOrderDate').addEventListener('change',()=>updateProgress());
+document.getElementById('cMinWeight').addEventListener('change',()=>{ updateCustomerPrice(); updateProgress(); document.getElementById('err-cMinWeight').style.display='none'; });
+document.getElementById('peopleCount').addEventListener('input',updateSizeSuggestion);
+
+// ─── PHOTO UPLOAD ────────────────────────────────────────────
+let cPhotoData=null;
+document.getElementById('cPhotoInput').addEventListener('change',e=>{
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    cPhotoData=ev.target.result;
+    document.getElementById('cPhotoPreview').src=cPhotoData;
+    document.getElementById('cPhotoPreviewArea').style.display='block';
+    document.getElementById('cPhotoLabel').style.display='none';
+  };
+  reader.readAsDataURL(file);
+});
+document.getElementById('cRemovePhotoBtn').addEventListener('click',()=>{
+  cPhotoData=null;
+  document.getElementById('cPhotoPreview').src='';
+  document.getElementById('cPhotoPreviewArea').style.display='none';
+  document.getElementById('cPhotoLabel').style.display='flex';
+  document.getElementById('cPhotoInput').value='';
+});
+
+// ─── VALIDATION ──────────────────────────────────────────────
+function validateForm(){
+  let valid=true;
+  const showErr=(id,show)=>{ const el=document.getElementById(id); if(el){ el.style.display=show?'block':'none'; } };
+  const markField=(id,err)=>{ const el=document.getElementById(id); if(el){ el.classList.toggle('error',err); } };
+
+  const name=document.getElementById('cName').value.trim();
+  if(!name){ showErr('err-cName',true); markField('cName',true); valid=false; }
+  else { showErr('err-cName',false); markField('cName',false); }
+
+  if(!document.getElementById('cCakeType').value){ showErr('err-cCakeType',true); valid=false; }
+  else showErr('err-cCakeType',false);
+
+  if(!document.getElementById('cBaseFlavor').value){ showErr('err-cBaseFlavor',true); valid=false; }
+  else showErr('err-cBaseFlavor',false);
+
+  if(!document.getElementById('cMinWeight').value){ showErr('err-cMinWeight',true); valid=false; }
+  else showErr('err-cMinWeight',false);
+
+  if(!document.getElementById('cPaymentMethod').value){ showErr('err-cPaymentMethod',true); valid=false; }
+  else showErr('err-cPaymentMethod',false);
+
+  const delivOpt=document.querySelector('input[name="cDeliveryOption"]:checked')?.value;
+  if(delivOpt==='scheduled'){
+    const date=document.getElementById('cOrderDate').value;
+    const time=document.getElementById('cOrderTime').value;
+    if(!date||date<minOrderDate()){ showErr('err-cOrderTime',true); valid=false; }
+    else if(!time){ showErr('err-cOrderTime',true); valid=false; }
+    else showErr('err-cOrderTime',false);
+  }
+
+  if(!document.getElementById('cTerms').checked){ showErr('err-cTerms',true); valid=false; }
+  else showErr('err-cTerms',false);
+
+  if(!valid){
+    // Scroll to first error
+    const firstErr=document.querySelector('.error,.field-error[style*="block"]');
+    if(firstErr) firstErr.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  return valid;
+}
+
+// ─── FORM SUBMIT ─────────────────────────────────────────────
+let submittedOrder=null;
+function submitCustomerOrder(){
+  if(!validateForm()) return;
+  const name=document.getElementById('cName').value.trim();
+  const phone=document.getElementById('cPhone').value.trim();
+  const nif=document.getElementById('cNif').value.trim();
+  const cakeType=document.getElementById('cCakeType').value;
+  const baseFlavor=document.getElementById('cBaseFlavor').value;
+  const combinationFlavor=document.getElementById('cCombinationFlavor').value;
+  const extraFilling=document.getElementById('cExtraFilling').value;
+  const cakeMessage=document.getElementById('cCakeMessage').value.trim();
+  const chefNotes=document.getElementById('cChefNotes').value.trim();
+  const minWeight=document.getElementById('cMinWeight').value;
+  const deliveryType=document.querySelector('input[name="cDeliveryType"]:checked')?.value||'';
+  const deliveryOption=document.querySelector('input[name="cDeliveryOption"]:checked')?.value||'';
+  const address=document.getElementById('cAddress').value.trim();
+  const orderDate=document.getElementById('cOrderDate').value;
+  const orderTime=document.getElementById('cOrderTime').value;
+  const expressTime=document.getElementById('cExpressTime').value;
+  const paymentMethod=document.getElementById('cPaymentMethod').value;
+  const maxWeight=(parseFloat(minWeight)+0.3).toFixed(1);
+  const ppkg=CAKE_PRICES[cakeType]||19.99;
+  const extraFillPrice=extraFilling?1.99:0;
+  const minPrice=(parseFloat(minWeight)*ppkg+extraFillPrice).toFixed(2);
+  const maxPrice=(parseFloat(maxWeight)*ppkg+extraFillPrice).toFixed(2);
+  let flavorDesc=getFlavorName(baseFlavor);
+  if(combinationFlavor) flavorDesc+=' + '+getFlavorName(combinationFlavor);
+  if(extraFilling) flavorDesc+=' c/ recheio extra de '+getFlavorName(extraFilling);
+  const delivLabel=deliveryType==='pickup'?'Recolha 🏪':deliveryType==='delivery'?'Entrega ao Domicílio 🚚':'—';
+  const dateStr=deliveryOption==='express'?'Expresso (hoje)':orderDate?new Date(orderDate+'T00:00:00').toLocaleDateString('pt-PT'):'—';
+  const timeStr=deliveryOption==='express'?(expressTime||'—'):(orderTime||'—');
+  const orderRef='BT-'+Date.now().toString().slice(-6);
+
+  const summary=`🍰 BISMI TREATS - Confirmação de Encomenda
+
+Olá ${name}! 😊
+
+Muito obrigado por escolher a Bismi Treats!
+A sua encomenda foi recebida com sucesso.
+
+📋 DETALHES DA ENCOMENDA
+🆔 Referência: ${orderRef}
+👤 Cliente: ${name}
+📞 Contacto: ${phone||'—'}
+${nif?'🪪 NIF: '+nif+'\n':''}
+🍰 O SEU BOLO
+Tipo: ${getCakeName(cakeType)}
+Sabor: ${flavorDesc}
+${cakeMessage?'💬 Mensagem: "'+cakeMessage+'"\n':''}Tamanho: ${minWeight}–${maxWeight} kg
+${chefNotes?'📝 Nota Chef: '+chefNotes+'\n':''}
+💰 PREÇO ESTIMADO: €${minPrice} – €${maxPrice}
+
+🚚 ENTREGA
+Tipo: ${deliveryOption==='express'?'Expresso ⚡':'Agendada 📅'} - ${delivLabel}
+Data: ${dateStr}
+Hora: ${timeStr}
+${address?'📍 Morada: '+address+'\n':''}
+💳 Pagamento: ${paymentMethod}
+
+ℹ️ IMPORTANTE:
+• O preço final será calculado após a pesagem
+• O seu bolo estará pronto 1h antes da hora escolhida
+• Será informado com foto e preço final quando pronto
+• Qualquer dúvida: 934453710 | bismitreats.pt@gmail.com
+
+Muito obrigado pela sua confiança! 🙏
+Bismi Treats — Luxury and taste in one bite 💕
+📸 @bismitreats.pt | 🌐 bismitreats.com`;
+
+  submittedOrder={
+    id:Date.now(), orderRef,
+    customerName:name, phone, nif, cakeType, baseFlavor, combinationFlavor,
+    extraFilling, cakeMessage, chefNotes, minWeight, maxWeight,
+    deliveryType, deliveryOption, address,
+    orderDate:deliveryOption==='express'?today():orderDate,
+    orderTime:deliveryOption==='express'?expressTime:orderTime,
+    expressTime, paymentMethod, status:'new',
+    submittedAt:new Date().toISOString(), summary,
+    referencePhoto:cPhotoData||null
+  };
+
+  // Save photo
+  if(cPhotoData){
+    try{
+      const photos=JSON.parse(localStorage.getItem('bismiPhotos_'+submittedOrder.id)||'[]');
+      photos.push({id:Date.now(),label:'Referência do Cliente',data:cPhotoData,type:'reference',uploadedBy:name,uploadedAt:new Date().toISOString()});
+      localStorage.setItem('bismiPhotos_'+submittedOrder.id,JSON.stringify(photos));
+    }catch(e){}
+  }
+
+  // Send to server + localStorage
+  fetch('/api/customer-requests',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(submittedOrder)}).catch(()=>{});
+  try{
+    const ex=JSON.parse(localStorage.getItem('customerOrders')||'[]');
+    ex.push(submittedOrder);
+    localStorage.setItem('customerOrders',JSON.stringify(ex));
+  }catch(e){}
+
+  // Show success
+  document.getElementById('orderFormSection').style.display='none';
+  document.getElementById('successScreen').style.display='block';
+  document.getElementById('stickySubmit').style.display='none';
+  document.getElementById('successRef').textContent=orderRef;
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  // Build summary box
+  const rows=[
+    [currentLang==='en'?'Name':'Nome', name],
+    [currentLang==='en'?'Cake':'Bolo', getCakeName(cakeType)],
+    [currentLang==='en'?'Flavour':'Sabor', flavorDesc],
+    cakeMessage?[currentLang==='en'?'Message':'Mensagem', '"'+cakeMessage+'"']:null,
+    chefNotes?[currentLang==='en'?'Chef Note':'Nota Chef', chefNotes]:null,
+    [currentLang==='en'?'Size':'Tamanho', minWeight+'–'+maxWeight+' kg'],
+    [currentLang==='en'?'Est. Price':'Preço Est.', '€'+minPrice+' – €'+maxPrice],
+    [currentLang==='en'?'Date':'Data', dateStr+' às '+timeStr],
+    [currentLang==='en'?'Delivery':'Entrega', delivLabel],
+    address?[currentLang==='en'?'Address':'Morada', address]:null,
+    [currentLang==='en'?'Payment':'Pagamento', paymentMethod],
+  ].filter(Boolean);
+  document.getElementById('orderSummaryBox').innerHTML=rows.map(([l,v])=>`<div class="summary-row"><span class="summary-label">${l}</span><span class="summary-value">${v}</span></div>`).join('');
+  window._orderSummary=summary;
+  window._submittedOrder=submittedOrder;
+}
+
+document.getElementById('stickySubmitBtn').addEventListener('click',submitCustomerOrder);
+
+// ─── SUCCESS BUTTONS ─────────────────────────────────────────
+document.getElementById('copyOrderBtn').addEventListener('click',()=>{
+  const summary=window._orderSummary||'';
+  const toast=document.getElementById('copiedToast');
+  navigator.clipboard.writeText(summary).then(()=>{ toast.style.display='block'; setTimeout(()=>toast.style.display='none',3500); })
+  .catch(()=>{ const ta=document.createElement('textarea'); ta.value=summary; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast.style.display='block'; setTimeout(()=>toast.style.display='none',3500); });
+});
+document.getElementById('openWhatsAppBtn').addEventListener('click',()=>window.open('https://wa.me/351934453710','_blank'));
+
+document.getElementById('saveReceiptImageBtn').addEventListener('click',()=>generateReceiptImage());
+
+function generateReceiptImage(){
+  const o=window._submittedOrder;
+  if(!o){ alert('No order data'); return; }
+  const canvas=document.createElement('canvas');
+  const W=560, scale=2;
+  canvas.width=W*scale; canvas.height=900*scale;
+  const ctx=canvas.getContext('2d');
+  ctx.scale(scale,scale);
+  // Background
+  ctx.fillStyle='#FFFDF7';
+  ctx.fillRect(0,0,W,900);
+  // Header gradient
+  const grad=ctx.createLinearGradient(0,0,W,120);
+  grad.addColorStop(0,'#b5845a'); grad.addColorStop(1,'#CB997E');
+  ctx.fillStyle=grad;
+  roundRect(ctx,0,0,W,120,0);
+  // Logo
+  ctx.font='bold 36px serif'; ctx.fillStyle='white'; ctx.textAlign='center';
+  ctx.fillText('🎂',W/2,45);
+  ctx.font='bold 22px Georgia,serif'; ctx.fillText('Bismi Treats',W/2,75);
+  ctx.font='13px sans-serif'; ctx.fillStyle='rgba(255,255,255,0.85)';
+  ctx.fillText('Luxury and taste in one bite',W/2,98);
+  ctx.fillText(o.orderRef||'',W/2,116);
+  // Body
+  let y=140;
+  ctx.textAlign='left';
+  function drawSection(title, rows){
+    ctx.fillStyle='#D4A373'; ctx.font='bold 11px sans-serif';
+    ctx.fillText(title.toUpperCase(),24,y); y+=4;
+    ctx.fillStyle='#e8d9c0'; ctx.fillRect(24,y,W-48,1); y+=12;
+    rows.forEach(([label,val])=>{
+      if(!val) return;
+      ctx.fillStyle='#7a6a58'; ctx.font='11px sans-serif';
+      ctx.fillText(label,24,y);
+      ctx.fillStyle='#3A3A3A'; ctx.font='bold 11px sans-serif';
+      const maxW2=W-24-ctx.measureText(label).width-20;
+      ctx.fillText(String(val).substring(0,50),W-24,y,'right');
+      y+=18;
+    });
+    y+=8;
+  }
+  const flavorDesc=getFlavorName(o.baseFlavor)+(o.combinationFlavor?' + '+getFlavorName(o.combinationFlavor):'')+(o.extraFilling?' c/ '+getFlavorName(o.extraFilling):'');
+  const ppkg=CAKE_PRICES[o.cakeType]||19.99;
+  const extraFill=o.extraFilling?1.99:0;
+  const minP=(parseFloat(o.minWeight)*ppkg+extraFill).toFixed(2);
+  const maxP=(parseFloat(o.maxWeight)*ppkg+extraFill).toFixed(2);
+  const dateStr=o.deliveryOption==='express'?'Expresso':o.orderDate?new Date(o.orderDate+'T00:00:00').toLocaleDateString('pt-PT'):'—';
+  const timeStr=o.deliveryOption==='express'?(o.expressTime||'—'):(o.orderTime||'—');
+  drawSection('Cliente',[['Nome',o.customerName],['Telefone',o.phone||'—'],['NIF',o.nif||null]]);
+  drawSection('Bolo',[['Tipo',getCakeName(o.cakeType)],['Sabor',flavorDesc],['Mensagem',o.cakeMessage||null],['Tamanho',o.minWeight+'–'+o.maxWeight+' kg']]);
+  drawSection('Preço Estimado',[['Base ('+o.minWeight+'–'+o.maxWeight+'kg × €'+ppkg+')','€'+(parseFloat(o.minWeight)*ppkg).toFixed(2)+' – €'+(parseFloat(o.maxWeight)*ppkg).toFixed(2)],o.extraFilling?['Recheio Extra','€'+extraFill.toFixed(2)]:null,['TOTAL ESTIMADO','€'+minP+' – €'+maxP]].filter(Boolean));
+  drawSection('Entrega',[['Data',dateStr],['Hora',timeStr],['Tipo',o.deliveryType==='pickup'?'Recolha':'Entrega'],o.address?['Morada',o.address]:null,['Pagamento',o.paymentMethod]].filter(Boolean));
+  // Footer
+  y=Math.max(y,780);
+  ctx.fillStyle='#e8d9c0'; ctx.fillRect(0,y,W,1); y+=16;
+  ctx.fillStyle='#7a6a58'; ctx.font='11px sans-serif'; ctx.textAlign='center';
+  ctx.fillText('📞 934453710  ·  ✉️ bismitreats.pt@gmail.com',W/2,y); y+=16;
+  ctx.fillText('📸 @bismitreats.pt  ·  🌐 bismitreats.com',W/2,y); y+=16;
+  ctx.fillStyle='#D4A373'; ctx.font='bold 12px Georgia,serif';
+  ctx.fillText('❤️ Obrigado por escolher a Bismi Treats!',W/2,y);
+  // Resize canvas to actual content
+  canvas.height=(y+30)*scale;
+  // Download
+  const link=document.createElement('a');
+  link.download='bismi-treats-recibo-'+o.orderRef+'.png';
+  link.href=canvas.toDataURL('image/png');
+  link.click();
+}
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath(); ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath(); ctx.fill();
+}
+
+document.getElementById('addToCalendarBtn').addEventListener('click',()=>openModal('calendarChoiceModal'));
+function addCustomerToCalendar(type){
+  const o=window._submittedOrder; if(!o) return;
+  const date=o.orderDate||today();
+  const time=o.orderTime||'18:00';
+  const title=encodeURIComponent('Bismi Treats — '+o.customerName+' ('+getCakeName(o.cakeType)+')');
+  const details=encodeURIComponent('Encomenda '+o.orderRef+'\nSabor: '+getFlavorName(o.baseFlavor)+'\nTamanho: '+o.minWeight+'–'+o.maxWeight+'kg');
+  if(type==='google'){
+    const dt=date.replace(/-/g,'')+'T'+time.replace(':','')+'00';
+    const dtEnd=date.replace(/-/g,'')+'T'+String(parseInt(time.split(':')[0])+1).padStart(2,'0')+time.split(':')[1]+'00';
+    window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dt}/${dtEnd}&details=${details}`,'_blank');
+  } else {
+    window.open(`https://outlook.live.com/calendar/0/deeplink/compose?subject=${title}&startdt=${date}T${time}:00&enddt=${date}T${String(parseInt(time.split(':')[0])+1).padStart(2,'0')}:${time.split(':')[1]}:00`,'_blank');
+  }
+  closeModal('calendarChoiceModal');
+}
+
+document.getElementById('newOrderBtn').addEventListener('click',()=>{
+  document.getElementById('customerOrderForm').reset();
+  document.querySelectorAll('.cake-type-card,.flavour-btn,.payment-card').forEach(el=>el.classList.remove('selected'));
+  document.querySelectorAll('.flavour-btn[data-value=""]').forEach(el=>el.classList.add('selected'));
+  document.getElementById('cCakeType').value='';
+  document.getElementById('cBaseFlavor').value='';
+  document.getElementById('cCombinationFlavor').value='';
+  document.getElementById('cExtraFilling').value='';
+  document.getElementById('cPaymentMethod').value='';
+  document.getElementById('cOrderTime').value='';
+  document.getElementById('cExpressTime').value='';
+  document.getElementById('cCombinationSection').style.display='none';
+  document.getElementById('cAddressSection').style.display='none';
+  document.getElementById('cScheduledSection').style.display='none';
+  document.getElementById('cExpressSection').style.display='none';
+  document.getElementById('cPriceDisplay').style.display='none';
+  document.getElementById('cPaymentInfo').style.display='none';
+  cPhotoData=null;
+  document.getElementById('cPhotoPreview').src='';
+  document.getElementById('cPhotoPreviewArea').style.display='none';
+  document.getElementById('cPhotoLabel').style.display='flex';
+  document.getElementById('cPhotoInput').value='';
+  document.getElementById('successScreen').style.display='none';
+  document.getElementById('orderFormSection').style.display='block';
+  document.getElementById('stickySubmit').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+  updateProgress();
+});
+
+// ─── ADMIN LOGIN ──────────────────────────────────────────────
+function openAdminLogin(){
+  document.getElementById('adminPass').value='';
+  document.getElementById('loginError').style.display='none';
+  openModal('adminLoginModal');
+  setTimeout(()=>document.getElementById('adminPass').focus(),100);
+}
+document.getElementById('adminAccessBtn').addEventListener('click',openAdminLogin);
+document.getElementById('loginTopBtn').addEventListener('click',openAdminLogin);
+document.getElementById('cancelLoginBtn').addEventListener('click',()=>closeModal('adminLoginModal'));
+document.getElementById('confirmLoginBtn').addEventListener('click',()=>{
+  const user=document.getElementById('adminUser').value.trim();
+  const pass=document.getElementById('adminPass').value;
+  if((user==='admin'&&pass==='admin')||(user==='Staff'&&pass==='Staff')){
+    closeModal('adminLoginModal');
+    window.location.href='login.html';
+  } else {
+    document.getElementById('loginError').style.display='block';
+    document.getElementById('adminPass').value='';
+  }
+});
+document.getElementById('adminPass').addEventListener('keydown',e=>{ if(e.key==='Enter') document.getElementById('confirmLoginBtn').click(); });
+
+function openModal(id){ document.getElementById(id).classList.add('active'); }
+function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('active'); }));
+
+// ─── INIT ─────────────────────────────────────────────────────
+setLang(currentLang);
+updateSizeSuggestion();
+updateProgress();
+</script>
+</body>
+</html>

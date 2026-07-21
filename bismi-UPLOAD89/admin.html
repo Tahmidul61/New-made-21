@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+
+<html lang="pt">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bismi Treats — Admin</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FFFDF7;
+  --card:#FFFFFF;
+  --card2:#FAEDCD;
+  --accent:#D4A373;
+  --accent2:#CB997E;
+  --accent-dark:#b5845a;
+  --text:#3A3A3A;
+  --text2:#7a6a58;
+  --border:#e8d9c0;
+  --border2:#d4c4a8;
+  --success:#6a9e6a;
+  --warning:#c9853a;
+  --danger:#c0544a;
+  --info:#5a85b0;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Georgia,sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* TOP BAR */
+.topbar{background:var(--card);border-bottom:2px solid var(--border);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(212,163,115,0.15)}
+.topbar-brand{display:flex;align-items:center;gap:10px}
+.brand-name{color:var(--accent-dark);font-family:Georgia,serif;font-size:1.2rem;font-weight:700;letter-spacing:.02em}
+.brand-sub{font-size:0.72rem;color:var(--text2);font-weight:400}
+.topbar-actions{display:flex;align-items:center;gap:10px}
+
+/* SETTINGS */
+.settings-wrapper{position:relative}
+.settings-btn{background:var(--card2);border:1px solid var(--border);color:var(--text2);width:38px;height:38px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s}
+.settings-btn:hover{background:var(--accent);border-color:var(--accent);color:white}
+.settings-menu{position:absolute;top:44px;right:0;background:var(--card);border:1px solid var(--border);border-radius:12px;min-width:230px;padding:8px;display:none;z-index:200;box-shadow:0 8px 32px rgba(212,163,115,0.25)}
+.settings-menu.open{display:block}
+.settings-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:0.88rem;color:var(--text);transition:background .15s}
+.settings-item:hover{background:var(--card2)}
+.settings-item i{width:18px;color:var(--accent);text-align:center}
+
+/* MAIN LAYOUT */
+.main-layout{display:grid;grid-template-columns:280px 1fr 340px;gap:16px;padding:16px;min-height:calc(100vh - 60px)}
+
+/* PANELS */
+.panel{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:all .3s;box-shadow:0 2px 12px rgba(212,163,115,0.1)}
+.panel.minimized .panel-body{display:none}
+.panel-header{padding:13px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:linear-gradient(135deg,var(--card2),#f5e4c0);flex-shrink:0}
+.panel-title{font-size:0.92rem;font-weight:700;display:flex;align-items:center;gap:8px;color:var(--accent-dark)}
+.panel-controls{display:flex;gap:6px}
+.panel-ctrl-btn{background:white;border:1px solid var(--border);color:var(--text2);width:28px;height:28px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.75rem;transition:all .2s}
+.panel-ctrl-btn:hover{background:var(--accent);color:white;border-color:var(--accent)}
+.panel-ctrl-btn.pinned{background:var(--accent);color:white;border-color:var(--accent)}
+.panel-body{flex:1;overflow-y:auto;padding:16px;max-height:calc(100vh - 120px)}
+
+/* DASHBOARD */
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.metric-card{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+.metric-card.blue{border-color:#5a85b040;background:#5a85b012}
+.metric-card.yellow{border-color:#c9853a40;background:#c9853a12}
+.metric-card.green{border-color:#6a9e6a40;background:#6a9e6a12}
+.metric-card.purple{border-color:#CB997E40;background:#CB997E12}
+.metric-card.orange{border-color:#D4A37340;background:#D4A37312}
+.metric-value{font-size:1.8rem;font-weight:800;margin-bottom:4px;font-family:Georgia,serif}
+.metric-label{font-size:0.72rem;color:var(--text2);text-transform:uppercase;letter-spacing:.04em}
+.metric-card.blue .metric-value{color:#5a85b0}
+.metric-card.yellow .metric-value{color:#c9853a}
+.metric-card.green .metric-value{color:#6a9e6a}
+.metric-card.purple .metric-value{color:#CB997E}
+.metric-card.orange .metric-value{color:#D4A373}
+
+.agenda-section h4{font-size:0.8rem;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:6px}
+.agenda-item{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.agenda-time{font-size:0.8rem;font-weight:700;color:var(--accent-dark);min-width:45px}
+.agenda-info{flex:1;font-size:0.83rem}
+.agenda-info strong{display:block;color:var(--text)}
+.agenda-flavor{color:var(--text2);font-size:0.76rem}
+.agenda-status{font-size:0.7rem;padding:3px 8px;border-radius:20px;font-weight:600}
+.status-pending{background:#c9853a20;color:#c9853a}
+.status-confirmed{background:#5a85b020;color:#5a85b0}
+.status-ready{background:#6a9e6a20;color:#6a9e6a}
+.status-delivered{background:#9a9a9a20;color:#9a9a9a}
+.empty-agenda{text-align:center;color:var(--text2);padding:20px;font-size:0.85rem}
+
+.dashboard-actions{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.dash-btn{background:white;border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;cursor:pointer;font-size:0.8rem;display:flex;align-items:center;gap:6px;transition:all .2s;position:relative;font-family:inherit}
+.dash-btn:hover{background:var(--accent);border-color:var(--accent);color:white}
+.badge{background:var(--danger);color:white;font-size:0.65rem;font-weight:700;padding:2px 5px;border-radius:10px;position:absolute;top:-6px;right:-6px}
+
+/* FORM */
+.form-section{margin-bottom:18px}
+.form-section-title{font-size:0.78rem;font-weight:700;color:var(--accent-dark);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:6px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.form-row.single{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:0.76rem;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.form-group input,.form-group select,.form-group textarea{background:var(--card2);border:1.5px solid var(--border);color:var(--text);padding:9px 11px;border-radius:8px;font-size:0.85rem;outline:none;transition:border-color .2s,box-shadow .2s;font-family:inherit}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(212,163,115,0.15)}
+.form-group select option{background:white;color:var(--text)}
+.form-group textarea{resize:vertical;min-height:60px}
+.price-per-kg-badge{font-size:0.75rem;color:var(--accent-dark);margin-top:3px;font-weight:600}
+
+.weight-arrow{color:var(--text2);font-size:0.8rem}
+.price-display{background:linear-gradient(135deg,#D4A37318,#CB997E18);border:1.5px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;display:none}
+.price-range{display:flex;align-items:center;justify-content:center;gap:8px;font-size:1.1rem;font-weight:700;color:var(--accent-dark);font-family:Georgia,serif}
+.price-breakdown{font-size:0.74rem;color:var(--text2);text-align:center;margin-top:4px}
+
+.delivery-toggle{display:flex;gap:8px}
+.delivery-toggle label{flex:1;text-align:center;padding:9px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:0.82rem;transition:all .2s;background:var(--card2);color:var(--text)}
+.delivery-toggle input[type=radio]{display:none}
+.delivery-toggle input[type=radio]:checked+label{background:var(--accent);border-color:var(--accent);color:white;font-weight:600}
+
+.scheduled-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+
+.extra-products-container{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.extra-product-item{display:flex;gap:8px;align-items:center}
+.extra-product-item input{flex:1;background:var(--card2);border:1.5px solid var(--border);color:var(--text);padding:8px 10px;border-radius:8px;font-size:0.82rem;outline:none;font-family:inherit}
+.extra-product-item input:focus{border-color:var(--accent)}
+.btn-remove-extra{background:none;border:1px solid #c0544a40;color:#c0544a;width:28px;height:28px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.75rem;flex-shrink:0;transition:all .2s}
+.btn-remove-extra:hover{background:#c0544a;color:white}
+.btn-add-extra{background:none;border:1.5px dashed var(--border);color:var(--text2);padding:8px;border-radius:8px;cursor:pointer;font-size:0.82rem;width:100%;margin-top:6px;transition:all .2s;font-family:inherit}
+.btn-add-extra:hover{border-color:var(--accent);color:var(--accent-dark)}
+
+.btn-submit{background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border:none;padding:13px;border-radius:10px;font-size:0.95rem;font-weight:700;cursor:pointer;width:100%;margin-top:8px;transition:all .2s;font-family:inherit;letter-spacing:.02em}
+.btn-submit:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 4px 16px rgba(212,163,115,0.4)}
+
+/* ORDERS */
+.orders-toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.orders-toolbar input,.orders-toolbar select{background:var(--card2);border:1.5px solid var(--border);color:var(--text);padding:7px 10px;border-radius:8px;font-size:0.82rem;outline:none;flex:1;min-width:80px;font-family:inherit}
+.orders-toolbar input:focus,.orders-toolbar select:focus{border-color:var(--accent)}
+
+.order-card{background:white;border:1.5px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.order-card:hover{border-color:var(--accent);box-shadow:0 4px 16px rgba(212,163,115,0.15)}
+.order-card-header{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,var(--card2),#f5e4c0)}
+.order-id-badge{font-size:0.78rem;font-weight:700;color:var(--accent-dark);flex:1}
+.order-status-badge{font-size:0.7rem;padding:3px 9px;border-radius:20px;font-weight:600}
+.btn-edit-order{background:none;border:none;color:var(--text2);cursor:pointer;padding:4px 6px;border-radius:6px;font-size:0.8rem;transition:all .2s}
+.btn-edit-order:hover{background:var(--accent);color:white}
+.order-card-body{padding:10px 12px;font-size:0.82rem}
+.order-info-row{display:flex;align-items:flex-start;gap:6px;margin-bottom:4px;color:var(--text2)}
+.order-info-row i{color:var(--accent);width:14px;flex-shrink:0;margin-top:2px}
+.order-info-row strong{color:var(--text)}
+.chef-note{background:var(--card2);border-radius:6px;padding:6px 8px;margin-top:4px;font-style:italic;border-left:3px solid var(--accent);font-size:0.8rem;color:var(--text2)}
+.order-card-actions{display:flex;gap:6px;padding:8px 12px;border-top:1px solid var(--border);flex-wrap:wrap;background:#faf8f4}
+
+.btn-action{border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:0.74rem;font-weight:600;display:flex;align-items:center;gap:4px;transition:all .2s;font-family:inherit}
+.btn-receipt{background:#D4A37320;color:var(--accent-dark);border:1px solid #D4A37340}
+.btn-receipt:hover{background:var(--accent);color:white}
+.btn-whatsapp-action{background:#25d36618;color:#1a9e4a;border:1px solid #25d36630}
+.btn-whatsapp-action:hover{background:#25d366;color:white}
+.btn-delivery-msg{background:#5a85b018;color:#5a85b0;border:1px solid #5a85b030}
+.btn-delivery-msg:hover{background:#5a85b0;color:white}
+.btn-calendar-action{background:#c9853a18;color:#c9853a;border:1px solid #c9853a30}
+.btn-calendar-action:hover{background:#c9853a;color:white}
+.btn-status-action{background:#6a9e6a18;color:#6a9e6a;border:1px solid #6a9e6a30}
+.btn-status-action:hover{background:#6a9e6a;color:white}
+.btn-delete-action{background:#c0544a18;color:#c0544a;border:1px solid #c0544a30}
+.btn-delete-action:hover{background:#c0544a;color:white}
+.btn-view-action{background:#5a85b018;color:#5a85b0;border:1px solid #5a85b030}
+.btn-view-action:hover{background:#5a85b0;color:white}
+.btn-insert-action{background:#6a9e6a18;color:#6a9e6a;border:1px solid #6a9e6a30}
+.btn-insert-action:hover{background:#6a9e6a;color:white}
+.btn-restore-action{background:#6a9e6a18;color:#6a9e6a;border:1px solid #6a9e6a30}
+.btn-restore-action:hover{background:#6a9e6a;color:white}
+
+.empty-state{text-align:center;padding:40px 20px;color:var(--text2)}
+.empty-state i{font-size:2.5rem;margin-bottom:12px;opacity:.3;display:block;color:var(--accent)}
+
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;background:rgba(58,40,20,.55);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px}
+.modal-overlay.active{display:flex}
+.modal{background:var(--card);border:1.5px solid var(--border);border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(212,163,115,0.3)}
+.modal.modal-lg{max-width:800px}
+.modal.modal-xl{max-width:1100px;max-height:95vh}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:linear-gradient(135deg,var(--card2),#f5e4c0);z-index:1;border-radius:14px 14px 0 0}
+.modal-header h3{font-size:1rem;font-weight:700;display:flex;align-items:center;gap:8px;color:var(--accent-dark)}
+.modal-close{background:none;border:none;color:var(--text2);font-size:1.2rem;cursor:pointer;padding:4px;border-radius:6px;transition:all .2s}
+.modal-close:hover{background:var(--danger);color:white}
+.modal-body{padding:20px}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;background:#faf8f4;border-radius:0 0 14px 14px}
+
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;transition:all .2s;font-family:inherit}
+.btn-primary:hover{opacity:.9;box-shadow:0 4px 12px rgba(212,163,115,0.4)}
+.btn-secondary{background:white;border:1.5px solid var(--border);color:var(--text);padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;transition:all .2s;font-family:inherit}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent-dark)}
+.btn-danger{background:#c0544a18;border:1px solid #c0544a40;color:#c0544a;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;transition:all .2s;font-family:inherit}
+.btn-danger:hover{background:#c0544a;color:white}
+
+/* RECEIPT */
+.receipt-type-tabs{display:flex;gap:8px;margin-bottom:16px}
+.receipt-type-btn{flex:1;padding:9px;border:1.5px solid var(--border);background:var(--card2);color:var(--text2);border-radius:8px;cursor:pointer;font-size:0.85rem;transition:all .2s;font-family:inherit}
+.receipt-type-btn.active{background:var(--accent);border-color:var(--accent);color:white;font-weight:600}
+.receipt-print-btns{display:flex;gap:8px;margin-bottom:16px}
+.receipt-doc{background:white;color:#2c3e50;padding:20px;border-radius:8px;font-size:0.85rem;border:1px solid #e0d0b8}
+.receipt-header{text-align:center;padding-bottom:12px;border-bottom:2px solid #D4A373;margin-bottom:12px}
+.receipt-logo{font-size:2rem}
+.receipt-header h2{font-size:1.3rem;margin:4px 0;color:#b5845a;font-family:Georgia,serif}
+.receipt-header p{color:#7f8c8d;font-size:0.8rem}
+.receipt-section{margin-bottom:10px}
+.receipt-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dotted #e0d0b8;font-size:0.82rem}
+.receipt-total{display:flex;justify-content:space-between;font-weight:700;font-size:1rem;padding-top:6px;border-top:2px solid #D4A373;color:#b5845a}
+.receipt-footer{text-align:center;margin-top:12px;font-style:italic;color:#7f8c8d;font-size:0.8rem}
+
+/* WHATSAPP */
+.whatsapp-msg{background:#f0ebe3;border:1px solid var(--border);border-radius:10px;padding:16px;font-family:monospace;font-size:0.82rem;white-space:pre-wrap;color:var(--text);max-height:300px;overflow-y:auto;line-height:1.6}
+
+/* GALLERY */
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.gallery-date-card{background:white;border:1.5px solid var(--border);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.gallery-date-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 12px rgba(212,163,115,0.2)}
+.gallery-date-card.has-orders{border-color:var(--accent);background:linear-gradient(135deg,#D4A37310,#FAEDCD)}
+.gallery-checkbox{position:absolute;top:6px;left:6px;width:14px;height:14px;cursor:pointer;accent-color:var(--accent)}
+.gallery-date-label{font-size:0.82rem;font-weight:700;margin-bottom:2px;color:var(--text)}
+.gallery-day-name{font-size:0.7rem;color:var(--text2);margin-bottom:6px}
+.gallery-order-count{font-size:1.4rem;font-weight:800;color:var(--text2);font-family:Georgia,serif}
+.gallery-order-count.has-orders{color:var(--accent-dark)}
+.gallery-order-label{font-size:0.68rem;color:var(--text2)}
+.gallery-order-card{background:white;border:1.5px solid var(--border);border-radius:10px;padding:12px;position:relative}
+.gallery-order-header{display:flex;justify-content:space-between;margin-bottom:6px;padding-left:20px}
+.gallery-order-num{font-weight:700;font-size:0.82rem;color:var(--accent-dark)}
+.gallery-order-status{font-size:0.72px;padding:2px 6px;border-radius:10px}
+.gallery-order-name{font-weight:600;font-size:0.85rem;margin-bottom:4px;color:var(--text)}
+.gallery-order-flavor,.gallery-order-time,.gallery-order-price{font-size:0.78rem;color:var(--text2);margin-bottom:2px}
+
+/* ALL ORDERS */
+.all-orders-toolbar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.all-orders-toolbar input,.all-orders-toolbar select{background:var(--card2);border:1.5px solid var(--border);color:var(--text);padding:7px 10px;border-radius:8px;font-size:0.82rem;outline:none;flex:1;min-width:100px;font-family:inherit}
+.view-toggle-btn{background:white;border:1.5px solid var(--border);color:var(--text2);padding:7px 12px;border-radius:8px;cursor:pointer;font-size:0.82rem;transition:all .2s;font-family:inherit}
+.view-toggle-btn.active{background:var(--accent);border-color:var(--accent);color:white}
+
+/* REMAINING */
+.remaining-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.remaining-stat{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.remaining-stat-value{font-size:1.5rem;font-weight:800;color:var(--accent-dark);font-family:Georgia,serif}
+.remaining-stat-label{font-size:0.72rem;color:var(--text2)}
+
+/* CUSTOMER REQUESTS */
+.request-card{background:white;border:1.5px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px}
+.request-header{display:flex;justify-content:space-between;margin-bottom:8px;align-items:center}
+.request-time{font-size:0.72rem;color:var(--text2)}
+.request-details{font-size:0.8rem;color:var(--text2);margin-bottom:8px;display:flex;flex-direction:column;gap:3px}
+.request-actions{display:flex;gap:6px;flex-wrap:wrap}
+.request-filter-tabs{display:flex;gap:8px;margin-bottom:12px}
+.req-tab{background:white;border:1.5px solid var(--border);color:var(--text2);padding:6px 14px;border-radius:20px;cursor:pointer;font-size:0.8rem;transition:all .2s;font-family:inherit}
+.req-tab.active{background:var(--accent);border-color:var(--accent);color:white}
+
+/* RECYCLE BIN */
+.recycle-item{background:white;border:1.5px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.recycle-info{flex:1;font-size:0.82rem}
+.recycle-info strong{display:block;margin-bottom:2px;color:var(--text)}
+.recycle-info span{color:var(--text2);font-size:0.75rem}
+.recycle-actions{display:flex;gap:6px}
+
+/* MONTHLY SALES */
+.month-checkboxes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.month-check-item{display:flex;align-items:center;gap:6px;font-size:0.82rem;cursor:pointer;color:var(--text)}
+.month-check-item input{accent-color:var(--accent)}
+.sales-month-section{margin-bottom:20px}
+.sales-month-section h4{background:var(--card2);padding:8px 12px;border-radius:8px;margin-bottom:8px;font-size:0.9rem;color:var(--accent-dark);border-left:3px solid var(--accent)}
+.sales-table{width:100%;border-collapse:collapse;font-size:0.8rem}
+.sales-table th{background:var(--accent);color:white;padding:6px 10px;text-align:left}
+.sales-table td{padding:6px 10px;border-bottom:1px solid var(--border);color:var(--text2)}
+.sales-table tr:hover td{background:var(--card2)}
+.sales-grand-total{font-weight:700;font-size:1rem;text-align:right;margin-top:12px;padding-top:8px;border-top:2px solid var(--accent);color:var(--accent-dark)}
+
+/* FINAL WEIGHT */
+.final-weight-form{display:flex;flex-direction:column;gap:12px}
+.final-price-display{background:linear-gradient(135deg,#6a9e6a18,#6a9e6a10);border:1.5px solid #6a9e6a40;border-radius:10px;padding:16px;text-align:center;font-size:1.5rem;font-weight:800;color:#6a9e6a;font-family:Georgia,serif}
+.discount-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.discount-btn{background:white;border:1.5px solid var(--border);color:var(--text);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:0.82rem;transition:all .2s;font-family:inherit}
+.discount-btn:hover{background:var(--warning);border-color:var(--warning);color:white}
+
+/* REMINDER */
+.reminder-notification{position:fixed;bottom:20px;left:20px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;padding:16px;border-radius:12px;display:flex;align-items:center;gap:12px;z-index:99999;box-shadow:0 8px 24px rgba(212,163,115,0.5);max-width:320px;animation:slideInLeft .3s ease}
+.reminder-icon{font-size:1.5rem}
+.reminder-body{flex:1;font-size:0.85rem}
+.reminder-body strong{display:block;margin-bottom:4px}
+.reminder-body p{margin:2px 0;opacity:.9}
+
+/* CALENDAR OPTIONS */
+.calendar-options{display:flex;flex-direction:column;gap:12px}
+.calendar-option-btn{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;cursor:pointer;color:var(--text);font-size:0.9rem;font-weight:600;transition:all .2s;font-family:inherit;width:100%}
+.calendar-option-btn:hover{border-color:var(--accent);background:linear-gradient(135deg,#D4A37318,#FAEDCD)}
+
+/* STATUS SELECT INLINE */
+.status-select-inline{background:var(--card2);border:1.5px solid var(--border);color:var(--text);padding:4px 8px;border-radius:7px;font-size:0.75rem;outline:none;cursor:pointer;font-family:inherit;transition:border-color .2s}
+.status-select-inline:focus{border-color:var(--accent)}
+
+/* RECEIPT CLASSIC */
+.receipt-doc{background:white;color:#2c3e50;padding:18px;border-radius:8px;font-size:0.84rem;border:1px solid #e0d0b8}
+.receipt-header{text-align:center;padding-bottom:12px;border-bottom:2px solid #D4A373;margin-bottom:12px}
+.receipt-logo{font-size:2rem}
+.receipt-header h2{font-size:1.3rem;margin:4px 0;color:#b5845a;font-family:Georgia,serif}
+.receipt-header p{color:#7f8c8d;font-size:0.78rem;margin:2px 0}
+.rcp-section-title{font-size:0.7rem;font-weight:700;color:#b5845a;text-transform:uppercase;letter-spacing:.06em;margin:10px 0 4px;padding-bottom:3px;border-bottom:1px solid #e8d9c0}
+.rcp-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dotted #e8d9c0;font-size:0.8rem;color:#555}
+.rcp-total{display:flex;justify-content:space-between;font-weight:700;font-size:0.95rem;padding-top:5px;border-top:2px solid #D4A373;color:#b5845a;margin-top:4px}
+.receipt-footer{text-align:center;margin-top:12px;font-style:italic;color:#7f8c8d;font-size:0.78rem}
+
+/* RECEIPT MODERN */
+.receipt-modern{background:white;border-radius:10px;overflow:hidden;border:1px solid #e0d0b8}
+.rcpm-header{background:linear-gradient(135deg,#b5845a,#CB997E);color:white;padding:18px;text-align:center}
+.rcpm-logo{font-size:2.2rem;margin-bottom:6px}
+.rcpm-brand{font-family:Georgia,serif;font-size:1.3rem;font-weight:700}
+.rcpm-type{font-size:0.82rem;opacity:.85;margin-top:3px}
+.rcpm-id{font-size:0.72rem;opacity:.7;margin-top:2px}
+.rcpm-body{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px}
+.rcpm-card{background:#FAEDCD;border:1px solid #e8d9c0;border-radius:8px;padding:10px}
+.rcpm-price-card{grid-column:span 2;background:linear-gradient(135deg,#D4A37315,#CB997E10);border-color:#D4A37340}
+.rcpm-card-title{font-size:0.72rem;font-weight:700;color:#b5845a;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;display:flex;align-items:center;gap:5px}
+.rcpm-card-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dotted #e8d9c0;font-size:0.8rem}
+.rcpm-label{color:#7a6a58}
+.rcpm-val{color:#3A3A3A;font-weight:500;text-align:right;max-width:55%}
+.rcpm-total-row{display:flex;justify-content:space-between;font-weight:700;font-size:0.95rem;padding-top:5px;border-top:2px solid #D4A373;color:#b5845a;margin-top:4px}
+.rcpm-footer{text-align:center;padding:12px;font-style:italic;color:#7f8c8d;font-size:0.78rem;border-top:1px solid #e8d9c0}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--card2)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+
+/* ANIMATIONS */
+@keyframes slideInLeft{from{transform:translateX(-100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* RESPONSIVE */
+@media(max-width:1200px){.main-layout{grid-template-columns:240px 1fr 300px}}
+@media(max-width:900px){.main-layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<!-- TOP BAR -->
+<div class="topbar">
+<div class="topbar-brand">
+<span style="font-size:1.6rem">🎂</span>
+<div>
+<div class="brand-name">Bismi Treats</div>
+<div class="brand-sub">Sistema de Gestão de Encomendas</div>
+</div>
+</div>
+<div class="topbar-actions">
+<button class="dash-btn" id="customerRequestsBtn" style="position:relative">
+<i class="fas fa-inbox"></i> Pedidos Clientes
+      <span class="badge" id="requestBadge" style="display:none">0</span>
+</button>
+<button class="dash-btn" id="viewRemainingOrdersBtn"><i class="fas fa-list-check"></i> Pendentes</button>
+<button class="dash-btn" id="adminLogoutBtn" style="background:#c0544a18;border-color:#c0544a30;color:#c0544a"><i class="fas fa-sign-out-alt"></i> Sair</button>
+<div class="settings-wrapper">
+<button class="settings-btn" id="settingsBtn" title="Configurações"><i class="fas fa-cog"></i></button>
+<div class="settings-menu" id="settingsMenu">
+<div class="settings-item" id="exportDataSettings"><i class="fas fa-download"></i> Exportar Dados</div>
+<div class="settings-item" id="importDataSettings"><i class="fas fa-upload"></i> Importar Dados</div>
+<div class="settings-item" id="monthlySalesReportSettings"><i class="fas fa-chart-bar"></i> Relatório Mensal</div>
+<div class="settings-item" id="reminderSettings"><i class="fas fa-bell"></i> Lembretes</div>
+<div class="settings-item" id="recycleBinSettings">
+<div class="settings-item" id="websiteAdminSettings"><i class="fas fa-globe"></i> Painel do Website</div><i class="fas fa-trash-restore"></i> Reciclagem</div>
+<div class="settings-item" id="removeModeSettings"><i class="fas fa-minus-circle"></i> Ativar Modo Remover</div>
+<div class="settings-item" id="editFormSettings"><i class="fas fa-edit"></i> Editar Formulário</div>
+<div class="settings-item" id="profilesSettings"><i class="fas fa-users"></i> Gerir Perfis</div>
+<div class="settings-item" id="activityLogSettings"><i class="fas fa-history"></i> Registo de Atividade</div>
+<div class="settings-item" id="loginHistorySettings"><i class="fas fa-sign-in-alt"></i> Histórico de Login</div>
+<div class="settings-item" id="staffStatsSettings"><i class="fas fa-chart-line"></i> Desempenho Staff</div>
+<div class="settings-item" id="autoBackupSettings"><i class="fas fa-cloud-download-alt"></i> Backup Automático</div>
+</div>
+</div>
+</div>
+</div>
+<input accept=".json" id="importFile" style="display:none" type="file"/>
+<!-- MAIN LAYOUT -->
+<div class="main-layout">
+<!-- DASHBOARD PANEL -->
+<div class="panel" id="dashboardPanel">
+<div class="panel-header">
+<div class="panel-title"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
+<div class="panel-controls">
+<button class="panel-ctrl-btn" id="pinDashboardBtn" title="Fixar"><i class="fas fa-thumbtack"></i></button>
+<button class="panel-ctrl-btn" id="toggleDashboardBtn" title="Minimizar"><i class="fas fa-minus"></i></button>
+</div>
+</div>
+<div class="panel-body" id="dashboardPanelBody">
+<div class="metric-grid">
+<div class="metric-card blue"><div class="metric-value" id="totalOrdersCount">0</div><div class="metric-label">Este Mês</div></div>
+<div class="metric-card yellow"><div class="metric-value" id="todayOrdersCount">0</div><div class="metric-label">Hoje</div></div>
+<div class="metric-card green"><div class="metric-value" id="tomorrowOrdersCount">0</div><div class="metric-label">Amanhã</div></div>
+<div class="metric-card purple"><div class="metric-value" id="todayRevenue">€0</div><div class="metric-label">Receita Hoje</div></div>
+<div class="metric-card orange" style="grid-column:span 2"><div class="metric-value" id="futureOrdersCount">0</div><div class="metric-label">Encomendas Futuras</div></div>
+</div>
+<div class="dashboard-actions">
+<button class="dash-btn" id="galleryViewBtn"><i class="fas fa-calendar-alt"></i> Calendário</button>
+<button class="dash-btn" id="viewAllOrdersBtn"><i class="fas fa-th"></i> Ver Todas</button>
+</div>
+<div class="agenda-section">
+<h4><i class="fas fa-clock"></i> Agenda de Hoje</h4>
+<div id="todayAgenda"><div class="empty-agenda">A carregar...</div></div>
+</div>
+</div>
+</div>
+<!-- FORM PANEL -->
+<div class="panel" id="formPanel">
+<div class="panel-header">
+<div class="panel-title"><i class="fas fa-plus-circle"></i> Nova Encomenda</div>
+<div class="panel-controls">
+<button class="panel-ctrl-btn" id="pinFormBtn" title="Fixar"><i class="fas fa-thumbtack"></i></button>
+<button class="panel-ctrl-btn" id="toggleFormBtn" title="Minimizar"><i class="fas fa-minus"></i></button>
+</div>
+</div>
+<div class="panel-body" id="formPanelBody">
+<form id="orderForm">
+<!-- CUSTOMER INFO -->
+<div class="form-section">
+<div class="form-section-title"><i class="fas fa-user"></i> Informações do Cliente</div>
+<div class="form-row">
+<div class="form-group">
+<label>ID do Cliente</label>
+<input id="customerId" placeholder="C-001" type="text"/>
+</div>
+<div class="form-group">
+<label>Nome *</label>
+<input id="customerName" placeholder="Nome completo" required="" type="text"/>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Telefone</label>
+<input id="phone" placeholder="9XXXXXXXX" type="tel"/>
+</div>
+<div class="form-group">
+<label>NIF (9 dígitos)</label>
+<input id="nif" maxlength="9" placeholder="XXXXXXXXX" type="text"/>
+</div>
+</div>
+</div>
+<!-- CAKE DETAILS -->
+<div class="form-section">
+<div class="form-section-title"><i class="fas fa-birthday-cake"></i> Detalhes do Bolo</div>
+<div class="form-row single">
+<div class="form-group">
+<label>Tipo de Bolo *</label>
+<select id="cakeType" required="">
+<option value="">Selecionar tipo...</option>
+<option data-price="19.99" value="sponge-chocolate">Chocolate Sponge Cake (€19.99/kg)</option>
+<option data-price="19.99" value="sponge-vanilla">Sponge Cake Vanilla (€19.99/kg)</option>
+<option data-price="19.99" value="sponge-normal">Sponge Cake Normal (€19.99/kg)</option>
+<option data-price="24.99" value="redvelvet">Red Velvet (€24.99/kg)</option>
+<option data-price="19.99" value="tres-leches">Tres Leches — mín. 1.5kg (€19.99/kg)</option>
+<option value="add-new">➕ Adicionar Novo Tipo...</option>
+</select>
+<div class="price-per-kg-badge" id="pricePerKgDisplay"></div>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Sabor Base *</label>
+<select id="baseFlavor" required="">
+<option value="">Selecionar sabor...</option>
+<option value="morango">Morango 🍓</option>
+<option value="chocolate">Chocolate 🍫</option>
+<option value="chocolate-branco">Chocolate Branco 🍫</option>
+<option value="limao">Limão 🍋</option>
+<option value="limao-verde">Limão Verde 🍋‍🟩 "Intensa"</option>
+<option value="laranja">Laranja 🍊</option>
+<option value="kiwi">Kiwi 🥝</option>
+<option value="coco">Coco 🥥</option>
+<option value="ananas">Ananás 🍍</option>
+<option value="cereja">Cereja 🍒</option>
+<option value="manga">Manga 🥭</option>
+<option value="framboesa">Framboesa 🫐</option>
+<option value="caramel">Caramel</option>
+<option value="frutos-vermelhos">Frutos Vermelhos</option>
+<option value="add-new">➕ Adicionar Novo Sabor...</option>
+</select>
+</div>
+<div class="form-group" id="combinationSection" style="display:none">
+<label>Combinação com</label>
+<select id="combinationFlavor">
+<option value="">Nenhuma</option>
+<option value="morango">Morango 🍓</option>
+<option value="chocolate">Chocolate 🍫</option>
+<option value="chocolate-branco">Chocolate Branco 🍫</option>
+<option value="limao">Limão 🍋</option>
+<option value="limao-verde">Limão Verde 🍋‍🟩</option>
+<option value="laranja">Laranja 🍊</option>
+<option value="kiwi">Kiwi 🥝</option>
+<option value="coco">Coco 🥥</option>
+<option value="ananas">Ananás 🍍</option>
+<option value="cereja">Cereja 🍒</option>
+<option value="manga">Manga 🥭</option>
+<option value="framboesa">Framboesa 🫐</option>
+<option value="caramel">Caramel</option>
+<option value="frutos-vermelhos">Frutos Vermelhos</option>
+<option value="add-new">➕ Adicionar...</option>
+</select>
+</div>
+</div>
+<div class="form-row single">
+<div class="form-group">
+<label>Recheio Extra (+€1.99)</label>
+<select id="extraFilling">
+<option value="">Sem recheio extra</option>
+<option data-price="1.99" value="morango">Morango 🍓 (+€1.99)</option>
+<option data-price="1.99" value="chocolate">Chocolate 🍫 (+€1.99)</option>
+<option data-price="1.99" value="chocolate-branco">Chocolate Branco 🍫 (+€1.99)</option>
+<option data-price="1.99" value="limao">Limão 🍋 (+€1.99)</option>
+<option data-price="1.99" value="limao-verde">Limão Verde 🍋‍🟩 (+€1.99)</option>
+<option data-price="1.99" value="laranja">Laranja 🍊 (+€1.99)</option>
+<option data-price="1.99" value="kiwi">Kiwi 🥝 (+€1.99)</option>
+<option data-price="1.99" value="coco">Coco 🥥 (+€1.99)</option>
+<option data-price="1.99" value="ananas">Ananás 🍍 (+€1.99)</option>
+<option data-price="1.99" value="cereja">Cereja 🍒 (+€1.99)</option>
+<option data-price="1.99" value="manga">Manga 🥭 (+€1.99)</option>
+<option data-price="1.99" value="framboesa">Framboesa 🫐 (+€1.99)</option>
+<option data-price="1.99" value="caramel">Caramel (+€1.99)</option>
+<option data-price="1.99" value="frutos-vermelhos">Frutos Vermelhos (+€1.99)</option>
+<option value="add-new">➕ Adicionar...</option>
+</select>
+</div>
+</div>
+<div class="form-row single">
+<div class="form-group">
+<label>Mensagem no Bolo</label>
+<input id="cakeMessage" placeholder="Ex: Feliz Aniversário Maria!" type="text"/>
+</div>
+</div>
+<div class="form-row single">
+<div class="form-group">
+<label>Nota para o Chef</label>
+<textarea id="chefNotes" placeholder="Instruções especiais para a cozinha..."></textarea>
+</div>
+<div class="form-row single" style="margin-top:8px">
+<div class="form-group">
+<label>Foto de Referência (opcional)</label>
+<div id="adminPhotoPreviewArea" style="display:none;margin-bottom:8px;position:relative">
+<img alt="Ref" id="adminPhotoPreview" src="" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;border:1.5px solid var(--border)"/>
+<button id="adminRemovePhotoBtn" style="position:absolute;top:6px;right:6px;background:#c0544a;color:white;border:none;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:0.7rem;display:flex;align-items:center;justify-content:center" type="button"><i class="fas fa-times"></i></button>
+</div>
+<label for="adminPhotoInput" id="adminPhotoLabel" style="display:flex;align-items:center;justify-content:center;gap:7px;padding:10px;background:var(--card2);border:1.5px dashed var(--border);border-radius:8px;cursor:pointer;font-size:0.82rem;color:var(--text2);transition:all .2s">
+<i class="fas fa-camera"></i> Adicionar foto de referência para o chef
+  </label>
+<input accept="image/*" id="adminPhotoInput" style="display:none" type="file"/>
+</div>
+</div>
+</div>
+</div>
+<!-- WEIGHT -->
+<div class="form-section">
+<div class="form-section-title"><i class="fas fa-weight"></i> Peso</div>
+<div id="normalWeightSection" style="display:flex;gap:10px;align-items:flex-end;margin-bottom:8px">
+<div class="form-group" style="flex:1">
+<label>Peso Mínimo (kg)</label>
+<select id="minWeight"><option value="">Selecionar...</option></select>
+</div>
+<div class="weight-arrow" style="padding-bottom:10px">→</div>
+<div class="form-group" style="flex:1">
+<label>Peso Máximo (kg)</label>
+<select disabled="" id="maxWeight"><option value="">Auto (+0.3kg)</option></select>
+</div>
+</div>
+<div id="customWeightSection" style="display:none;margin-bottom:8px">
+<div class="form-row">
+<div class="form-group">
+<label>Peso Mínimo (kg)</label>
+<input id="customMinWeight" min="1" placeholder="Ex: 1.2" step="0.1" type="number"/>
+</div>
+<div class="form-group">
+<label>Peso Máximo (kg)</label>
+<input id="customMaxWeight" min="1" placeholder="Ex: 1.5" step="0.1" type="number"/>
+</div>
+</div>
+</div>
+<button class="btn-add-extra" id="customWeightBtn" type="button"><i class="fas fa-edit"></i> Peso Personalizado</button>
+<div class="price-display" id="priceDisplay">
+<div class="price-range">€<span id="minPrice">0</span> — €<span id="maxPrice">0</span></div>
+<div class="price-breakdown" id="priceBreakdown"></div>
+</div>
+</div>
+<!-- EXTRA PRODUCTS -->
+<div class="form-section">
+<div class="form-section-title"><i class="fas fa-plus-square"></i> Produtos/Serviços Extra</div>
+<div class="extra-products-container" id="extraProductsContainer"></div>
+<button class="btn-add-extra" id="addExtraProductBtn" type="button"><i class="fas fa-plus"></i> Adicionar Produto/Serviço Extra</button>
+</div>
+<!-- DELIVERY -->
+<div class="form-section">
+<div class="form-section-title"><i class="fas fa-truck"></i> Entrega</div>
+<div class="form-row single">
+<div class="form-group">
+<label>Tipo de Entrega</label>
+<div class="delivery-toggle">
+<input id="pickupRadio" name="deliveryType" type="radio" value="pickup"/>
+<label for="pickupRadio">🏪 Recolha</label>
+<input id="deliveryRadio" name="deliveryType" type="radio" value="delivery"/>
+<label for="deliveryRadio">🚚 Entrega</label>
+</div>
+</div>
+</div>
+<div class="form-row single" id="addressSection" style="display:none">
+<div class="form-group">
+<label>Morada de Entrega</label>
+<input id="address" placeholder="Rua, número, cidade..." type="text"/>
+</div>
+</div>
+<div class="form-row single">
+<div class="form-group">
+<label>Agendamento</label>
+<div class="delivery-toggle">
+<input id="scheduledRadio" name="deliveryOption" type="radio" value="scheduled"/>
+<label for="scheduledRadio">📅 Agendada</label>
+<input id="expressRadio" name="deliveryOption" type="radio" value="express"/>
+<label for="expressRadio">⚡ Expresso</label>
+</div>
+</div>
+</div>
+<div class="scheduled-grid" id="scheduledDelivery" style="display:none">
+<div class="form-group">
+<label>Data</label>
+<input id="orderDate" type="date"/>
+</div>
+<div class="form-group">
+<label>Hora</label>
+<input id="orderTime" max="22:00" min="08:00" type="time"/>
+</div>
+</div>
+<div id="expressDelivery" style="display:none;margin-top:8px">
+<div class="form-group">
+<label>Hora de Entrega Expresso</label>
+<input id="expressTime" max="22:00" min="08:00" type="time"/>
+</div>
+<p style="font-size:0.75rem;color:var(--warning);margin-top:4px">⚡ Tempo estimado: 5–6 horas para preparação</p>
+</div>
+</div>
+<!-- PAYMENT & STATUS -->
+<div class="form-section">
+<div class="form-section-title"><i class="fas fa-credit-card"></i> Pagamento &amp; Estado</div>
+<div class="form-row">
+<div class="form-group">
+<label>Método de Pagamento</label>
+<select id="paymentMethod">
+<option value="">Selecionar...</option>
+<option value="MBWay">MBWay</option>
+<option value="Transferência">Transferência Bancária</option>
+<option value="Dinheiro">Dinheiro</option>
+</select>
+</div>
+<div class="form-group">
+<label>Estado</label>
+<select id="orderStatus">
+<option value="pending">⏳ Pendente</option>
+<option value="confirmed">✅ Confirmado</option>
+<option value="ready">🎂 Pronto</option>
+<option value="delivered">📦 Entregue</option>
+</select>
+</div>
+</div>
+</div>
+<button class="btn-submit" type="submit"><i class="fas fa-plus-circle"></i> Adicionar Encomenda</button>
+</form>
+</div>
+</div>
+<!-- ORDERS PANEL -->
+<div class="panel" id="ordersPanel">
+<div class="panel-header">
+<div class="panel-title"><i class="fas fa-list"></i> Encomendas</div>
+<div class="panel-controls">
+<button class="panel-ctrl-btn" id="pinOrdersBtn" title="Fixar"><i class="fas fa-thumbtack"></i></button>
+<button class="panel-ctrl-btn" id="toggleOrdersBtn" title="Minimizar"><i class="fas fa-minus"></i></button>
+</div>
+</div>
+<div class="panel-body" id="ordersPanelBody">
+<div class="orders-toolbar">
+<input id="searchOrders" placeholder="🔍 Pesquisar..." type="text"/>
+<select id="statusFilter">
+<option value="">Em Curso</option>
+<option value="pending">Pendente</option>
+<option value="confirmed">Confirmado</option>
+<option value="ready">Pronto</option>
+<option value="delivered">Entregue</option>
+</select>
+<select id="yearFilter"><option value="">Todos os Anos</option></select>
+</div>
+<div id="ordersList"><div class="empty-state"><i class="fas fa-inbox"></i><p>A carregar encomendas...</p></div></div>
+</div>
+</div>
+</div>
+<!-- ═══════════════════ MODALS ═══════════════════ -->
+<!-- RECEIPT MODAL -->
+<div class="modal-overlay" id="receiptModal">
+<div class="modal">
+<div class="modal-header">
+<h3><i class="fas fa-receipt"></i> Recibo</h3>
+<button class="modal-close" id="closeReceiptModal"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<input id="receiptOrderId" type="hidden"/>
+<div class="receipt-type-tabs">
+<button class="receipt-type-btn active" id="receiptTypeConfirmation">📋 Confirmação</button>
+<button class="receipt-type-btn" id="receiptTypeComplete">✅ Final</button>
+</div>
+<div class="receipt-type-tabs" style="margin-top:6px">
+<button class="receipt-type-btn active" id="receiptStyleClassic">📄 Clássico</button>
+<button class="receipt-type-btn" id="receiptStyleModern">✨ Moderno</button>
+</div>
+<div class="receipt-print-btns">
+<button class="btn-secondary" id="printA4Btn"><i class="fas fa-print"></i> Imprimir A4</button>
+<button class="btn-secondary" id="printA5Btn"><i class="fas fa-print"></i> Imprimir A5</button>
+</div>
+<div id="receiptContent"></div>
+</div>
+</div>
+</div>
+<!-- WHATSAPP MODAL -->
+<div class="modal-overlay" id="whatsappModal">
+<div class="modal">
+<div class="modal-header">
+<h3><i class="fab fa-whatsapp" style="color:#25d366"></i> Mensagem WhatsApp</h3>
+<button class="modal-close" id="closeWhatsappModal"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<input id="whatsappOrderId" type="hidden"/>
+<div class="receipt-type-tabs" style="margin-bottom:12px">
+<button class="receipt-type-btn active" id="waTypeConfirmation" onclick="switchWaType('confirmation')">📋 Confirmação</button>
+<button class="receipt-type-btn" id="waTypeFinal" onclick="switchWaType('final')">✅ Recibo Final</button>
+</div>
+<div class="whatsapp-msg" id="whatsappMessageText"></div>
+</div>
+<div class="modal-footer">
+<button class="btn-secondary" id="copyWhatsappBtn"><i class="fas fa-copy"></i> Copiar</button>
+<button class="btn-primary" id="sendWhatsappBtn"><i class="fab fa-whatsapp"></i> Enviar</button>
+</div>
+</div>
+</div>
+<!-- DELIVERY MESSAGE MODAL -->
+<div class="modal-overlay" id="deliveryMsgModal">
+<div class="modal">
+<div class="modal-header">
+<h3><i class="fas fa-truck" style="color:#5a85b0"></i> Mensagem de Entrega</h3>
+<button class="modal-close" id="closeDeliveryMsgModal"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<input id="deliveryMsgOrderId" type="hidden"/>
+<div class="whatsapp-msg" id="deliveryMsgText"></div>
+</div>
+<div class="modal-footer">
+<button class="btn-secondary" id="copyDeliveryMsgBtn"><i class="fas fa-copy"></i> Copiar</button>
+<button class="btn-primary" id="sendDeliveryMsgBtn"><i class="fab fa-whatsapp"></i> Enviar</button>
+</div>
+</div>
+</div>
+<!-- CALENDAR MODAL -->
+<div class="modal-overlay" id="calendarModal">
+<div class="modal" style="max-width:360px">
+<div class="modal-header">
+<h3><i class="fas fa-calendar-plus"></i> Adicionar ao Calendário</h3>
+<button class="modal-close" id="closeCalendarModal"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<input id="calendarOrderId" type="hidden"/>
+<div class="calendar-options">
+<button class="calendar-option-btn" id="googleCalendarBtn">
+<i class="fab fa-google" style="color:#4285f4;font-size:1.3rem"></i> Google Calendar
+        </button>
+<button class="calendar-option-btn" id="outlookCalendarBtn">
+<i class="fab fa-microsoft" style="color:#0078d4;font-size:1.3rem"></i> Outlook Calendar
+        </button>
+</div>
+</div>
+</div>
+</div>
+<!-- FINAL WEIGHT MODAL -->
+<div class="modal-overlay" id="finalWeightModal">
+<div class="modal" style="max-width:420px">
+<div class="modal-header">
+<h3><i class="fas fa-weight"></i> Peso Final &amp; Preço</h3>
+<button class="modal-close" id="closeFinalWeightModal"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<input id="finalWeightOrderId" type="hidden"/>
+<div class="final-weight-form">
+<div class="form-group">
+<label>Peso Final do Bolo</label>
+<select id="finalWeightSelect"></select>
+</div>
+<div class="form-group">
+<label>Preço por kg (€)</label>
+<input id="finalPricePerKg" min="0" step="0.01" type="number" value="19.99"/>
+</div>
+<div class="form-group">
+<label>Desconto (%)</label>
+<input id="finalDiscount" max="100" min="0" step="1" type="number" value="0"/>
+<div class="discount-btns">
+<button class="discount-btn" data-discount="5" type="button">5%</button>
+<button class="discount-btn" data-discount="10" type="button">10%</button>
+<button class="discount-btn" data-discount="15" type="button">15%</button>
+<button class="discount-btn" data-discount="0" type="button">Sem Desconto</button>
+</div>
+</div>
+<div class="final-price-display" id="finalPriceDisplay">€0.00</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn-secondary" id="cancelFinalWeightBtn">Cancelar</button>
+<button class="btn-primary" id="confirmFinalWeightBtn"><i class="fas fa-check"></i> Confirmar</button>
+</div>
+</div>
+</div>
+<!-- EDIT ORDER MODAL -->
+<div class="modal-overlay" id="editOrderModal">
+<div class="modal modal-lg">
+<div class="modal-header">
+<h3><i class="fas fa-edit"></i> Editar Encomenda</h3>
+<button class="modal-close" id="closeEditOrderModal"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<form id="editOrderForm">
+<input id="editOrderId" type="hidden"/>
+<div class="form-row">
+<div class="form-group"><label>ID Cliente</label><input id="editCustomerId" type="text"/></div>
+<div class="form-group"><label>Nome *</label><input id="editCustomerName" required="" type="text"/></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Telefone</label><input id="editPhone" type="tel"/></div>
+<div class="form-group"><label>NIF</label><input id="editNif" maxlength="9" type="text"/></div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Tipo de Bolo</label>
+<select id="editCakeType">
+<option value="">Selecionar...</option>
+<option data-price="19.99" value="sponge-chocolate">Chocolate Sponge Cake</option>
+<option data-price="19.99" value="sponge-vanilla">Sponge Cake Vanilla</option>
+<option data-price="19.99" value="sponge-normal">Sponge Cake Normal</option>
+<option data-price="24.99" value="redvelvet">Red Velvet</option>
+<option data-price="19.99" value="tres-leches">Tres Leches</option>
+<option value="add-new">➕ Adicionar Novo...</option>
+</select>
+</div>
+<div class="form-group">
+<label>Sabor Base</label>
+<select id="editBaseFlavor">
+<option value="">Selecionar...</option>
+<option value="morango">Morango 🍓</option>
+<option value="chocolate">Chocolate 🍫</option>
+<option value="chocolate-branco">Chocolate Branco 🍫</option>
+<option value="limao">Limão 🍋</option>
+<option value="limao-verde">Limão Verde 🍋‍🟩</option>
+<option value="laranja">Laranja 🍊</option>
+<option value="kiwi">Kiwi 🥝</option>
+<option value="coco">Coco 🥥</option>
+<option value="ananas">Ananás 🍍</option>
+<option value="cereja">Cereja 🍒</option>
+<option value="manga">Manga 🥭</option>
+<option value="framboesa">Framboesa 🫐</option>
+<option value="caramel">Caramel</option>
+<option value="frutos-vermelhos">Frutos Vermelhos</option>
+<option value="add-new">➕ Adicionar...</option>
+</select>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group" id="editCombinationSection">
+<label>Combinação com</label>
+<select id="editCombinationFlavor">
+<option value="">Nenhuma</option>
+<option value="morango">Morango 🍓</option>
+<option value="chocolate">Chocolate 🍫</option>
+<option value="chocolate-branco">Chocolate Branco 🍫</option>
+<option value="limao">Limão 🍋</option>
+<option value="laranja">Laranja 🍊</option>
+<option value="kiwi">Kiwi 🥝</option>
+<option value="coco">Coco 🥥</option>
+<option value="ananas">Ananás 🍍</option>
+<option value="cereja">Cereja 🍒</option>
+<option value="manga">Manga 🥭</option>
+<option value="framboesa">Framboesa 🫐</option>
+<option value="add-new">➕ Adicionar...</option>
+</select>
+</div>
+<div class="form-group">
+<label>Recheio Extra</label>
+<select id="editExtraFilling">
+<option value="">Sem recheio extra</option>
+<option data-price="1.99" value="morango">Morango 🍓 (+€1.99)</option>
+<option data-price="1.99" value="chocolate">Chocolate 🍫 (+€1.99)</option>
+<option data-price="1.99" value="chocolate-branco">Chocolate Branco 🍫 (+€1.99)</option>
+<option data-price="1.99" value="ananas">Ananás 🍍 (+€1.99)</option>
+<option data-price="1.99" value="coco">Coco 🥥 (+€1.99)</option>
+<option value="add-new">➕ Adicionar...</option>
+</select>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Mensagem no Bolo</label><input id="editCakeMessage" type="text"/></div>
+<div class="form-group"><label>Nota para o Chef</label><textarea id="editChefNotes" style="min-height:40px"></textarea></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Peso Mínimo (kg)</label><select id="editMinWeight"></select></div>
+<div class="form-group"><label>Peso Máximo (kg)</label><select disabled="" id="editMaxWeight"></select></div>
+</div>
+<div class="extra-products-container" id="editExtraProductsContainer"></div>
+<button class="btn-add-extra" id="editAddExtraProductBtn" style="margin-bottom:10px" type="button"><i class="fas fa-plus"></i> Adicionar Extra</button>
+<div class="form-row">
+<div class="form-group">
+<label>Tipo de Entrega</label>
+<select id="editDeliveryType">
+<option value="">Selecionar...</option>
+<option value="pickup">🏪 Recolha</option>
+<option value="delivery">🚚 Entrega</option>
+</select>
+</div>
+<div class="form-group">
+<label>Agendamento</label>
+<select id="editDeliveryOption">
+<option value="">Selecionar...</option>
+<option value="scheduled">📅 Agendada</option>
+<option value="express">⚡ Expresso</option>
+</select>
+</div>
+</div>
+<div class="scheduled-grid" id="editScheduledDelivery" style="display:none">
+<div class="form-group"><label>Data</label><input id="editOrderDate" type="date"/></div>
+<div class="form-group"><label>Hora</label><input id="editOrderTime" type="time"/></div>
+</div>
+<div id="editAddressSection" style="display:none;margin-top:8px">
+<div class="form-group"><label>Morada</label><input id="editAddress" type="text"/></div>
+</div>
+<div class="form-row" style="margin-top:10px">
+<div class="form-group">
+<label>Pagamento</label>
+<select id="editPaymentMethod">
+<option value="">Selecionar...</option>
+<option value="MBWay">MBWay</option>
+<option value="Transferência">Transferência</option>
+<option value="Dinheiro">Dinheiro</option>
+</select>
+</div>
+<div class="form-group">
+<label>Estado</label>
+<select id="editOrderStatus">
+<option value="pending">⏳ Pendente</option>
+<option value="confirmed">✅ Confirmado</option>
+<option value="ready">🎂 Pronto</option>
+<option value="delivered">📦 Entregue</option>
+</select>
+</div>
+</div>
+<div class="modal-footer" style="padding:12px 0 0 0;border-top:none;background:none">
+<button class="btn-secondary" id="cancelEditOrderBtn" type="button">Cancelar</button>
+<button class="btn-primary" type="submit"><i class="fas fa-save"></i> Guardar</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- GALLERY / CALENDAR MODAL -->
+<div class="modal-overlay" id="galleryModal">
+<div class="modal modal-xl">
+<div class="modal-header">
+<h3><i class="fas fa-calendar-alt"></i> <span id="galleryTitle">Calendário</span></h3>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+<select id="galleryYearSelect" style="background:white;border:1.5px solid var(--border);color:var(--text);padding:5px 8px;border-radius:6px;font-size:0.82rem;outline:none"></select>
+<select id="galleryMonthSelect" style="background:white;border:1.5px solid var(--border);color:var(--text);padding:5px 8px;border-radius:6px;font-size:0.82rem;outline:none">
+<option value="">Mês...</option>
+<option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option>
+<option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option>
+<option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>
+<option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option>
+</select>
+<button class="btn-secondary" id="galleryBackBtn" style="padding:6px 12px;font-size:0.82rem"><i class="fas fa-arrow-left"></i> Voltar</button>
+<button class="btn-secondary" id="selectAllGallery" style="padding:6px 12px;font-size:0.82rem"><i class="fas fa-check-square"></i> Selecionar Tudo</button>
+<button class="btn-primary" id="printSelectedGallery" style="padding:6px 12px;font-size:0.82rem"><i class="fas fa-print"></i> Imprimir Selecionados</button>
+<button class="modal-close" id="closeGalleryModal"><i class="fas fa-times"></i></button>
+</div>
+</div>
+<div class="modal-body">
+<div class="gallery-grid" id="galleryContent"></div>
+</div>
+</div>
+</div>
+<!-- ALL ORDERS MODAL -->
+<div class="modal-overlay" id="allOrdersModal">
+<div class="modal modal-xl">
+<div class="modal-header">
+<h3><i class="fas fa-th"></i> Todas as Encomendas</h3>
+<div style="display:flex;gap:8px;align-items:center">
+<button class="view-toggle-btn active" id="allOrdersGridBtn"><i class="fas fa-th"></i></button>
+<button class="view-toggle-btn" id="allOrdersListBtn"><i class="fas fa-list"></i></button>
+<button class="modal-close" id="closeAllOrdersModal"><i class="fas fa-times"></i></button>
+</div>
+</div>
+<div class="modal-body">
+<div class="all-orders-toolbar">
+<input id="allOrdersSearch" placeholder="🔍 Pesquisar..." type="text"/>
+<select id="allOrdersStatusFilter">
+<option value="">Todos os Estados</option>
+<option value="pending">Pendente</option>
+<option value="confirmed">Confirmado</option>
+<option value="ready">Pronto</option>
+<option value="delivered">Entregue</option>
+</select>
+<select id="allOrdersYearFilter"><option value="">Todos os Anos</option></select>
+</div>
+<div id="allOrdersContent"></div>
+</div>
+</div>
+</div>
+<!-- REMAINING ORDERS MODAL -->
+<div class="modal-overlay" id="remainingOrdersModal">
+<div class="modal modal-xl">
+<div class="modal-header">
+<h3><i class="fas fa-list-check"></i> Encomendas Pendentes</h3>
+<button class="modal-close" id="closeRemainingModal"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<div class="remaining-stats">
+<div class="remaining-stat"><div class="remaining-stat-value" id="remainingTotal">0</div><div class="remaining-stat-label">Total</div></div>
+<div class="remaining-stat"><div class="remaining-stat-value" id="remainingPending" style="color:#c9853a">0</div><div class="remaining-stat-label">Pendente</div></div>
+<div class="remaining-stat"><div class="remaining-stat-value" id="remainingConfirmed" style="color:#5a85b0">0</div><div class="remaining-stat-label">Confirmado</div></div>
+<div class="remaining-stat"><div class="remaining-stat-value" id="remainingReady" style="color:#6a9e6a">0</div><div class="remaining-stat-label">Pronto</div></div>
+</div>
+<div id="remainingOrdersList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px"></div>
+</div>
+</div>
+</div>
+<!-- CUSTOMER REQUESTS MODAL -->
+<div class="modal-overlay" id="customerRequestsModal">
+<div class="modal modal-lg">
+<div class="modal-header">
+<h3><i class="fas fa-inbox"></i> Pedidos de Clientes</h3>
+<button class="modal-close" id="closeCustomerRequestsModal"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<div class="request-filter-tabs" id="requestFilterTabs">
+<button class="req-tab active" data-filter="all">Todos</button>
+<button class="req-tab" data-filter="sent">Enviados</button>
+<button class="req-tab" data-filter="copied">Copiados</button>
+</div>
+<div id="customerRequestsList"></div>
+</div>
+</div>
+</div>
+<!-- REQUEST DETAIL MODAL -->
+<div class="modal-overlay" id="requestDetailModal">
+<div class="modal">
+<div class="modal-header">
+<h3><i class="fas fa-eye"></i> Detalhes do Pedido</h3>
+<button class="modal-close" id="closeRequestDetailModal"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<input id="requestDetailId" type="hidden"/>
+<pre id="requestDetailContent" style="background:var(--card2);padding:12px;border-radius:8px;font-size:0.8rem;white-space:pre-wrap;overflow-x:auto;color:var(--text);border:1px solid var(--border)"></pre>
+</div>
+<div class="modal-footer">
+<button class="btn-secondary" id="closeRequestDetailBtn">Fechar</button>
+<button class="btn-primary" id="insertRequestBtn"><i class="fas fa-plus"></i> Inserir no Formulário</button>
+</div>
+</div>
+</div>
+<!-- RECYCLE BIN MODAL -->
+<div class="modal-overlay" id="recycleBinModal">
+<div class="modal modal-lg">
+<div class="modal-header">
+<h3><i class="fas fa-trash-restore"></i> Reciclagem</h3>
+<button class="modal-close" id="closeRecycleBinModal"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<div style="margin-bottom:12px;text-align:right">
+<button class="btn-danger" id="emptyRecycleBinBtn"><i class="fas fa-trash"></i> Esvaziar Tudo</button>
+</div>
+<div id="recycleBinList"></div>
+</div>
+</div>
+</div>
+<!-- EDIT FORM MODAL -->
+<div class="modal-overlay" id="editFormModal">
+<div class="modal modal-lg">
+<div class="modal-header">
+<h3><i class="fas fa-edit"></i> Editar Opções do Formulário</h3>
+<button class="modal-close" id="closeEditFormModal"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<h4 style="margin-bottom:10px;color:var(--accent-dark)">Tipos de Bolo</h4>
+<div id="editFormCakeTypes"></div>
+<h4 style="margin:16px 0 10px;color:var(--accent-dark)">Sabores</h4>
+<div id="editFormFlavors"></div>
+</div>
+<div class="modal-footer">
+<button class="btn-secondary" id="closeEditFormBtn">Fechar</button>
+</div>
+</div>
+</div>
+<!-- MONTHLY SALES MODAL -->
+<div class="modal-overlay" id="monthlySalesModal">
+<div class="modal modal-xl">
+<div class="modal-header">
+<h3><i class="fas fa-chart-bar"></i> Relatório de Vendas</h3>
+<button class="modal-close" id="closeMonthlySalesModal"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+<select id="salesYearSelect" style="background:white;border:1.5px solid var(--border);color:var(--text);padding:7px 10px;border-radius:8px;font-size:0.85rem;outline:none"></select>
+<button class="btn-secondary" id="selectAllMonthsBtn" style="padding:7px 14px;font-size:0.82rem">Selecionar Todos os Meses</button>
+<button class="btn-primary" id="exportSalesPDFBtn" style="padding:7px 14px;font-size:0.82rem"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+</div>
+<div class="month-checkboxes">
+<label class="month-check-item"><input class="month-checkbox" type="checkbox" value="0"/> Janeiro</label>
+<label class="month-check-item"><input class="month-checkbox" type="checkbox" value="1"/> Fevereiro</label>
+<label class="month-check-item"><input class="month-checkbox" type="checkbox" value="2"/> Março</label>
+<label class="month-check-item"><input class="month-checkbox" type="checkbox" value="3"/> Abril</label>
+<label class="month-check-item"><input class="month-checkbox" type="checkbox" value="4"/> Maio</label>
+<label class="month-check-item"><input class="month-checkbox" type="checkbox" value="5"/> Junho</label>
+<label class="month-check-item"><input class="month-checkbox" type="checkbox" value="6"/> Julho</label>
+<label class="month-check-item"><input class="month-checkbox" type="checkbox" value="7"/> Agosto</label>
+<label class="month-check-item"><input class="month-checkbox" type="checkbox" value="8"/> Setembro</label>
+<label class="month-check-item"><input class="month-checkbox" type="checkbox" value="9"/> Outubro</label>
+<label class="month-check-item"><input class="month-checkbox" type="checkbox" value="10"/> Novembro</label>
+<label class="month-check-item"><input class="month-checkbox" type="checkbox" value="11"/> Dezembro</label>
+</div>
+<div id="monthlySalesContent"></div>
+</div>
+</div>
+</div>
+<!-- REMINDER SETTINGS MODAL -->
+<div class="modal-overlay" id="reminderSettingsModal">
+<div class="modal" style="max-width:380px">
+<div class="modal-header">
+<h3><i class="fas fa-bell"></i> Configurações de Lembretes</h3>
+<button class="modal-close" id="closeReminderSettingsModal"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--card2);border-radius:10px;border:1px solid var(--border)">
+<input id="remindersEnabled" style="width:18px;height:18px;accent-color:var(--accent)" type="checkbox"/>
+<label for="remindersEnabled" style="cursor:pointer;font-size:0.9rem;color:var(--text)">Ativar lembretes automáticos (24h e 2h antes da entrega)</label>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn-secondary" id="cancelReminderBtn">Cancelar</button>
+<button class="btn-primary" id="saveReminderBtn"><i class="fas fa-save"></i> Guardar</button>
+</div>
+</div>
+</div>
+<!-- PROFILES MODAL -->
+<div class="modal-overlay" id="profilesModal">
+<div class="modal modal-lg">
+<div class="modal-header">
+<h3><i class="fas fa-users"></i> Gerir Perfis</h3>
+<button class="modal-close" id="closeProfilesModal"><i class="fas fa-times"></i></button>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end">
+<div class="form-group"><label>Nome</label><input id="newProfileName" placeholder="Nome do staff" type="text"/></div>
+<div class="form-group"><label>Função</label>
+<select id="newProfileRole">
+<option value="counter">🧾 Counter</option>
+<option value="kitchen">👨‍🍳 Kitchen</option>
+<option value="delivery">🚚 Delivery</option>
+</select>
+</div>
+<div class="form-group"><label>PIN</label><input id="newProfilePin" maxlength="8" placeholder="PIN (4-8 dígitos)" type="text"/></div>
+<button class="btn-primary" id="addProfileBtn" style="height:38px"><i class="fas fa-plus"></i></button>
+</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn-secondary" id="closeProfilesBtn">Fechar</button>
+</div>
+<!-- ACTIVITY LOG MODAL -->
+<div class="modal-overlay" id="activityLogModal">
+<div class="modal modal-xl">
+<div class="modal-header">
+<h3><i class="fas fa-history"></i> Registo de Atividade</h3>
+<button class="modal-close" id="closeActivityLogModal"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+<input id="activitySearch" placeholder="🔍 Pesquisar staff, ação..." style="background:var(--card2);border:1.5px solid var(--border);color:var(--text);padding:7px 10px;border-radius:8px;font-size:0.82rem;outline:none;flex:1;font-family:inherit" type="text"/>
+<select id="activityRoleFilter" style="background:var(--card2);border:1.5px solid var(--border);color:var(--text);padding:7px 10px;border-radius:8px;font-size:0.82rem;outline:none;font-family:inherit">
+<option value="">Todos os Perfis</option>
+<option value="admin">Admin</option>
+<option value="counter">Counter</option>
+<option value="kitchen">Kitchen</option>
+<option value="delivery">Delivery</option>
+</select>
+<input id="activityDateFilter" style="background:var(--card2);border:1.5px solid var(--border);color:var(--text);padding:7px 10px;border-radius:8px;font-size:0.82rem;outline:none;font-family:inherit" type="date"/>
+<button class="btn-secondary" id="exportActivityBtn" style="padding:7px 14px;font-size:0.82rem"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+</div>
+<div id="activityLogContent"></div>
+</div>
+</div>
+</div>
+<!-- ORDER HISTORY MODAL -->
+<div class="modal-overlay" id="orderHistoryModal">
+<div class="modal">
+<div class="modal-header">
+<h3><i class="fas fa-history"></i> Histórico da Encomenda</h3>
+<button class="modal-close" id="closeOrderHistoryModal"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<div id="orderHistoryContent"></div>
+</div>
+<div class="modal-footer">
+<button class="btn-secondary" id="closeOrderHistoryBtn">Fechar</button>
+</div>
+</div>
+</div>
+<!-- LOGIN HISTORY MODAL -->
+<div class="modal-overlay" id="loginHistoryModal">
+<div class="modal modal-lg">
+<div class="modal-header">
+<h3><i class="fas fa-sign-in-alt"></i> Histórico de Login</h3>
+<button class="modal-close" id="closeLoginHistoryModal"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<div id="loginHistoryContent"></div>
+</div>
+</div>
+</div>
+<!-- STAFF STATS MODAL -->
+<div class="modal-overlay" id="staffStatsModal">
+<div class="modal modal-lg">
+<div class="modal-header">
+<h3><i class="fas fa-chart-line"></i> Desempenho do Staff</h3>
+<button class="modal-close" id="closeStaffStatsModal"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<div id="staffStatsContent"></div>
+</div>
+</div>
+</div>
+<!-- PHOTO GALLERY MODAL -->
+<div class="modal-overlay" id="photoGalleryModal">
+<div class="modal modal-xl">
+<div class="modal-header">
+<h3><i class="fas fa-images"></i> Galeria de Fotos</h3>
+<button class="modal-close" id="closePhotoGalleryModal"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+<select id="photoTypeFilter" style="background:var(--card2);border:1.5px solid var(--border);color:var(--text);padding:7px 10px;border-radius:8px;font-size:0.82rem;outline:none;font-family:inherit">
+<option value="">Todos os Tipos</option>
+<option value="reference">Referência</option>
+<option value="ready">Bolo Pronto</option>
+</select>
+<button class="btn-secondary" id="downloadAllPhotosBtn" style="padding:7px 14px;font-size:0.82rem"><i class="fas fa-download"></i> Descarregar Todas</button>
+</div>
+<div id="photoGalleryContent" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px"></div>
+</div>
+</div>
+</div>
+<!-- PHOTO VIEW MODAL -->
+<div class="modal-overlay" id="photoViewModal">
+<div class="modal" style="max-width:700px;background:transparent;border:none;box-shadow:none">
+<div style="position:relative">
+<button class="modal-close" id="closePhotoViewModal" style="position:absolute;top:-40px;right:0;background:white;border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center"><i class="fas fa-times"></i></button>
+<img alt="Foto" id="photoViewImg" src="" style="width:100%;border-radius:12px;max-height:80vh;object-fit:contain"/>
+<div id="photoViewCaption" style="text-align:center;color:white;margin-top:8px;font-size:0.85rem"></div>
+</div>
+</div>
+</div>
+<!-- BUSINESS CALENDAR MODAL -->
+<div class="modal-overlay" id="businessCalendarModal">
+<div class="modal modal-xl">
+<div class="modal-header">
+<h3><i class="fas fa-calendar-alt"></i> Calendário de Negócio</h3>
+<button class="modal-close" id="closeBusinessCalendarModal"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap">
+<select id="bizCalYear" style="background:var(--card2);border:1.5px solid var(--border);color:var(--text);padding:7px 10px;border-radius:8px;font-size:0.85rem;outline:none;font-family:inherit"></select>
+<div id="bizCalMonthBtns" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+</div>
+<div id="businessCalendarContent"></div>
+<div id="bizCalDayDetail" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)"></div>
+</div>
+</div>
+</div>
+<!-- BACKUP MODAL -->
+<div class="modal-overlay" id="backupModal">
+<div class="modal" style="max-width:480px">
+<div class="modal-header">
+<h3><i class="fas fa-cloud-download-alt"></i> Backup Automático</h3>
+<button class="modal-close" id="closeBackupModal"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-body">
+<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px">
+<div style="font-size:0.82rem;color:var(--text2);margin-bottom:4px">Último backup</div>
+<div id="lastBackupTime" style="font-weight:700;color:var(--accent-dark)">A verificar...</div>
+</div>
+<button class="btn-primary" id="manualBackupBtn" style="width:100%;margin-bottom:10px"><i class="fas fa-download"></i> Fazer Backup Agora</button>
+<div id="backupList" style="margin-top:12px"></div>
+</div>
+</div>
+</div>
+<script src="auth.js"></script>
+<script src="script.js"></script>
+
+<script>
+// ─── ADMIN AUTH CHECK ─────────────────────────────────────────
+const _currentSession = AUTH.checkSession();
+(function(){
+  if(!_currentSession || (_currentSession.role !== 'admin' && _currentSession.role !== 'counter')){
+    window.location.href = 'login.html';
+    return;
+  }
+  // Set session cookie so server knows we're authenticated
+  document.cookie = 'bismiSession=active_' + Date.now() + '; path=/; max-age=86400; SameSite=Strict';
+  // Show name in topbar
+  const brand = document.querySelector('.brand-name');
+  if(brand && _currentSession) brand.textContent = 'Bismi Treats — ' + _currentSession.name + (_currentSession.role==='counter'?' (Counter)':'');
+})();
+document.getElementById('adminLogoutBtn')?.addEventListener('click', ()=>{
+  if(confirm('Terminar sessão?')){
+    AUTH.logout();
+    window.location.href = 'login.html';
+  }
+});
+
+// ─── COUNTER RESTRICTIONS ─────────────────────────────────────
+function applyCounterRestrictions(){
+  if(!_currentSession || _currentSession.role !== 'counter') return;
+
+  // Grey out & disable settings button
+  const settingsBtn = document.getElementById('settingsBtn');
+  if(settingsBtn){
+    settingsBtn.style.opacity='0.35';
+    settingsBtn.style.cursor='not-allowed';
+    settingsBtn.style.pointerEvents='none';
+    settingsBtn.title='Acesso restrito — apenas Admin';
+  }
+
+  // Grey out settings menu items that are admin-only
+  const adminOnlySettings = ['exportDataSettings','importDataSettings','monthlySalesReportSettings',
+    'reminderSettings','recycleBinSettings','removeModeSettings','editFormSettings',
+    'profilesSettings','activityLogSettings','loginHistorySettings','staffStatsSettings','autoBackupSettings'];
+  adminOnlySettings.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){ el.style.opacity='0.35'; el.style.pointerEvents='none'; el.style.cursor='not-allowed'; }
+  });
+
+  // Grey out delete buttons (counter cannot delete)
+  document.addEventListener('click', e=>{
+    const deleteBtn = e.target.closest('.btn-delete-action');
+    if(deleteBtn){ e.preventDefault(); e.stopPropagation(); showToast('Acesso restrito — apenas Admin pode eliminar','error'); return false; }
+  }, true);
+
+  // Grey out recycle bin & monthly sales in topbar
+  const adminTopBtns = ['monthlySalesReportSettings'];
+  adminTopBtns.forEach(id=>{ const el=document.getElementById(id); if(el){ el.style.opacity='0.35'; el.style.pointerEvents='none'; } });
+
+  // Show counter badge
+  const badge = document.createElement('div');
+  badge.style.cssText='background:#5a85b018;border:1px solid #5a85b030;color:#5a85b0;padding:3px 10px;border-radius:8px;font-size:0.75rem;font-weight:600;margin-left:8px';
+  badge.textContent='🧾 Counter';
+  document.querySelector('.topbar-actions')?.prepend(badge);
+
+  // Disable edit form options
+  setTimeout(()=>{
+    document.querySelectorAll('.btn-delete-action').forEach(btn=>{
+      btn.style.opacity='0.35'; btn.style.pointerEvents='none'; btn.style.cursor='not-allowed'; btn.title='Acesso restrito';
+    });
+  }, 500);
+
+  // Re-apply on render
+  const origRender = window.renderOrdersList;
+  if(typeof origRender === 'function'){
+    window.renderOrdersList = function(){
+      origRender();
+      setTimeout(()=>{
+        document.querySelectorAll('.btn-delete-action').forEach(btn=>{
+          btn.style.opacity='0.35'; btn.style.pointerEvents='none'; btn.style.cursor='not-allowed'; btn.title='Acesso restrito';
+        });
+      }, 100);
+    };
+  }
+}
+document.addEventListener('DOMContentLoaded', applyCounterRestrictions);
+
+// ─── PROFILES ────────────────────────────────────────────────
+
+function renderProfiles(){
+  const profiles = AUTH.getProfiles();
+  const roleColors = {admin:'#b5845a',counter:'#5a85b0',kitchen:'#6a9e6a',delivery:'#c9853a'};
+  const roleIcons = {admin:'👑',counter:'🧾',kitchen:'👨‍🍳',delivery:'🚚'};
+  const roleLabels = {admin:'Admin',counter:'Counter',kitchen:'Kitchen',delivery:'Delivery'};
+  const grouped = {admin:[],counter:[],kitchen:[],delivery:[]};
+  profiles.forEach(p => { if(grouped[p.role]) grouped[p.role].push(p); });
+  let html = '';
+  Object.entries(grouped).forEach(([role, list]) => {
+    if(list.length === 0) return;
+    html += `<div style="margin-bottom:16px">
+      <h4 style="font-size:0.8rem;color:var(--accent-dark);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">${roleIcons[role]} ${roleLabels[role]}</h4>
+      ${list.map(p => `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:10px;margin-bottom:6px">
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:0.88rem;color:var(--text)">${p.name}</div>
+          <div style="font-size:0.74rem;color:var(--text2)">PIN: ${'•'.repeat(p.pin.length)} | ${p.active?'✅ Ativo':'❌ Inativo'}</div>
+        </div>
+        ${p.id !== 'admin-1' ? `
+        <button onclick="editProfilePin('${p.id}')" style="background:var(--card);border:1px solid var(--border);color:var(--text2);padding:5px 10px;border-radius:6px;cursor:pointer;font-size:0.75rem"><i class="fas fa-key"></i> PIN</button>
+        <button onclick="toggleProfileActive('${p.id}',${p.active})" style="background:var(--card);border:1px solid var(--border);color:var(--text2);padding:5px 10px;border-radius:6px;cursor:pointer;font-size:0.75rem">${p.active?'Desativar':'Ativar'}</button>
+        <button onclick="deleteProfileConfirm('${p.id}')" style="background:#c0544a18;border:1px solid #c0544a30;color:#c0544a;padding:5px 10px;border-radius:6px;cursor:pointer;font-size:0.75rem"><i class="fas fa-trash"></i></button>
+        ` : '<span style="font-size:0.72rem;color:var(--text2)">Admin Principal</span>'}
+      </div>`).join('')}
+    </div>`;
+  });
+  document.getElementById('profilesContent').innerHTML = html || '<p style="color:var(--text2)">Sem perfis</p>';
+}
+function editProfilePin(id){
+  const newPin = prompt('Novo PIN (4-8 dígitos):');
+  if(!newPin || newPin.length < 4){ showToast('PIN inválido','error'); return; }
+  AUTH.updateProfile(id, {pin: newPin});
+  renderProfiles();
+  showToast('PIN atualizado!');
+}
+function toggleProfileActive(id, current){
+  AUTH.updateProfile(id, {active: !current});
+  renderProfiles();
+  showToast(current ? 'Perfil desativado' : 'Perfil ativado');
+}
+function deleteProfileConfirm(id){
+  if(!confirm('Eliminar este perfil?')) return;
+  AUTH.deleteProfile(id);
+  renderProfiles();
+  showToast('Perfil eliminado');
+}
+// ─── CALENDAR ACCESS MANAGEMENT ──────────────────────────────
+function renderCalendarAccess(){
+  const calAccess = JSON.parse(localStorage.getItem('bismiCalendarAccess')||'{}');
+  const roles = ['counter','kitchen','delivery'];
+  const roleLabels = {counter:'🧾 Counter',kitchen:'👨‍🍳 Kitchen',delivery:'🚚 Delivery'};
+  return `<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+    <h4 style="font-size:0.85rem;color:var(--accent-dark);margin-bottom:10px">📅 Acesso ao Calendário</h4>
+    ${roles.map(role=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px;margin-bottom:6px">
+      <span style="font-size:0.85rem;font-weight:600;color:var(--text)">${roleLabels[role]}</span>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="checkbox" ${calAccess[role]!==false?'checked':''} onchange="toggleCalendarAccess('${role}',this.checked)" style="width:18px;height:18px;accent-color:var(--accent)"/>
+        <span style="font-size:0.82rem;color:var(--text2)">${calAccess[role]!==false?'Permitido':'Bloqueado'}</span>
+      </label>
+    </div>`).join('')}
+  </div>`;
+}
+function toggleCalendarAccess(role, allowed){
+  const calAccess = JSON.parse(localStorage.getItem('bismiCalendarAccess')||'{}');
+  calAccess[role] = allowed;
+  localStorage.setItem('bismiCalendarAccess', JSON.stringify(calAccess));
+  // Re-render calendar access section
+  const calSection = document.getElementById('calendarAccessSection');
+  if(calSection) calSection.innerHTML = renderCalendarAccess();
+  showToast(`Acesso ao calendário ${allowed?'permitido':'bloqueado'} para ${role}`);
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  var addProfileBtn = document.getElementById('addProfileBtn');
+  if(addProfileBtn) addProfileBtn.addEventListener('click', function() {
+    var name = document.getElementById('newProfileName').value.trim();
+    var role = document.getElementById('newProfileRole').value;
+    var pin = document.getElementById('newProfilePin').value.trim();
+    if(!name){ showToast('Insira o nome','error'); return; }
+    if(!pin || pin.length < 4){ showToast('PIN deve ter pelo menos 4 dígitos','error'); return; }
+    AUTH.addProfile(name, role, pin);
+    document.getElementById('newProfileName').value = '';
+    document.getElementById('newProfilePin').value = '';
+    renderProfiles();
+    showToast('Perfil adicionado!');
+  });
+});
+
+// ─── ACTIVITY LOG ─────────────────────────────────────────────
+function openActivityLog(){
+  renderActivityLog();
+  openModal('activityLogModal');
+}
+function renderActivityLog(){
+  const search = (document.getElementById('activitySearch')?.value||'').toLowerCase();
+  const roleF = document.getElementById('activityRoleFilter')?.value||'';
+  const dateF = document.getElementById('activityDateFilter')?.value||'';
+  let log = AUTH.getActivityLog().reverse();
+  if(search) log = log.filter(e => (e.profileName||'').toLowerCase().includes(search)||(e.details||'').toLowerCase().includes(search)||(e.orderRef||'').toLowerCase().includes(search));
+  if(roleF) log = log.filter(e => e.role === roleF);
+  if(dateF) log = log.filter(e => e.timestamp && e.timestamp.startsWith(dateF));
+  const roleColors = {admin:'#b5845a',counter:'#5a85b0',kitchen:'#6a9e6a',delivery:'#c9853a'};
+  const container = document.getElementById('activityLogContent');
+  if(log.length === 0){ container.innerHTML='<div class="empty-state"><i class="fas fa-history"></i><p>Sem registos</p></div>'; return; }
+  container.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:0.82rem">
+    <thead><tr style="background:var(--accent);color:white">
+      <th style="padding:8px 10px;text-align:left">Data/Hora</th>
+      <th style="padding:8px 10px;text-align:left">Staff</th>
+      <th style="padding:8px 10px;text-align:left">Função</th>
+      <th style="padding:8px 10px;text-align:left">Ação</th>
+      <th style="padding:8px 10px;text-align:left">Detalhes</th>
+    </tr></thead>
+    <tbody>${log.map(e => {
+      const dt = new Date(e.timestamp);
+      const timeStr = dt.toLocaleDateString('pt-PT')+' '+dt.toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
+      return `<tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:6px 10px;color:var(--text2)">${timeStr}</td>
+        <td style="padding:6px 10px;font-weight:600">${e.profileName||'—'}</td>
+        <td style="padding:6px 10px"><span style="background:${roleColors[e.role]||'#999'}20;color:${roleColors[e.role]||'#999'};padding:2px 8px;border-radius:8px;font-size:0.72rem;font-weight:600">${e.role||'—'}</span></td>
+        <td style="padding:6px 10px">${e.action||e.type||'—'}</td>
+        <td style="padding:6px 10px;color:var(--text2)">${e.details||'—'}${e.orderRef?' ('+e.orderRef+')':''}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
+}
+function exportActivityPDF(){
+  const content = document.getElementById('activityLogContent').innerHTML;
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Registo de Atividade</title>
+  <style>@page{size:A4;margin:12mm}body{font-family:'Segoe UI',sans-serif;font-size:10px}h1{color:#b5845a;font-family:Georgia,serif;margin-bottom:16px}table{width:100%;border-collapse:collapse}th{background:#D4A373;color:white;padding:5px 8px;text-align:left}td{padding:4px 8px;border-bottom:1px solid #e8d9c0}</style></head>
+  <body><h1>🎂 Bismi Treats — Registo de Atividade</h1>${content}
+<!-- PHOTO MANAGER MODAL -->
+<div class="modal-overlay" id="photoManagerModal">
+  <div class="modal-container" style="max-width:500px">
+    <div class="modal-header">
+      <h3><i class="fas fa-camera"></i> Gestor de Fotos</h3>
+      <button class="modal-close" onclick="closeModal('photoManagerModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="photoOrderId"/>
+      <div id="photoManagerContent" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;min-height:60px"></div>
+      <div style="border:2px dashed var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;position:relative">
+        <input type="file" id="orderPhotoUploadInput" accept="image/*" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer" onchange="uploadOrderPhoto(this)"/>
+        <i class="fas fa-plus" style="color:var(--accent);font-size:1.2rem;display:block;margin-bottom:4px"></i>
+        <span style="font-size:.8rem;color:var(--text2)">Clique para adicionar foto(s)</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('photoManagerModal')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+</body></html>`);
+  w.document.close(); setTimeout(()=>w.print(),500);
+}
+
+// ─── ORDER HISTORY ────────────────────────────────────────────
+function openOrderHistory(orderId, orderRef){
+  const history = AUTH.getOrderHistory(orderId);
+  const container = document.getElementById('orderHistoryContent');
+  if(history.length === 0){ container.innerHTML='<p style="color:var(--text2);text-align:center;padding:20px">Sem histórico para esta encomenda</p>'; }
+  else {
+    const roleColors = {admin:'#b5845a',counter:'#5a85b0',kitchen:'#6a9e6a',delivery:'#c9853a'};
+    container.innerHTML = `<p style="font-size:0.82rem;color:var(--text2);margin-bottom:12px">Encomenda: <strong>${orderRef||orderId}</strong></p>
+    <div style="display:flex;flex-direction:column;gap:8px">
+    ${history.map(h => {
+      const dt = new Date(h.timestamp);
+      const timeStr = dt.toLocaleDateString('pt-PT')+' '+dt.toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
+      return `<div style="display:flex;gap:10px;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px">
+        <div style="width:3px;background:${roleColors[h.role]||'#999'};border-radius:2px;flex-shrink:0"></div>
+        <div style="flex:1">
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+            <span style="font-weight:600;font-size:0.85rem">${h.profileName||'—'} <span style="background:${roleColors[h.role]||'#999'}20;color:${roleColors[h.role]||'#999'};padding:1px 6px;border-radius:6px;font-size:0.7rem">${h.role}</span></span>
+            <span style="font-size:0.72rem;color:var(--text2)">${timeStr}</span>
+          </div>
+          <div style="font-size:0.8rem;color:var(--text2)">${h.action}: ${h.details}</div>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+  }
+  openModal('orderHistoryModal');
+}
+
+// ─── LOGIN HISTORY ────────────────────────────────────────────
+function openLoginHistory(){
+  const history = AUTH.getLoginHistory().reverse();
+  const roleColors = {admin:'#b5845a',counter:'#5a85b0',kitchen:'#6a9e6a',delivery:'#c9853a'};
+  const container = document.getElementById('loginHistoryContent');
+  if(history.length === 0){ container.innerHTML='<div class="empty-state"><i class="fas fa-sign-in-alt"></i><p>Sem histórico</p></div>'; }
+  else {
+    container.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:0.82rem">
+      <thead><tr style="background:var(--accent);color:white">
+        <th style="padding:8px 10px;text-align:left">Staff</th>
+        <th style="padding:8px 10px;text-align:left">Função</th>
+        <th style="padding:8px 10px;text-align:left">Login</th>
+        <th style="padding:8px 10px;text-align:left">Logout</th>
+        <th style="padding:8px 10px;text-align:left">Duração</th>
+      </tr></thead>
+      <tbody>${history.map(h => {
+        const loginDt = new Date(h.loginAt);
+        const loginStr = loginDt.toLocaleDateString('pt-PT')+' '+loginDt.toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
+        let logoutStr = '—', duration = '—';
+        if(h.logoutAt){
+          const logoutDt = new Date(h.logoutAt);
+          logoutStr = logoutDt.toLocaleDateString('pt-PT')+' '+logoutDt.toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
+          const mins = Math.round((logoutDt-loginDt)/1000/60);
+          duration = mins < 60 ? mins+'min' : Math.floor(mins/60)+'h '+( mins%60)+'min';
+        }
+        return `<tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:6px 10px;font-weight:600">${h.profileName||'—'}</td>
+          <td style="padding:6px 10px"><span style="background:${roleColors[h.role]||'#999'}20;color:${roleColors[h.role]||'#999'};padding:2px 8px;border-radius:8px;font-size:0.72rem;font-weight:600">${h.role||'—'}</span></td>
+          <td style="padding:6px 10px;color:var(--text2)">${loginStr}</td>
+          <td style="padding:6px 10px;color:var(--text2)">${logoutStr}</td>
+          <td style="padding:6px 10px;color:var(--text2)">${duration}</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>`;
+  }
+  openModal('loginHistoryModal');
+}
+
+// ─── STAFF STATS ──────────────────────────────────────────────
+function openStaffStats(){
+  const log = AUTH.getActivityLog().filter(e => e.type === 'order');
+  const stats = {};
+  log.forEach(e => {
+    const key = e.profileName + '|' + e.role;
+    if(!stats[key]) stats[key] = {name:e.profileName,role:e.role,actions:0,orders:new Set()};
+    stats[key].actions++;
+    if(e.orderId) stats[key].orders.add(e.orderId);
+  });
+  const roleColors = {admin:'#b5845a',counter:'#5a85b0',kitchen:'#6a9e6a',delivery:'#c9853a'};
+  const list = Object.values(stats).sort((a,b)=>b.actions-a.actions);
+  const container = document.getElementById('staffStatsContent');
+  if(list.length === 0){ container.innerHTML='<div class="empty-state"><i class="fas fa-chart-line"></i><p>Sem dados de atividade ainda</p></div>'; }
+  else {
+    container.innerHTML = list.map(s => `
+      <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--card2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px">
+        <div style="width:44px;height:44px;border-radius:10px;background:${roleColors[s.role]||'#999'}20;display:flex;align-items:center;justify-content:center;font-size:1.3rem">${s.role==='admin'?'👑':s.role==='counter'?'🧾':s.role==='kitchen'?'👨‍🍳':'🚚'}</div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:0.9rem;color:var(--text)">${s.name}</div>
+          <div style="font-size:0.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:.04em">${s.role}</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:1.4rem;font-weight:800;color:var(--accent-dark);font-family:Georgia,serif">${s.actions}</div>
+          <div style="font-size:0.7rem;color:var(--text2)">ações</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:1.4rem;font-weight:800;color:#6a9e6a;font-family:Georgia,serif">${s.orders.size}</div>
+          <div style="font-size:0.7rem;color:var(--text2)">encomendas</div>
+        </div>
+      </div>`).join('');
+  }
+  openModal('staffStatsModal');
+}
+
+// ─── PHOTO GALLERY ────────────────────────────────────────────
+function openPhotoGallery(){
+  renderPhotoGallery();
+  openModal('photoGalleryModal');
+}
+function getAllPhotos(){
+  const allPhotos = [];
+  orders.forEach(order => {
+    try {
+      const photos = JSON.parse(localStorage.getItem('bismiPhotos_'+order.id)||'[]');
+      photos.forEach(p => allPhotos.push({...p, orderRef: order.orderId, customerName: order.customerName, orderId: order.id}));
+    } catch {}
+  });
+  return allPhotos;
+}
+function renderPhotoGallery(){
+  const typeF = document.getElementById('photoTypeFilter')?.value||'';
+  let photos = getAllPhotos();
+  if(typeF) photos = photos.filter(p => p.type === typeF);
+  const container = document.getElementById('photoGalleryContent');
+  if(photos.length === 0){ container.innerHTML='<div class="empty-state" style="grid-column:1/-1"><i class="fas fa-images"></i><p>Sem fotos</p></div>'; return; }
+  container.innerHTML = photos.map((p,i) => `
+    <div style="background:var(--card);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer" onclick="viewGalleryPhoto(${i})">
+      <img src="${p.data}" alt="${p.label}" style="width:100%;height:130px;object-fit:cover"/>
+      <div style="padding:8px">
+        <div style="font-size:0.78rem;font-weight:600;color:var(--text);margin-bottom:2px">${p.label||'Foto'}</div>
+        <div style="font-size:0.7rem;color:var(--text2)">${p.orderRef||''} — ${p.customerName||''}</div>
+        <div style="display:flex;gap:4px;margin-top:6px">
+          <a href="${p.data}" download="bismi-photo-${p.id||i}.jpg" style="background:var(--card2);border:1px solid var(--border);color:var(--text2);padding:3px 8px;border-radius:6px;font-size:0.7rem;text-decoration:none;display:flex;align-items:center;gap:3px"><i class="fas fa-download"></i> Guardar</a>
+          <button onclick="event.stopPropagation();deleteOrderPhoto(${p.orderId},'${p.id}')" style="background:#c0544a18;border:1px solid #c0544a30;color:#c0544a;padding:3px 8px;border-radius:6px;font-size:0.7rem;cursor:pointer"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+    </div>`).join('');
+  window._galleryPhotos = photos;
+}
+function viewGalleryPhoto(idx){
+  const photos = window._galleryPhotos||[];
+  const p = photos[idx];
+  if(!p) return;
+  document.getElementById('photoViewImg').src = p.data;
+  document.getElementById('photoViewCaption').textContent = `${p.label} — ${p.orderRef} (${p.customerName})`;
+  openModal('photoViewModal');
+}
+function deleteOrderPhoto(orderId, photoId){
+  if(!confirm('Eliminar esta foto?')) return;
+  try {
+    const photos = JSON.parse(localStorage.getItem('bismiPhotos_'+orderId)||'[]');
+    const filtered = photos.filter(p => String(p.id) !== String(photoId));
+    localStorage.setItem('bismiPhotos_'+orderId, JSON.stringify(filtered));
+    renderPhotoGallery();
+    showToast('Foto eliminada');
+  } catch(e){}
+}
+function downloadAllPhotos(){
+  const photos = getAllPhotos();
+  if(photos.length === 0){ showToast('Sem fotos para descarregar','error'); return; }
+  photos.forEach((p,i) => {
+    setTimeout(() => {
+      const a = document.createElement('a');
+      a.href = p.data;
+      a.download = `bismi-${p.orderRef||'photo'}-${p.label||i}.jpg`;
+      a.click();
+    }, i * 300);
+  });
+}
+
+// ─── BUSINESS CALENDAR ───────────────────────────────────────
+const MONTHS_PT_CAL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const MONTHS_FULL = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DAYS_SHORT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+let bizCalSelectedMonth = new Date().getMonth();
+let bizCalSelectedYear = new Date().getFullYear();
+
+function openBusinessCalendar(){
+  // Populate year
+  const yearSel = document.getElementById('bizCalYear');
+  yearSel.innerHTML = '';
+  const years = [...new Set(orders.map(o=>o.orderDate?o.orderDate.substring(0,4):null).filter(Boolean))].sort().reverse();
+  if(years.length === 0) years.push(String(new Date().getFullYear()));
+  years.forEach(y => { const opt=document.createElement('option'); opt.value=y; opt.textContent=y; yearSel.appendChild(opt); });
+  yearSel.value = String(bizCalSelectedYear);
+  // Month buttons
+  const monthBtns = document.getElementById('bizCalMonthBtns');
+  monthBtns.innerHTML = MONTHS_PT_CAL.map((m,i) => `<button onclick="setBizCalMonth(${i})" id="bizMonthBtn${i}" style="padding:5px 10px;border-radius:8px;border:1.5px solid var(--border);background:var(--card2);color:var(--text2);cursor:pointer;font-size:0.78rem;font-family:inherit;transition:all .2s">${m}</button>`).join('');
+  setBizCalMonth(bizCalSelectedMonth);
+  openModal('businessCalendarModal');
+}
+function setBizCalMonth(month){
+  bizCalSelectedMonth = month;
+  bizCalSelectedYear = parseInt(document.getElementById('bizCalYear').value)||new Date().getFullYear();
+  document.querySelectorAll('[id^="bizMonthBtn"]').forEach((btn,i) => {
+    btn.style.background = i===month?'var(--accent)':'var(--card2)';
+    btn.style.color = i===month?'white':'var(--text2)';
+    btn.style.borderColor = i===month?'var(--accent)':'var(--border)';
+  });
+  renderBusinessCalendar();
+}
+function renderBusinessCalendar(){
+  const year = bizCalSelectedYear;
+  const month = bizCalSelectedMonth;
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay();
+  // Build order map
+  const orderMap = {};
+  orders.forEach(o => {
+    if(!o.orderDate) return;
+    const d = new Date(o.orderDate+'T00:00:00');
+    if(d.getFullYear()===year && d.getMonth()===month){
+      const day = d.getDate();
+      if(!orderMap[day]) orderMap[day] = [];
+      orderMap[day].push(o);
+    }
+  });
+  let html = `<h4 style="font-size:0.95rem;color:var(--accent-dark);margin-bottom:12px;font-family:Georgia,serif">${MONTHS_FULL[month]} ${year}</h4>`;
+  html += `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px">`;
+  DAYS_SHORT.forEach(d => { html += `<div style="text-align:center;font-size:0.72rem;font-weight:700;color:var(--text2);padding:4px">${d}</div>`; });
+  html += '</div>';
+  html += `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">`;
+  // Empty cells
+  for(let i=0;i<firstDay;i++) html += '<div></div>';
+  for(let d=1;d<=daysInMonth;d++){
+    const dayOrders = orderMap[d]||[];
+    const count = dayOrders.length;
+    let bg = 'var(--card2)', color = 'var(--text2)', border = 'var(--border)';
+    if(count >= 6){ bg='#c0544a20'; color='#c0544a'; border='#c0544a40'; }
+    else if(count >= 3){ bg='#c9853a20'; color='#c9853a'; border='#c9853a40'; }
+    else if(count >= 1){ bg='#D4A37320'; color='var(--accent-dark)'; border='var(--accent)'; }
+    const isToday = new Date().getDate()===d && new Date().getMonth()===month && new Date().getFullYear()===year;
+    html += `<div onclick="showBizCalDay(${d})" style="background:${bg};border:1.5px solid ${border};border-radius:8px;padding:6px 4px;text-align:center;cursor:pointer;transition:all .2s;${isToday?'outline:2px solid var(--accent-dark);':''}" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+      <div style="font-size:0.82rem;font-weight:700;color:${color}">${d}</div>
+      ${count>0?`<div style="font-size:1rem;font-weight:800;color:${color};font-family:Georgia,serif">${count}</div><div style="font-size:0.6rem;color:${color}">enc.</div>`:''}
+    </div>`;
+  }
+  html += '</div>';
+  // Legend
+  html += `<div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap">
+    <span style="font-size:0.72rem;color:var(--text2);display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;background:#D4A37320;border:1px solid var(--accent);border-radius:3px;display:inline-block"></span>1–2 encomendas</span>
+    <span style="font-size:0.72rem;color:var(--text2);display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;background:#c9853a20;border:1px solid #c9853a40;border-radius:3px;display:inline-block"></span>3–5 encomendas</span>
+    <span style="font-size:0.72rem;color:var(--text2);display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;background:#c0544a20;border:1px solid #c0544a40;border-radius:3px;display:inline-block"></span>6+ encomendas</span>
+  </div>`;
+  document.getElementById('businessCalendarContent').innerHTML = html;
+  document.getElementById('bizCalDayDetail').style.display = 'none';
+}
+function showBizCalDay(day){
+  const year = bizCalSelectedYear, month = bizCalSelectedMonth;
+  const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+  const dayOrders = orders.filter(o => o.orderDate === dateStr);
+  const detail = document.getElementById('bizCalDayDetail');
+  detail.style.display = 'block';
+  if(dayOrders.length === 0){ detail.innerHTML=`<p style="color:var(--text2);font-size:0.85rem">Sem encomendas em ${day} de ${MONTHS_FULL[month]}</p>`; return; }
+  detail.innerHTML = `<h4 style="font-size:0.88rem;color:var(--accent-dark);margin-bottom:10px">${day} de ${MONTHS_FULL[month]} ${year} — ${dayOrders.length} encomenda${dayOrders.length!==1?'s':''}</h4>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
+  ${dayOrders.map(o => `<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px">
+    <div style="font-weight:700;font-size:0.85rem;color:var(--accent-dark)">${o.orderId||''} — ${o.customerName}</div>
+    <div style="font-size:0.78rem;color:var(--text2);margin-top:3px">${getCakeTypeName(o.cakeType)} — ${getFlavorName(o.baseFlavor)}</div>
+    <div style="font-size:0.78rem;color:var(--text2)">⏰ ${o.orderTime||'—'} | ${o.deliveryType==='pickup'?'🏪 Recolha':'🚚 Entrega'}</div>
+    <div style="font-size:0.78rem;color:var(--text2)">📞 ${o.phone||'—'}</div>
+    <span style="font-size:0.7rem;padding:2px 7px;border-radius:8px;font-weight:600;background:${STATUS_COLORS[o.status]?'':'#D4A37320'}" class="order-status-badge ${STATUS_COLORS[o.status]||''}">${STATUS_LABELS[o.status]||o.status}</span>
+  </div>`).join('')}
+  </div>`;
+  detail.scrollIntoView({behavior:'smooth'});
+}
+document.addEventListener('DOMContentLoaded', function(){
+document.getElementById('bizCalYear')?.addEventListener('change', () => { bizCalSelectedYear=parseInt(document.getElementById('bizCalYear').value); renderBusinessCalendar(); });
+
+// ─── BACKUP ───────────────────────────────────────────────────
+function openBackup(){
+  loadBackupList();
+  openModal('backupModal');
+}
+function loadBackupList(){
+  fetch('/api/backup/list').then(r=>r.json()).then(backups => {
+    const lastTime = document.getElementById('lastBackupTime');
+    if(backups.length > 0){
+      const last = backups[0];
+      lastTime.textContent = last.date.replace('T',' ').slice(0,16);
+    } else { lastTime.textContent = 'Nenhum backup encontrado'; }
+    const list = document.getElementById('backupList');
+    if(backups.length === 0){ list.innerHTML='<p style="color:var(--text2);font-size:0.82rem">Sem backups disponíveis</p>'; return; }
+    list.innerHTML = `<h4 style="font-size:0.82rem;color:var(--accent-dark);margin-bottom:8px">Backups Disponíveis (${backups.length})</h4>
+    ${backups.slice(0,10).map(b => `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--card2);border:1px solid var(--border);border-radius:8px;margin-bottom:6px">
+      <div>
+        <div style="font-size:0.82rem;font-weight:600;color:var(--text)">${b.date.replace('T',' ').slice(0,16)}</div>
+        <div style="font-size:0.72rem;color:var(--text2)">${(b.size/1024).toFixed(1)} KB</div>
+      </div>
+      <a href="/api/backup/download/${b.name}" download="${b.name}" style="background:var(--card);border:1px solid var(--border);color:var(--text2);padding:5px 10px;border-radius:6px;font-size:0.75rem;text-decoration:none;display:flex;align-items:center;gap:4px"><i class="fas fa-download"></i> Descarregar</a>
+    </div>`).join('')}`;
+  }).catch(() => {
+    document.getElementById('lastBackupTime').textContent = 'Servidor não disponível';
+  });
+}
+document.getElementById('manualBackupBtn')?.addEventListener('click', () => {
+  // Also save current data
+  saveData();
+  fetch('/api/backup', {method:'POST'}).then(r=>r.json()).then(data => {
+    if(data.ok){ showToast('✅ Backup realizado com sucesso!'); loadBackupList(); }
+    else { showToast('Erro no backup','error'); }
+  }).catch(() => {
+    // Fallback: export JSON
+    exportData();
+    showToast('Backup exportado como ficheiro!');
+  });
+});
+
+// ─── SETTINGS MENU ADDITIONS ─────────────────────────────────
+document.getElementById('profilesSettings')?.addEventListener('click', () => { openProfiles(); document.getElementById('settingsMenu').classList.remove('open'); });
+document.getElementById('activityLogSettings')?.addEventListener('click', () => { openActivityLog(); document.getElementById('settingsMenu').classList.remove('open'); });
+document.getElementById('loginHistorySettings')?.addEventListener('click', () => { openLoginHistory(); document.getElementById('settingsMenu').classList.remove('open'); });
+document.getElementById('staffStatsSettings')?.addEventListener('click', () => { openStaffStats(); document.getElementById('settingsMenu').classList.remove('open'); });
+document.getElementById('autoBackupSettings')?.addEventListener('click', () => { openBackup(); document.getElementById('settingsMenu').classList.remove('open'); });
+
+// Add to topbar: business calendar & photo gallery buttons
+document.addEventListener('DOMContentLoaded', () => {
+  const topbarActions = document.querySelector('.topbar-actions');
+  if(topbarActions){
+    const calBtn = document.createElement('button');
+    calBtn.className = 'dash-btn';
+    calBtn.innerHTML = '<i class="fas fa-calendar-check"></i> Calendário Negócio';
+    calBtn.addEventListener('click', openBusinessCalendar);
+    topbarActions.insertBefore(calBtn, topbarActions.firstChild);
+    const galBtn = document.createElement('button');
+    galBtn.className = 'dash-btn';
+    galBtn.innerHTML = '<i class="fas fa-images"></i> Galeria';
+    galBtn.addEventListener('click', openPhotoGallery);
+    topbarActions.insertBefore(galBtn, topbarActions.firstChild);
+  }
+});
+
+// ─── MODAL CLOSE ADDITIONS ───────────────────────────────────
+document.getElementById('closeProfilesModal')?.addEventListener('click', () => closeModal('profilesModal'));
+document.getElementById('closeProfilesBtn')?.addEventListener('click', () => closeModal('profilesModal'));
+document.getElementById('closeActivityLogModal')?.addEventListener('click', () => closeModal('activityLogModal'));
+document.getElementById('exportActivityBtn')?.addEventListener('click', exportActivityPDF);
+document.getElementById('activitySearch')?.addEventListener('input', renderActivityLog);
+document.getElementById('activityRoleFilter')?.addEventListener('change', renderActivityLog);
+document.getElementById('activityDateFilter')?.addEventListener('change', renderActivityLog);
+document.getElementById('closeOrderHistoryModal')?.addEventListener('click', () => closeModal('orderHistoryModal'));
+document.getElementById('closeOrderHistoryBtn')?.addEventListener('click', () => closeModal('orderHistoryModal'));
+document.getElementById('closeLoginHistoryModal')?.addEventListener('click', () => closeModal('loginHistoryModal'));
+document.getElementById('closeStaffStatsModal')?.addEventListener('click', () => closeModal('staffStatsModal'));
+document.getElementById('closePhotoGalleryModal')?.addEventListener('click', () => closeModal('photoGalleryModal'));
+document.getElementById('closePhotoViewModal')?.addEventListener('click', () => closeModal('photoViewModal'));
+document.getElementById('closeBusinessCalendarModal')?.addEventListener('click', () => closeModal('businessCalendarModal'));
+document.getElementById('closeBackupModal')?.addEventListener('click', () => closeModal('backupModal'));
+document.getElementById('photoTypeFilter')?.addEventListener('change', renderPhotoGallery);
+document.getElementById('downloadAllPhotosBtn')?.addEventListener('click', downloadAllPhotos);
+});
+
+// ─── ADD HISTORY BUTTON TO ORDER CARDS ───────────────────────
+// Patch renderOrderCard to add history button
+const _origRenderOrderCard = window.renderOrderCard;
+if(typeof renderOrderCard === 'function'){
+  const origFn = renderOrderCard;
+  window.renderOrderCard = function(order){
+    let html = origFn(order);
+    // Inject history button into actions
+    html = html.replace('</div>\n    </div>', `<button class="btn-action" onclick="openOrderHistory(${order.id},'${order.orderId||''}')" style="background:#b5845a18;color:#b5845a;border:1px solid #b5845a30"><i class="fas fa-history"></i></button>\n</div>\n    </div>`);
+    return html;
+  };
+}
+
+// ─── ADD PHOTO UPLOAD TO ORDER CARDS ─────────────────────────
+window.triggerAdminPhotoUpload = function(orderId){
+  window._adminPhotoOrderId = orderId;
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = 'image/*';
+  input.onchange = e => {
+    const file = e.target.files[0]; if(!file) return;
+    const label = prompt('Etiqueta da foto:') || 'Referência';
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const photos = JSON.parse(localStorage.getItem('bismiPhotos_'+orderId)||'[]');
+        photos.push({id:Date.now(),label,data:ev.target.result,type:'reference',uploadedBy:'Admin',uploadedAt:new Date().toISOString()});
+        localStorage.setItem('bismiPhotos_'+orderId, JSON.stringify(photos));
+        renderOrdersList();
+        showToast('Foto adicionada!');
+      } catch(e){}
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+};
+
+// ─── AUTO BACKUP REMINDER ────────────────────────────────────
+function checkBackupReminder(){
+  fetch('/api/backup/list').then(r=>r.json()).then(backups => {
+    if(backups.length === 0){
+      showToast('⚠️ Nenhum backup encontrado. Faça um backup nas configurações.','warning');
+      return;
+    }
+    const lastBackup = new Date(backups[0].date.replace('T',' '));
+    const daysSince = (new Date()-lastBackup)/1000/60/60/24;
+    if(daysSince > 3) showToast(`⚠️ Último backup há ${Math.floor(daysSince)} dias. Faça um backup!`,'warning');
+  }).catch(()=>{});
+}
+setTimeout(checkBackupReminder, 5000);
+</script>
+
+<!-- PHOTO MANAGER MODAL -->
+<div class="modal-overlay" id="photoManagerModal">
+  <div class="modal-container" style="max-width:500px">
+    <div class="modal-header">
+      <h3><i class="fas fa-camera"></i> Gestor de Fotos</h3>
+      <button class="modal-close" onclick="closeModal('photoManagerModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="photoOrderId"/>
+      <div id="photoManagerContent" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;min-height:60px"></div>
+      <div style="border:2px dashed var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;position:relative">
+        <input type="file" id="orderPhotoUploadInput" accept="image/*" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer" onchange="uploadOrderPhoto(this)"/>
+        <i class="fas fa-plus" style="color:var(--accent);font-size:1.2rem;display:block;margin-bottom:4px"></i>
+        <span style="font-size:.8rem;color:var(--text2)">Clique para adicionar foto(s)</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('photoManagerModal')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

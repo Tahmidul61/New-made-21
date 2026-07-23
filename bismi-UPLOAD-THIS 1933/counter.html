@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+
+<html lang="pt">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bismi Treats — Counter</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FFFDF7;--card:#FFFFFF;--card2:#FAEDCD;
+  --accent:#D4A373;--accent2:#CB997E;--accent-dark:#b5845a;
+  --text:#3A3A3A;--text2:#7a6a58;--border:#e8d9c0;--border2:#d4c4a8;
+  --success:#6a9e6a;--warning:#c9853a;--danger:#c0544a;--info:#5a85b0;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Georgia,sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* TOPBAR */
+.topbar{background:var(--card);border-bottom:2px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(212,163,115,0.15)}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.role-badge{background:#5a85b020;color:#5a85b0;padding:4px 12px;border-radius:20px;font-size:0.78rem;font-weight:700;border:1px solid #5a85b030}
+.user-name{font-weight:700;color:var(--accent-dark);font-size:0.95rem}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.btn-logout{background:white;border:1.5px solid var(--border);color:var(--text2);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:0.82rem;font-family:inherit;transition:all .2s;display:flex;align-items:center;gap:6px}
+.btn-logout:hover{border-color:var(--danger);color:var(--danger)}
+.notif-btn{background:white;border:1.5px solid var(--border);color:var(--text2);width:38px;height:38px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;position:relative;transition:all .2s}
+.notif-btn:hover{background:var(--accent);color:white;border-color:var(--accent)}
+.notif-badge{position:absolute;top:-4px;right:-4px;background:var(--danger);color:white;font-size:0.6rem;font-weight:700;padding:2px 5px;border-radius:10px;display:none}
+
+/* LAYOUT */
+.main-layout{display:grid;grid-template-columns:1fr 380px;gap:0;min-height:calc(100vh - 58px)}
+.left-panel{border-right:1px solid var(--border);overflow-y:auto}
+.right-panel{overflow-y:auto;background:var(--card)}
+
+/* PANEL HEADER */
+.panel-header{padding:12px 16px;background:linear-gradient(135deg,var(--card2),#f5e4c0);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.panel-title{font-size:0.9rem;font-weight:700;color:var(--accent-dark);display:flex;align-items:center;gap:8px}
+
+/* ORDERS */
+.orders-toolbar{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap}
+.orders-toolbar input,.orders-toolbar select{background:var(--card2);border:1.5px solid var(--border);color:var(--text);padding:7px 10px;border-radius:8px;font-size:0.82rem;outline:none;flex:1;min-width:80px;font-family:inherit}
+.orders-toolbar input:focus,.orders-toolbar select:focus{border-color:var(--accent)}
+.orders-list{padding:12px}
+
+/* ORDER CARD */
+.order-card{background:white;border:1.5px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.order-card:hover{border-color:var(--accent);box-shadow:0 4px 16px rgba(212,163,115,0.15)}
+.order-card.priority{border-color:#c0544a}
+.order-card-header{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,var(--card2),#f5e4c0)}
+.order-id-badge{font-size:0.78rem;font-weight:700;color:var(--accent-dark);flex:1}
+.order-status-badge{font-size:0.7rem;padding:3px 9px;border-radius:20px;font-weight:600}
+.status-pending{background:#c9853a20;color:#c9853a}
+.status-confirmed{background:#5a85b020;color:#5a85b0}
+.status-ready{background:#6a9e6a20;color:#6a9e6a}
+.status-delivered{background:#9a9a9a20;color:#9a9a9a}
+.btn-edit-order{background:none;border:none;color:var(--text2);cursor:pointer;padding:4px 6px;border-radius:6px;font-size:0.8rem;transition:all .2s}
+.btn-edit-order:hover{background:var(--accent);color:white}
+.order-card-body{padding:10px 12px;font-size:0.82rem}
+.order-info-row{display:flex;align-items:flex-start;gap:6px;margin-bottom:4px;color:var(--text2)}
+.order-info-row i{color:var(--accent);width:14px;flex-shrink:0;margin-top:2px}
+.order-info-row strong{color:var(--text)}
+.chef-note{background:var(--card2);border-radius:6px;padding:6px 8px;margin-top:4px;font-style:italic;border-left:3px solid var(--accent);font-size:0.8rem;color:var(--text2)}
+.order-card-actions{display:flex;gap:6px;padding:8px 12px;border-top:1px solid var(--border);flex-wrap:wrap;background:#faf8f4}
+.btn-action{border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:0.74rem;font-weight:600;display:flex;align-items:center;gap:4px;transition:all .2s;font-family:inherit}
+.btn-receipt{background:#D4A37320;color:var(--accent-dark);border:1px solid #D4A37340}
+.btn-receipt:hover{background:var(--accent);color:white}
+.btn-whatsapp-action{background:#25d36618;color:#1a9e4a;border:1px solid #25d36630}
+.btn-whatsapp-action:hover{background:#25d366;color:white}
+.btn-status-action{background:#6a9e6a18;color:#6a9e6a;border:1px solid #6a9e6a30}
+.btn-status-action:hover{background:#6a9e6a;color:white}
+.btn-priority{background:#c0544a18;color:#c0544a;border:1px solid #c0544a30}
+.btn-priority:hover{background:#c0544a;color:white}
+.btn-priority.active{background:#c0544a;color:white}
+.status-select-inline{background:var(--card2);border:1.5px solid var(--border);color:var(--text);padding:4px 8px;border-radius:7px;font-size:0.75rem;outline:none;cursor:pointer;font-family:inherit}
+
+/* FORM PANEL */
+.form-panel{padding:16px}
+.form-section{margin-bottom:16px}
+.form-section-title{font-size:0.78rem;font-weight:700;color:var(--accent-dark);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:6px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.form-row.single{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:0.76rem;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.form-group input,.form-group select,.form-group textarea{background:var(--card2);border:1.5px solid var(--border);color:var(--text);padding:9px 11px;border-radius:8px;font-size:0.85rem;outline:none;transition:border-color .2s;font-family:inherit}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(212,163,115,0.15)}
+.form-group textarea{resize:vertical;min-height:55px}
+.price-per-kg-badge{font-size:0.75rem;color:var(--accent-dark);margin-top:3px;font-weight:600}
+.delivery-toggle{display:flex;gap:8px}
+.delivery-toggle label{flex:1;text-align:center;padding:9px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:0.82rem;transition:all .2s;background:var(--card2);color:var(--text)}
+.delivery-toggle input[type=radio]{display:none}
+.delivery-toggle input[type=radio]:checked+label{background:var(--accent);border-color:var(--accent);color:white;font-weight:600}
+.scheduled-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.price-display{background:linear-gradient(135deg,#D4A37318,#CB997E18);border:1.5px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;display:none;text-align:center}
+.price-range{font-size:1.1rem;font-weight:700;color:var(--accent-dark);font-family:Georgia,serif}
+.price-breakdown{font-size:0.74rem;color:var(--text2);margin-top:4px}
+.extra-products-container{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.extra-product-item{display:flex;gap:8px;align-items:center}
+.extra-product-item input{flex:1;background:var(--card2);border:1.5px solid var(--border);color:var(--text);padding:8px 10px;border-radius:8px;font-size:0.82rem;outline:none;font-family:inherit}
+.extra-product-item input:focus{border-color:var(--accent)}
+.btn-remove-extra{background:none;border:1px solid #c0544a40;color:#c0544a;width:28px;height:28px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.75rem;flex-shrink:0;transition:all .2s}
+.btn-remove-extra:hover{background:#c0544a;color:white}
+.btn-add-extra{background:none;border:1.5px dashed var(--border);color:var(--text2);padding:8px;border-radius:8px;cursor:pointer;font-size:0.82rem;width:100%;margin-top:6px;transition:all .2s;font-family:inherit}
+.btn-add-extra:hover{border-color:var(--accent);color:var(--accent-dark)}
+.btn-submit{background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border:none;padding:13px;border-radius:10px;font-size:0.95rem;font-weight:700;cursor:pointer;width:100%;margin-top:8px;transition:all .2s;font-family:inherit}
+.btn-submit:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 4px 16px rgba(212,163,115,0.4)}
+
+/* NOTIFICATIONS */
+.notif-panel{position:fixed;top:58px;right:0;width:340px;background:var(--card);border-left:1px solid var(--border);border-bottom:1px solid var(--border);border-radius:0 0 0 12px;box-shadow:-4px 4px 20px rgba(212,163,115,0.2);z-index:200;display:none;max-height:400px;overflow-y:auto}
+.notif-panel.open{display:block}
+.notif-header{padding:12px 16px;background:linear-gradient(135deg,var(--card2),#f5e4c0);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.notif-header h4{font-size:0.88rem;font-weight:700;color:var(--accent-dark)}
+.notif-item{padding:12px 16px;border-bottom:1px solid var(--border);font-size:0.82rem}
+.notif-item.unread{background:linear-gradient(135deg,#D4A37308,#FAEDCD)}
+.notif-item-title{font-weight:600;color:var(--text);margin-bottom:3px}
+.notif-item-sub{color:var(--text2);font-size:0.76rem}
+.notif-time{font-size:0.7rem;color:var(--text2);margin-top:3px}
+.notif-empty{padding:20px;text-align:center;color:var(--text2);font-size:0.85rem}
+.btn-clear-notif{background:none;border:none;color:var(--text2);font-size:0.78rem;cursor:pointer;padding:4px 8px;border-radius:6px}
+.btn-clear-notif:hover{background:var(--card2);color:var(--accent-dark)}
+
+/* DAILY SUMMARY */
+.daily-summary{background:linear-gradient(135deg,var(--card2),#f5e4c0);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;gap:12px;flex-wrap:wrap}
+.summary-stat{text-align:center;flex:1;min-width:60px}
+.summary-stat-val{font-size:1.4rem;font-weight:800;color:var(--accent-dark);font-family:Georgia,serif}
+.summary-stat-label{font-size:0.68rem;color:var(--text2);text-transform:uppercase;letter-spacing:.04em}
+
+/* RETURNING CUSTOMER */
+.returning-badge{background:#D4A37320;color:var(--accent-dark);padding:3px 8px;border-radius:8px;font-size:0.72rem;font-weight:600;border:1px solid #D4A37340;display:inline-flex;align-items:center;gap:4px}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:40px 20px;color:var(--text2)}
+.empty-state i{font-size:2.5rem;margin-bottom:12px;opacity:.3;display:block;color:var(--accent)}
+
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;background:rgba(58,40,20,.55);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px}
+.modal-overlay.active{display:flex}
+.modal{background:var(--card);border:1.5px solid var(--border);border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(212,163,115,0.3)}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:linear-gradient(135deg,var(--card2),#f5e4c0);z-index:1;border-radius:14px 14px 0 0}
+.modal-header h3{font-size:1rem;font-weight:700;color:var(--accent-dark);display:flex;align-items:center;gap:8px}
+.modal-close{background:none;border:none;color:var(--text2);font-size:1.2rem;cursor:pointer;padding:4px;border-radius:6px}
+.modal-close:hover{background:var(--danger);color:white}
+.modal-body{padding:20px}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;background:#faf8f4;border-radius:0 0 14px 14px}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;font-family:inherit}
+.btn-secondary{background:white;border:1.5px solid var(--border);color:var(--text);padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;font-family:inherit}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent-dark)}
+
+/* RECEIPT */
+.receipt-type-tabs{display:flex;gap:8px;margin-bottom:10px}
+.receipt-type-btn{flex:1;padding:9px;border:1.5px solid var(--border);background:var(--card2);color:var(--text2);border-radius:8px;cursor:pointer;font-size:0.85rem;transition:all .2s;font-family:inherit}
+.receipt-type-btn.active{background:var(--accent);border-color:var(--accent);color:white;font-weight:600}
+.receipt-print-btns{display:flex;gap:8px;margin-bottom:12px}
+.receipt-doc{background:white;color:#2c3e50;padding:18px;border-radius:8px;font-size:0.84rem;border:1px solid #e0d0b8}
+.receipt-header{text-align:center;padding-bottom:12px;border-bottom:2px solid #D4A373;margin-bottom:12px}
+.receipt-logo{font-size:2rem}
+.receipt-header h2{font-size:1.3rem;margin:4px 0;color:#b5845a;font-family:Georgia,serif}
+.receipt-header p{color:#7f8c8d;font-size:0.78rem;margin:2px 0}
+.rcp-section-title{font-size:0.7rem;font-weight:700;color:#b5845a;text-transform:uppercase;letter-spacing:.06em;margin:10px 0 4px;padding-bottom:3px;border-bottom:1px solid #e8d9c0}
+.rcp-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dotted #e8d9c0;font-size:0.8rem;color:#555}
+.rcp-total{display:flex;justify-content:space-between;font-weight:700;font-size:0.95rem;padding-top:5px;border-top:2px solid #D4A373;color:#b5845a;margin-top:4px}
+.receipt-footer{text-align:center;margin-top:12px;font-style:italic;color:#7f8c8d;font-size:0.78rem}
+.receipt-modern{background:white;border-radius:10px;overflow:hidden;border:1px solid #e0d0b8}
+.rcpm-header{background:linear-gradient(135deg,#b5845a,#CB997E);color:white;padding:18px;text-align:center}
+.rcpm-logo{font-size:2.2rem;margin-bottom:6px}
+.rcpm-brand{font-family:Georgia,serif;font-size:1.3rem;font-weight:700}
+.rcpm-type{font-size:0.82rem;opacity:.85;margin-top:3px}
+.rcpm-id{font-size:0.72rem;opacity:.7;margin-top:2px}
+.rcpm-body{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px}
+.rcpm-card{background:#FAEDCD;border:1px solid #e8d9c0;border-radius:8px;padding:10px}
+.rcpm-price-card{grid-column:span 2;background:linear-gradient(135deg,#D4A37315,#CB997E10);border-color:#D4A37340}
+.rcpm-card-title{font-size:0.72rem;font-weight:700;color:#b5845a;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;display:flex;align-items:center;gap:5px}
+.rcpm-card-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dotted #e8d9c0;font-size:0.8rem}
+.rcpm-label{color:#7a6a58}
+.rcpm-val{color:#3A3A3A;font-weight:500;text-align:right;max-width:55%}
+.rcpm-total-row{display:flex;justify-content:space-between;font-weight:700;font-size:0.95rem;padding-top:5px;border-top:2px solid #D4A373;color:#b5845a;margin-top:4px}
+.rcpm-footer{text-align:center;padding:12px;font-style:italic;color:#7f8c8d;font-size:0.78rem;border-top:1px solid #e8d9c0}
+
+/* WHATSAPP */
+.whatsapp-msg{background:#f0ebe3;border:1px solid var(--border);border-radius:10px;padding:16px;font-family:monospace;font-size:0.82rem;white-space:pre-wrap;color:var(--text);max-height:300px;overflow-y:auto;line-height:1.6}
+
+/* PHOTOS */
+.photos-section{margin-top:8px;border-top:1px solid var(--border);padding-top:8px}
+.photos-grid{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.photo-thumb{width:60px;height:60px;border-radius:8px;object-fit:cover;border:1.5px solid var(--border);cursor:pointer;transition:all .2s}
+.photo-thumb:hover{border-color:var(--accent);transform:scale(1.05)}
+.photo-label{font-size:0.65rem;color:var(--text2);text-align:center;margin-top:2px;max-width:60px}
+.btn-add-photo{background:none;border:1.5px dashed var(--border);color:var(--text2);padding:6px 10px;border-radius:8px;cursor:pointer;font-size:0.78rem;font-family:inherit;transition:all .2s;display:flex;align-items:center;gap:5px}
+.btn-add-photo:hover{border-color:var(--accent);color:var(--accent-dark)}
+
+/* PHOTO MODAL */
+.photo-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:2000;padding:16px}
+.photo-modal-overlay.active{display:flex}
+.photo-modal-img{max-width:90vw;max-height:85vh;border-radius:12px}
+.photo-close-btn{position:fixed;top:16px;right:16px;background:white;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center}
+
+/* FINAL WEIGHT */
+.final-price-display{background:linear-gradient(135deg,#6a9e6a18,#6a9e6a10);border:1.5px solid #6a9e6a40;border-radius:10px;padding:16px;text-align:center;font-size:1.5rem;font-weight:800;color:#6a9e6a;font-family:Georgia,serif}
+.discount-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.discount-btn{background:white;border:1.5px solid var(--border);color:var(--text);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:0.82rem;transition:all .2s;font-family:inherit}
+.discount-btn:hover{background:var(--warning);border-color:var(--warning);color:white}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--card2)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+
+@media(max-width:900px){.main-layout{grid-template-columns:1fr}.right-panel{border-top:2px solid var(--border)}}
+</style>
+</head>
+<body>
+<!-- TOPBAR -->
+<div class="topbar">
+<div class="topbar-left">
+<span style="font-size:1.4rem">🧾</span>
+<div>
+<div class="user-name" id="userName">Counter</div>
+<div class="role-badge">Counter Staff</div>
+</div>
+</div>
+<div class="topbar-right">
+<button class="notif-btn" id="notifBtn" title="Notificações">
+<i class="fas fa-bell"></i>
+<span class="notif-badge" id="notifBadge">0</span>
+</button>
+<button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Sair</button>
+</div>
+</div>
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel" id="notifPanel">
+<div class="notif-header">
+<h4><i class="fas fa-bell"></i> Notificações</h4>
+<button class="btn-clear-notif" id="clearNotifBtn">Limpar tudo</button>
+</div>
+<div id="notifList"></div>
+</div>
+<!-- COUNTER DASHBOARD -->
+<div id="counterDashboard" style="background:var(--card);border-bottom:2px solid var(--border);padding:12px 16px">
+<div id="counterMetrics" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:10px"></div>
+<div id="counterAlerts" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+</div>
+<!-- DAILY SUMMARY -->
+<div class="daily-summary" id="dailySummary"></div>
+<!-- MAIN LAYOUT -->
+<div class="main-layout">
+<!-- LEFT: ORDERS -->
+<div class="left-panel">
+<div class="panel-header">
+<div class="panel-title"><i class="fas fa-list"></i> Encomendas</div>
+</div>
+<div class="orders-toolbar">
+<input id="searchOrders" placeholder="🔍 Pesquisar..." type="text"/>
+<select id="statusFilter">
+<option value="">Em Curso</option>
+<option value="pending">Pendente</option>
+<option value="confirmed">Confirmado</option>
+<option value="ready">Pronto</option>
+<option value="delivered">Entregue</option>
+</select>
+</div>
+<div class="orders-list" id="ordersList"></div>
+</div>
+<!-- RIGHT: NEW ORDER FORM -->
+<div class="right-panel">
+<div class="panel-header">
+<div class="panel-title"><i class="fas fa-plus-circle"></i> Nova Encomenda</div>
+</div>
+<div class="form-panel">
+<form id="orderForm">
+<div class="form-section">
+<div class="form-section-title"><i class="fas fa-user"></i> Cliente</div>
+<div class="form-row">
+<div class="form-group"><label>ID Cliente</label><input id="customerId" placeholder="C-001" type="text"/></div>
+<div class="form-group"><label>Nome *</label><input id="customerName" placeholder="Nome completo" required="" type="text"/></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>Telefone</label><input id="phone" placeholder="9XXXXXXXX" type="tel"/></div>
+<div class="form-group"><label>NIF</label><input id="nif" maxlength="9" placeholder="XXXXXXXXX" type="text"/></div>
+</div>
+<div id="returningCustomerBadge" style="display:none;margin-top:4px"></div>
+</div>
+<div class="form-section">
+<div class="form-section-title"><i class="fas fa-birthday-cake"></i> Bolo</div>
+<div class="form-row single">
+<div class="form-group">
+<label>Tipo de Bolo *</label>
+<select id="cakeType" required="">
+<option value="">Selecionar...</option>
+<option data-price="19.99" value="sponge-chocolate">Chocolate Sponge Cake (€19.99/kg)</option>
+<option data-price="19.99" value="sponge-vanilla">Sponge Cake Vanilla (€19.99/kg)</option>
+<option data-price="19.99" value="sponge-normal">Sponge Cake Normal (€19.99/kg)</option>
+<option data-price="24.99" value="redvelvet">Red Velvet (€24.99/kg)</option>
+<option data-price="19.99" value="tres-leches">Tres Leches — mín. 1.5kg (€19.99/kg)</option>
+</select>
+<div class="price-per-kg-badge" id="pricePerKgDisplay"></div>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Sabor Base *</label>
+<select id="baseFlavor" required="">
+<option value="">Selecionar...</option>
+<option value="morango">Morango 🍓</option>
+<option value="chocolate">Chocolate 🍫</option>
+<option value="chocolate-branco">Chocolate Branco 🍫</option>
+<option value="limao">Limão 🍋</option>
+<option value="limao-verde">Limão Verde 🍋‍🟩</option>
+<option value="laranja">Laranja 🍊</option>
+<option value="kiwi">Kiwi 🥝</option>
+<option value="coco">Coco 🥥</option>
+<option value="ananas">Ananás 🍍</option>
+<option value="cereja">Cereja 🍒</option>
+<option value="manga">Manga 🥭</option>
+<option value="framboesa">Framboesa 🫐</option>
+<option value="caramel">Caramel</option>
+<option value="frutos-vermelhos">Frutos Vermelhos</option>
+</select>
+</div>
+<div class="form-group" id="combinationSection" style="display:none">
+<label>Combinação com</label>
+<select id="combinationFlavor">
+<option value="">Nenhuma</option>
+<option value="morango">Morango 🍓</option>
+<option value="chocolate">Chocolate 🍫</option>
+<option value="chocolate-branco">Chocolate Branco 🍫</option>
+<option value="limao">Limão 🍋</option>
+<option value="laranja">Laranja 🍊</option>
+<option value="kiwi">Kiwi 🥝</option>
+<option value="coco">Coco 🥥</option>
+<option value="ananas">Ananás 🍍</option>
+<option value="cereja">Cereja 🍒</option>
+<option value="manga">Manga 🥭</option>
+<option value="framboesa">Framboesa 🫐</option>
+</select>
+</div>
+</div>
+<div class="form-row single">
+<div class="form-group">
+<label>Recheio Extra (+€1.99)</label>
+<select id="extraFilling">
+<option value="">Sem recheio extra</option>
+<option value="morango">Morango 🍓 (+€1.99)</option>
+<option value="chocolate">Chocolate 🍫 (+€1.99)</option>
+<option value="chocolate-branco">Chocolate Branco 🍫 (+€1.99)</option>
+<option value="limao">Limão 🍋 (+€1.99)</option>
+<option value="laranja">Laranja 🍊 (+€1.99)</option>
+<option value="kiwi">Kiwi 🥝 (+€1.99)</option>
+<option value="coco">Coco 🥥 (+€1.99)</option>
+<option value="ananas">Ananás 🍍 (+€1.99)</option>
+<option value="cereja">Cereja 🍒 (+€1.99)</option>
+<option value="manga">Manga 🥭 (+€1.99)</option>
+<option value="framboesa">Framboesa 🫐 (+€1.99)</option>
+<option value="caramel">Caramel (+€1.99)</option>
+<option value="frutos-vermelhos">Frutos Vermelhos (+€1.99)</option>
+</select>
+</div>
+</div>
+<div class="form-row single">
+<div class="form-group"><label>Mensagem no Bolo</label><input id="cakeMessage" placeholder="Ex: Feliz Aniversário!" type="text"/></div>
+</div>
+<div class="form-row single">
+<div class="form-group"><label>Nota para o Chef</label><textarea id="chefNotes" placeholder="Instruções especiais..."></textarea></div>
+</div>
+<div class="form-row single">
+<div class="form-group">
+<label>Foto de Referência (opcional)</label>
+<div id="counterPhotoPreviewArea" style="display:none;margin-bottom:8px;position:relative">
+<img alt="Ref" id="counterPhotoPreview" src="" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;border:1.5px solid var(--border)"/>
+<button id="counterRemovePhotoBtn" style="position:absolute;top:6px;right:6px;background:#c0544a;color:white;border:none;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:0.7rem;display:flex;align-items:center;justify-content:center" type="button"><i class="fas fa-times"></i></button>
+</div>
+<label for="counterPhotoInput" id="counterPhotoLabel" style="display:flex;align-items:center;justify-content:center;gap:7px;padding:10px;background:var(--card2);border:1.5px dashed var(--border);border-radius:8px;cursor:pointer;font-size:0.82rem;color:var(--text2);transition:all .2s;cursor:pointer">
+<i class="fas fa-camera"></i> Adicionar foto de referência para o chef
+  </label>
+<input accept="image/*" id="counterPhotoInput" style="display:none" type="file"/>
+</div>
+</div>
+</div>
+<div class="form-section">
+<div class="form-section-title"><i class="fas fa-weight"></i> Peso</div>
+<div id="normalWeightSection" style="display:flex;gap:10px;align-items:flex-end;margin-bottom:8px">
+<div class="form-group" style="flex:1"><label>Peso Mínimo</label><select id="minWeight"><option value="">Selecionar...</option></select></div>
+</div>
+<div id="customWeightSection" style="display:none;margin-bottom:8px">
+<div class="form-row">
+<div class="form-group"><label>Peso Mín. (kg)</label><input id="customMinWeight" min="1" placeholder="1.2" step="0.1" type="number"/></div>
+<div class="form-group"><label>Peso Máx. (kg)</label><input id="customMaxWeight" min="1" placeholder="1.5" step="0.1" type="number"/></div>
+</div>
+</div>
+<button class="btn-add-extra" id="customWeightBtn" type="button"><i class="fas fa-edit"></i> Peso Personalizado</button>
+<div class="price-display" id="priceDisplay">
+<div class="price-range">€<span id="minPrice">0</span> — €<span id="maxPrice">0</span></div>
+<div class="price-breakdown" id="priceBreakdown"></div>
+</div>
+</div>
+<div class="form-section">
+<div class="form-section-title"><i class="fas fa-plus-square"></i> Extras</div>
+<div class="extra-products-container" id="extraProductsContainer"></div>
+<button class="btn-add-extra" id="addExtraProductBtn" type="button"><i class="fas fa-plus"></i> Adicionar Extra</button>
+</div>
+<div class="form-section">
+<div class="form-section-title"><i class="fas fa-truck"></i> Entrega</div>
+<div class="form-row single" style="margin-bottom:10px">
+<div class="form-group">
+<label>Tipo</label>
+<div class="delivery-toggle">
+<input id="pickupRadio" name="deliveryType" type="radio" value="pickup"/>
+<label for="pickupRadio">🏪 Recolha</label>
+<input id="deliveryRadio" name="deliveryType" type="radio" value="delivery"/>
+<label for="deliveryRadio">🚚 Entrega</label>
+</div>
+</div>
+</div>
+<div class="form-row single" id="addressSection" style="display:none">
+<div class="form-group"><label>Morada</label><input id="address" placeholder="Rua, número, cidade..." type="text"/></div>
+</div>
+<div class="form-row single" style="margin-bottom:10px">
+<div class="form-group">
+<label>Agendamento</label>
+<div class="delivery-toggle">
+<input id="scheduledRadio" name="deliveryOption" type="radio" value="scheduled"/>
+<label for="scheduledRadio">📅 Agendada</label>
+<input id="expressRadio" name="deliveryOption" type="radio" value="express"/>
+<label for="expressRadio">⚡ Expresso</label>
+</div>
+</div>
+</div>
+<div class="scheduled-grid" id="scheduledDelivery" style="display:none">
+<div class="form-group"><label>Data</label><input id="orderDate" type="date"/></div>
+<div class="form-group"><label>Hora</label><input id="orderTime" max="22:00" min="18:00" type="time"/></div>
+</div>
+<div id="expressDelivery" style="display:none;margin-top:8px">
+<div class="form-group"><label>Hora Expresso</label><input id="expressTime" max="22:00" min="18:00" type="time"/></div>
+</div>
+</div>
+<div class="form-section">
+<div class="form-section-title"><i class="fas fa-credit-card"></i> Pagamento &amp; Estado</div>
+<div class="form-row">
+<div class="form-group">
+<label>Pagamento</label>
+<select id="paymentMethod">
+<option value="">Selecionar...</option>
+<option value="MBWay">MBWay</option>
+<option value="Transferência">Transferência</option>
+<option value="Dinheiro">Dinheiro</option>
+</select>
+</div>
+<div class="form-group">
+<label>Estado</label>
+<select id="orderStatus">
+<option value="pending">⏳ Pendente</option>
+<option value="confirmed">✅ Confirmado</option>
+</select>
+</div>
+</div>
+</div>
+<button class="btn-submit" type="submit"><i class="fas fa-plus-circle"></i> Adicionar Encomenda</button>
+</form>
+</div>
+</div>
+</div>
+<!-- RECEIPT MODAL -->
+<div class="modal-overlay" id="receiptModal">
+<div class="modal">
+<div class="modal-header"><h3><i class="fas fa-receipt"></i> Recibo</h3><button class="modal-close" id="closeReceiptModal"><i class="fas fa-times"></i></button></div>
+<div class="modal-body">
+<input id="receiptOrderId" type="hidden"/>
+<div class="receipt-type-tabs">
+<button class="receipt-type-btn active" id="receiptTypeConfirmation">📋 Confirmação</button>
+<button class="receipt-type-btn" id="receiptTypeComplete">✅ Final</button>
+</div>
+<div class="receipt-type-tabs" style="margin-top:6px">
+<button class="receipt-type-btn active" id="receiptStyleClassic">📄 Clássico</button>
+<button class="receipt-type-btn" id="receiptStyleModern">✨ Moderno</button>
+</div>
+<div class="receipt-print-btns">
+<button class="btn-secondary" id="printA4Btn"><i class="fas fa-print"></i> A4</button>
+<button class="btn-secondary" id="printA5Btn"><i class="fas fa-print"></i> A5</button>
+</div>
+<div id="receiptContent"></div>
+</div>
+</div>
+</div>
+<!-- WHATSAPP MODAL -->
+<div class="modal-overlay" id="whatsappModal">
+<div class="modal">
+<div class="modal-header"><h3><i class="fab fa-whatsapp" style="color:#25d366"></i> WhatsApp</h3><button class="modal-close" id="closeWhatsappModal"><i class="fas fa-times"></i></button></div>
+<div class="modal-body">
+<input id="whatsappOrderId" type="hidden"/>
+<div class="whatsapp-msg" id="whatsappMessageText"></div>
+</div>
+<div class="modal-footer">
+<button class="btn-secondary" id="copyWhatsappBtn"><i class="fas fa-copy"></i> Copiar</button>
+<button class="btn-primary" id="sendWhatsappBtn"><i class="fab fa-whatsapp"></i> Enviar</button>
+</div>
+</div>
+</div>
+<!-- FINAL WEIGHT MODAL -->
+<div class="modal-overlay" id="finalWeightModal">
+<div class="modal" style="max-width:420px">
+<div class="modal-header"><h3><i class="fas fa-weight"></i> Peso Final &amp; Preço</h3><button class="modal-close" id="closeFinalWeightModal"><i class="fas fa-times"></i></button></div>
+<div class="modal-body">
+<input id="finalWeightOrderId" type="hidden"/>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div class="form-group"><label>Peso Final</label><select id="finalWeightSelect"></select></div>
+<div class="form-group"><label>Preço/kg (€)</label><input id="finalPricePerKg" min="0" step="0.01" type="number" value="19.99"/></div>
+<div class="form-group">
+<label>Desconto (%)</label>
+<input id="finalDiscount" max="100" min="0" step="1" type="number" value="0"/>
+<div class="discount-btns">
+<button class="discount-btn" data-discount="5" type="button">5%</button>
+<button class="discount-btn" data-discount="10" type="button">10%</button>
+<button class="discount-btn" data-discount="15" type="button">15%</button>
+<button class="discount-btn" data-discount="0" type="button">Sem Desconto</button>
+</div>
+</div>
+<div class="final-price-display" id="finalPriceDisplay">€0.00</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn-secondary" id="cancelFinalWeightBtn">Cancelar</button>
+<button class="btn-primary" id="confirmFinalWeightBtn"><i class="fas fa-check"></i> Confirmar</button>
+</div>
+</div>
+</div>
+<!-- EDIT ORDER MODAL -->
+<div class="modal-overlay" id="editOrderModal">
+<div class="modal">
+<div class="modal-header"><h3><i class="fas fa-edit"></i> Editar Encomenda</h3><button class="modal-close" id="closeEditOrderModal"><i class="fas fa-times"></i></button></div>
+<div class="modal-body">
+<form id="editOrderForm">
+<input id="editOrderId" type="hidden"/>
+<div class="form-row"><div class="form-group"><label>ID Cliente</label><input id="editCustomerId" type="text"/></div><div class="form-group"><label>Nome *</label><input id="editCustomerName" required="" type="text"/></div></div>
+<div class="form-row"><div class="form-group"><label>Telefone</label><input id="editPhone" type="tel"/></div><div class="form-group"><label>NIF</label><input id="editNif" maxlength="9" type="text"/></div></div>
+<div class="form-row">
+<div class="form-group"><label>Tipo de Bolo</label><select id="editCakeType"><option value="">Selecionar...</option><option value="sponge-chocolate">Chocolate Sponge Cake</option><option value="sponge-vanilla">Sponge Cake Vanilla</option><option value="sponge-normal">Sponge Cake Normal</option><option value="redvelvet">Red Velvet</option><option value="tres-leches">Tres Leches</option></select></div>
+<div class="form-group"><label>Sabor Base</label><select id="editBaseFlavor"><option value="">Selecionar...</option><option value="morango">Morango 🍓</option><option value="chocolate">Chocolate 🍫</option><option value="chocolate-branco">Chocolate Branco 🍫</option><option value="limao">Limão 🍋</option><option value="laranja">Laranja 🍊</option><option value="kiwi">Kiwi 🥝</option><option value="coco">Coco 🥥</option><option value="ananas">Ananás 🍍</option><option value="cereja">Cereja 🍒</option><option value="manga">Manga 🥭</option><option value="framboesa">Framboesa 🫐</option><option value="caramel">Caramel</option><option value="frutos-vermelhos">Frutos Vermelhos</option></select></div>
+</div>
+<div class="form-row"><div class="form-group"><label>Mensagem no Bolo</label><input id="editCakeMessage" type="text"/></div><div class="form-group"><label>Nota Chef</label><textarea id="editChefNotes" style="min-height:40px"></textarea></div></div>
+<div class="form-row"><div class="form-group"><label>Peso Mín. (kg)</label><select id="editMinWeight"></select></div><div class="form-group"><label>Pagamento</label><select id="editPaymentMethod"><option value="">Selecionar...</option><option value="MBWay">MBWay</option><option value="Transferência">Transferência</option><option value="Dinheiro">Dinheiro</option></select></div></div>
+<div class="form-row"><div class="form-group"><label>Data</label><input id="editOrderDate" type="date"/></div><div class="form-group"><label>Hora</label><input id="editOrderTime" type="time"/></div></div>
+<div class="form-group" style="margin-bottom:10px"><label>Morada</label><input id="editAddress" type="text"/></div>
+<div class="form-group" style="margin-bottom:10px"><label>Estado</label><select id="editOrderStatus"><option value="pending">⏳ Pendente</option><option value="confirmed">✅ Confirmado</option><option value="ready">🎂 Pronto</option><option value="delivered">📦 Entregue</option></select></div>
+<div class="extra-products-container" id="editExtraProductsContainer"></div>
+<button class="btn-add-extra" id="editAddExtraProductBtn" style="margin-bottom:10px" type="button"><i class="fas fa-plus"></i> Adicionar Extra</button>
+<div class="modal-footer" style="padding:12px 0 0;border-top:none;background:none">
+<button class="btn-secondary" id="cancelEditOrderBtn" type="button">Cancelar</button>
+<button class="btn-primary" type="submit"><i class="fas fa-save"></i> Guardar</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- PHOTO MODAL -->
+<div class="photo-modal-overlay" id="photoModal">
+<button class="photo-close-btn" onclick="document.getElementById('photoModal').classList.remove('active')"><i class="fas fa-times"></i></button>
+<img alt="Foto" class="photo-modal-img" id="photoModalImg" src=""/>
+</div>
+<input accept="image/*" id="photoFileInput" style="display:none" type="file"/>
+<script src="auth.js"></script>
+<script>
+// ─── AUTH CHECK ──────────────────────────────────────────────
+const session = AUTH.checkSession();
+if (!session || session.role !== 'counter') {
+  window.location.href = 'login.html';
+}
+document.getElementById('userName').textContent = session ? session.name : 'Counter';
+
+let currentPhotoOrderId = null;
+let currentReceiptType = 'confirmation';
+
+
+
+// ─── RETURNING CUSTOMER CHECK ────────────────────────────────
+function checkReturningCustomer(phone) {
+  if (!phone || phone.length < 6) { document.getElementById('returningCustomerBadge').style.display = 'none'; return; }
+  const existing = orders.filter(o => o.phone && o.phone.replace(/\D/g,'').includes(phone.replace(/\D/g,'')));
+  const badge = document.getElementById('returningCustomerBadge');
+  if (existing.length > 0) {
+    badge.style.display = 'block';
+    badge.innerHTML = `<span class="returning-badge">🌟 Cliente recorrente — ${existing.length} encomenda${existing.length !== 1 ? 's' : ''} anteriores</span>`;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+document.getElementById('phone').addEventListener('input', e => checkReturningCustomer(e.target.value));
+
+// ─── RENDER ORDERS ───────────────────────────────────────────
+function renderOrdersList() {
+  loadData();
+  const search = (document.getElementById('searchOrders')?.value || '').toLowerCase();
+  const statusF = document.getElementById('statusFilter')?.value || '';
+  let list = orders.filter(o => {
+    if (statusF === '') { if (o.status === 'delivered') return false; }
+    else { if (o.status !== statusF) return false; }
+    if (search) { const hay = [o.customerName, o.phone, o.nif, o.orderId, o.baseFlavor, o.cakeType, o.orderDate].join(' ').toLowerCase(); if (!hay.includes(search)) return false; }
+    return true;
+  });
+  list = getSortedOrders(list);
+  const container = document.getElementById('ordersList');
+  if (list.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>Sem encomendas</p></div>'; return; }
+  container.innerHTML = list.map(o => renderCounterOrderCard(o)).join('');
+  renderDailySummary();
+}
+
+function renderCounterOrderCard(order) {
+  const flavorDesc = getFlavorDesc(order);
+  const weightDesc = getWeightDesc(order);
+  const priceDesc = getPriceDesc(order);
+  const dateStr = order.deliveryOption === 'express' ? '⚡ Expresso' : formatDate(order.orderDate);
+  const timeStr = order.deliveryOption === 'express' ? (order.expressTime || '—') : formatTime(order.orderTime);
+  const photos = getOrderPhotos(order.id);
+  let photosHtml = '';
+  if (photos.length > 0) {
+    photosHtml = `<div class="photos-section">
+      <div style="font-size:0.72rem;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Fotos</div>
+      <div class="photos-grid">${photos.map(p => `<div><img class="photo-thumb" src="${p.data}" alt="${p.label}" onclick="viewPhoto('${p.data}')"/><div class="photo-label">${p.label}</div></div>`).join('')}</div>
+    </div>`;
+  }
+  return `<div class="order-card ${order.priority ? 'priority' : ''}" id="order-card-${order.id}">
+    <div class="order-card-header">
+      <span class="order-id-badge">${order.orderId || ''} — ${order.customerName}</span>
+      <select class="status-select-inline" onchange="changeStatusInline(${order.id},this.value)">
+        ${['pending','confirmed','ready','delivered'].map(s => `<option value="${s}" ${s === order.status ? 'selected' : ''}>${STATUS_LABELS[s]}</option>`).join('')}
+      </select>
+      <button class="btn-edit-order" onclick="openEditOrder(${order.id})"><i class="fas fa-edit"></i></button>
+    </div>
+    <div class="order-card-body">
+      <div class="order-info-row"><i class="fas fa-birthday-cake"></i><span><strong>${getCakeTypeName(order.cakeType)}</strong> — ${flavorDesc}</span></div>
+      ${order.cakeMessage ? `<div class="order-info-row"><i class="fas fa-comment"></i><span>"${order.cakeMessage}"</span></div>` : ''}
+      <div class="order-info-row"><i class="fas fa-weight"></i><span>${weightDesc} — ${priceDesc}</span></div>
+      <div class="order-info-row"><i class="fas fa-calendar"></i><span>${dateStr} ${timeStr !== '—' ? 'às ' + timeStr : ''} — ${order.deliveryType === 'pickup' ? '🏪 Recolha' : '🚚 Entrega'}</span></div>
+      ${order.address ? `<div class="order-info-row"><i class="fas fa-map-marker-alt"></i><span>${order.address}</span></div>` : ''}
+      ${order.chefNotes ? `<div class="chef-note">${order.chefNotes}</div>` : ''}
+      ${photosHtml}
+    </div>
+    <div class="order-card-actions">
+      <button class="btn-action btn-receipt" onclick="openReceipt(${order.id})"><i class="fas fa-receipt"></i> Recibo</button>
+      <button class="btn-action btn-whatsapp-action" onclick="openWhatsApp(${order.id})"><i class="fab fa-whatsapp"></i></button>
+      <button class="btn-action btn-priority ${order.priority ? 'active' : ''}" onclick="togglePriority(${order.id})" title="Urgente">🔴</button>
+      <button class="btn-action btn-add-photo" onclick="triggerPhotoUpload(${order.id})" style="background:#5a85b018;color:#5a85b0;border:1px solid #5a85b030"><i class="fas fa-camera"></i></button>
+    </div>
+  </div>`;
+}
+
+// ─── PRIORITY FLAG ───────────────────────────────────────────
+function togglePriority(orderId) {
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+  order.priority = !order.priority;
+  saveData();
+  AUTH.logOrderActivity(orderId, order.orderId, 'priority', order.priority ? 'Marcado como urgente' : 'Urgente removido', session);
+  renderOrdersList();
+  showToast(order.priority ? '🔴 Marcado como urgente' : 'Urgente removido');
+}
+
+// ─── STATUS CHANGE ───────────────────────────────────────────
+function changeStatusInline(orderId, newStatus) {
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+  const oldStatus = order.status;
+  if (newStatus === 'ready') {
+    order.status = 'ready';
+    saveData();
+    AUTH.logOrderActivity(orderId, order.orderId, 'status_change', `Estado: ${oldStatus} → ready`, session);
+    renderOrdersList();
+    openFinalWeightModal(orderId);
+    return;
+  }
+  order.status = newStatus;
+  saveData();
+  AUTH.logOrderActivity(orderId, order.orderId, 'status_change', `Estado: ${oldStatus} → ${newStatus}`, session);
+  renderOrdersList();
+  showToast(`Estado: ${STATUS_LABELS[newStatus]}`);
+}
+
+// ─── PHOTOS ──────────────────────────────────────────────────
+function getOrderPhotos(orderId, type = null) {
+  try { const p = JSON.parse(localStorage.getItem('bismiPhotos_' + orderId) || '[]'); return type ? p.filter(x => x.type === type) : p; } catch { return []; }
+}
+function saveOrderPhoto(orderId, photo) {
+  try { const p = getOrderPhotos(orderId); p.push({ ...photo, id: Date.now() }); localStorage.setItem('bismiPhotos_' + orderId, JSON.stringify(p)); } catch (e) {}
+}
+function triggerPhotoUpload(orderId) {
+  currentPhotoOrderId = orderId;
+  document.getElementById('photoFileInput').click();
+}
+document.getElementById('photoFileInput').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file || !currentPhotoOrderId) return;
+  const label = prompt('Etiqueta da foto (ex: Referência, Decoração, etc.):') || 'Referência';
+  const reader = new FileReader();
+  reader.onload = ev => {
+    saveOrderPhoto(currentPhotoOrderId, { label, data: ev.target.result, type: 'reference', uploadedBy: session.name, uploadedAt: new Date().toISOString() });
+    AUTH.logOrderActivity(currentPhotoOrderId, '', 'photo_upload', `Foto adicionada: ${label}`, session);
+    renderOrdersList();
+    showToast('Foto adicionada!');
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+});
+function viewPhoto(src) {
+  document.getElementById('photoModalImg').src = src;
+  document.getElementById('photoModal').classList.add('active');
+}
+
+// ─── NOTIFICATIONS ───────────────────────────────────────────
+function checkNotifications() {
+  try {
+    const notifications = JSON.parse(localStorage.getItem('bismiCounterNotifications') || '[]');
+    const unseen = notifications.filter(n => !n.seen);
+    const badge = document.getElementById('notifBadge');
+    badge.style.display = unseen.length > 0 ? 'block' : 'none';
+    badge.textContent = unseen.length;
+  } catch (e) {}
+}
+function renderNotifications() {
+  try {
+    const notifications = JSON.parse(localStorage.getItem('bismiCounterNotifications') || '[]').reverse();
+    const list = document.getElementById('notifList');
+    if (notifications.length === 0) { list.innerHTML = '<div class="notif-empty">Sem notificações</div>'; return; }
+    list.innerHTML = notifications.map((n, i) => {
+      const dt = new Date(n.timestamp);
+      const timeStr = dt.toLocaleDateString('pt-PT') + ' ' + dt.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+      let title = '', sub = '';
+      if (n.type === 'delivered') {
+        title = `✅ Entregue: ${n.orderRef || ''} — ${n.customerName}`;
+        sub = `Por: ${n.deliveredBy} | Pagamento: ${n.paymentCollected ? '✅ Recebido' : '❌ Pendente'}`;
+      } else if (n.type === 'ready') {
+        title = `🎂 Pronto: ${n.orderRef || ''} — ${n.customerName}`;
+        sub = 'Bolo pronto para entrega/recolha';
+      }
+      return `<div class="notif-item ${n.seen ? '' : 'unread'}">
+        <div class="notif-item-title">${title}</div>
+        <div class="notif-item-sub">${sub}</div>
+        <div class="notif-time">${timeStr}</div>
+      </div>`;
+    }).join('');
+    // Mark all as seen
+    const all = JSON.parse(localStorage.getItem('bismiCounterNotifications') || '[]');
+    all.forEach(n => n.seen = true);
+    localStorage.setItem('bismiCounterNotifications', JSON.stringify(all));
+    checkNotifications();
+  } catch (e) {}
+}
+
+document.getElementById('notifBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  const panel = document.getElementById('notifPanel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) renderNotifications();
+});
+document.addEventListener('click', () => document.getElementById('notifPanel').classList.remove('open'));
+document.getElementById('notifPanel').addEventListener('click', e => e.stopPropagation());
+document.getElementById('clearNotifBtn').addEventListener('click', () => {
+  localStorage.setItem('bismiCounterNotifications', '[]');
+  renderNotifications();
+  checkNotifications();
+});
+
+// ─── RECEIPT ─────────────────────────────────────────────────
+function openReceipt(orderId) {
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+  document.getElementById('receiptOrderId').value = orderId;
+  currentReceiptType = 'confirmation';
+  document.getElementById('receiptTypeConfirmation').classList.add('active');
+  document.getElementById('receiptTypeComplete').classList.remove('active');
+  renderReceipt(order, 'confirmation');
+  openModal('receiptModal');
+}
+document.getElementById('receiptTypeConfirmation')?.addEventListener('click', () => {
+  currentReceiptType = 'confirmation';
+  document.getElementById('receiptTypeConfirmation').classList.add('active');
+  document.getElementById('receiptTypeComplete').classList.remove('active');
+  const orderId = parseInt(document.getElementById('receiptOrderId').value);
+  const order = orders.find(o => o.id === orderId);
+  if (order) renderReceipt(order, 'confirmation');
+});
+document.getElementById('receiptTypeComplete')?.addEventListener('click', () => {
+  currentReceiptType = 'complete';
+  document.getElementById('receiptTypeComplete').classList.add('active');
+  document.getElementById('receiptTypeConfirmation').classList.remove('active');
+  const orderId = parseInt(document.getElementById('receiptOrderId').value);
+  const order = orders.find(o => o.id === orderId);
+  if (order) renderReceipt(order, 'complete');
+});
+document.getElementById('receiptStyleClassic')?.addEventListener('click', () => {
+  document.getElementById('receiptStyleClassic').classList.add('active');
+  document.getElementById('receiptStyleModern').classList.remove('active');
+  document.getElementById('receiptContent').innerHTML = window._receiptClassic || '';
+});
+document.getElementById('receiptStyleModern')?.addEventListener('click', () => {
+  document.getElementById('receiptStyleModern').classList.add('active');
+  document.getElementById('receiptStyleClassic').classList.remove('active');
+  document.getElementById('receiptContent').innerHTML = window._receiptModern || '';
+});
+document.getElementById('printA4Btn')?.addEventListener('click', () => printReceipt('a4'));
+document.getElementById('printA5Btn')?.addEventListener('click', () => printReceipt('a5'));
+
+// ─── WHATSAPP ────────────────────────────────────────────────
+function openWhatsApp(orderId) {
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+  document.getElementById('whatsappOrderId').value = orderId;
+  document.getElementById('whatsappMessageText').textContent = buildWhatsAppMessage(order);
+  openModal('whatsappModal');
+}
+document.getElementById('copyWhatsappBtn')?.addEventListener('click', copyWhatsAppMessage);
+document.getElementById('sendWhatsappBtn')?.addEventListener('click', sendWhatsApp);
+
+// ─── MODAL CLOSES ────────────────────────────────────────────
+['closeReceiptModal','closeWhatsappModal','closeFinalWeightModal','cancelFinalWeightBtn','closeEditOrderModal','cancelEditOrderBtn'].forEach(id => {
+  const btn = document.getElementById(id);
+  if (btn) btn.addEventListener('click', () => {
+    ['receiptModal','whatsappModal','finalWeightModal','editOrderModal'].forEach(m => closeModal(m));
+  });
+});
+document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.remove('active'); }));
+
+// ─── FINAL WEIGHT ────────────────────────────────────────────
+document.getElementById('confirmFinalWeightBtn')?.addEventListener('click', () => {
+  confirmFinalWeight();
+  AUTH.logOrderActivity(parseInt(document.getElementById('finalWeightOrderId').value), '', 'final_weight', 'Peso final confirmado', session);
+});
+document.querySelectorAll('.discount-btn').forEach(btn => btn.addEventListener('click', () => { document.getElementById('finalDiscount').value = btn.dataset.discount; updateFinalPrice(); }));
+document.getElementById('finalWeightSelect')?.addEventListener('change', updateFinalPrice);
+document.getElementById('finalPricePerKg')?.addEventListener('input', updateFinalPrice);
+document.getElementById('finalDiscount')?.addEventListener('input', updateFinalPrice);
+
+// ─── EDIT ORDER ──────────────────────────────────────────────
+initEditOrderForm();
+
+// ─── FORM INIT ───────────────────────────────────────────────
+initOrderForm();
+
+// ─── SEARCH & FILTER ─────────────────────────────────────────
+document.getElementById('searchOrders')?.addEventListener('input', renderOrdersList);
+document.getElementById('statusFilter')?.addEventListener('change', renderOrdersList);
+
+// ─── CALENDAR ACCESS ─────────────────────────────────────────
+function openCounterCalendar(){
+  const calAccess = JSON.parse(localStorage.getItem('bismiCalendarAccess')||'{}');
+  if(calAccess['counter']===false){ showToast('Acesso ao calendário não autorizado','error'); return; }
+  let modal = document.getElementById('counterCalModal');
+  if(!modal){ modal=document.createElement('div'); modal.id='counterCalModal'; modal.style.cssText='position:fixed;inset:0;background:rgba(58,40,20,.55);display:flex;align-items:flex-start;justify-content:center;z-index:1000;padding:16px;overflow-y:auto'; document.body.appendChild(modal); }
+  const now=new Date(); const todayStr=today();
+  const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const DAYS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const year=now.getFullYear(); const month=now.getMonth();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const firstDay=new Date(year,month,1).getDay();
+  const orderMap={};
+  orders.forEach(o=>{ if(!o.orderDate) return; const d=new Date(o.orderDate+'T00:00:00'); if(d.getFullYear()===year&&d.getMonth()===month){ const day=d.getDate(); if(!orderMap[day]) orderMap[day]=[]; orderMap[day].push(o); } });
+  let html=`<div style="background:white;border-radius:16px;width:100%;max-width:520px;overflow:hidden;box-shadow:0 20px 60px rgba(212,163,115,0.3);margin-top:10px">
+    <div style="background:linear-gradient(135deg,#FAEDCD,#f5e4c0);padding:14px 18px;border-bottom:1px solid #e8d9c0;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0">
+      <h3 style="font-size:0.95rem;font-weight:700;color:#b5845a">📅 ${MONTHS[month]} ${year}</h3>
+      <button onclick="document.getElementById('counterCalModal').remove()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#7a6a58">✕</button>
+    </div>
+    <div style="padding:14px">
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px">
+        ${DAYS.map(d=>`<div style="text-align:center;font-size:0.68rem;font-weight:700;color:#7a6a58;padding:3px">${d}</div>`).join('')}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">
+        ${'<div></div>'.repeat(firstDay)}
+        ${Array.from({length:daysInMonth},(_,i)=>i+1).map(d=>{
+          const dayOrders=orderMap[d]||[]; const count=dayOrders.length;
+          let bg='#FAEDCD',color='#7a6a58',border='#e8d9c0';
+          if(count>=6){bg='#c0544a20';color='#c0544a';border='#c0544a40';}
+          else if(count>=3){bg='#c9853a20';color='#c9853a';border='#c9853a40';}
+          else if(count>=1){bg='#D4A37320';color='#b5845a';border='#D4A373';}
+          const isToday=now.getDate()===d;
+          return `<div style="background:${bg};border:1.5px solid ${border};border-radius:6px;padding:4px 2px;text-align:center;${isToday?'outline:2px solid #b5845a;':''}">
+            <div style="font-size:0.78rem;font-weight:700;color:${color}">${d}</div>
+            ${count>0?`<div style="font-size:0.9rem;font-weight:800;color:${color}">${count}</div>`:''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>`;
+  modal.innerHTML=html;
+}
+
+// Add calendar button to topbar
+document.addEventListener('DOMContentLoaded',()=>{
+  const topbarRight = document.querySelector('.topbar-right');
+  if(topbarRight){
+    const calBtn=document.createElement('button');
+    calBtn.className='btn-logout';
+    calBtn.innerHTML='<i class="fas fa-calendar-alt"></i>';
+    calBtn.title='Calendário';
+    calBtn.addEventListener('click',openCounterCalendar);
+    topbarRight.insertBefore(calBtn,document.getElementById('notifBtn'));
+  }
+});
+
+// ─── LOGOUT ──────────────────────────────────────────────────
+document.getElementById('logoutBtn').addEventListener('click', () => { AUTH.logout(); window.location.href = 'login.html'; });
+
+// ─── COUNTER PHOTO UPLOAD (NEW ORDER FORM) ───────────────────
+let counterPhotoData = null;
+document.getElementById('counterPhotoInput').addEventListener('change', e=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev=>{
+    counterPhotoData = ev.target.result;
+    document.getElementById('counterPhotoPreview').src = counterPhotoData;
+    document.getElementById('counterPhotoPreviewArea').style.display = 'block';
+    document.getElementById('counterPhotoLabel').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+});
+document.getElementById('counterRemovePhotoBtn').addEventListener('click', ()=>{
+  counterPhotoData = null;
+  document.getElementById('counterPhotoPreview').src = '';
+  document.getElementById('counterPhotoPreviewArea').style.display = 'none';
+  document.getElementById('counterPhotoLabel').style.display = 'flex';
+  document.getElementById('counterPhotoInput').value = '';
+});
+document.getElementById('counterPhotoLabel').addEventListener('mouseenter', e=>{ e.currentTarget.style.borderColor='var(--accent)'; e.currentTarget.style.color='var(--accent-dark)'; });
+document.getElementById('counterPhotoLabel').addEventListener('mouseleave', e=>{ e.currentTarget.style.borderColor='var(--border)'; e.currentTarget.style.color='var(--text2)'; });
+
+// Patch submitOrder to save photo after order is created
+const _origSubmitOrder = submitOrder;
+window.submitOrder = function(){
+  _origSubmitOrder();
+  // After order added, save photo if exists
+  if(counterPhotoData && orders.length > 0){
+    const lastOrder = orders[orders.length-1];
+    try{
+      const photos = JSON.parse(localStorage.getItem('bismiPhotos_'+lastOrder.id)||'[]');
+      photos.push({id:Date.now(),label:'Referência do Counter',data:counterPhotoData,type:'reference',uploadedBy:session.name,uploadedAt:new Date().toISOString()});
+      localStorage.setItem('bismiPhotos_'+lastOrder.id, JSON.stringify(photos));
+      AUTH.logOrderActivity(lastOrder.id, lastOrder.orderId, 'photo_upload', 'Foto de referência adicionada', session);
+    }catch(e){}
+    // Reset photo
+    counterPhotoData = null;
+    document.getElementById('counterPhotoPreview').src='';
+    document.getElementById('counterPhotoPreviewArea').style.display='none';
+    document.getElementById('counterPhotoLabel').style.display='flex';
+    document.getElementById('counterPhotoInput').value='';
+  }
+};
+
+// ─── INIT ────────────────────────────────────────────────────
+loadData();
+populateWeightSelects('minWeight', null);
+populateWeightSelects('editMinWeight', null);
+populateFinalWeightSelect();
+renderOrdersList();
+renderDailySummary();
+checkNotifications();
+setInterval(() => { renderOrdersList(); checkNotifications(); }, 15000);
+</script>
+
+<script src="script.js"></script>
+</body>
+</html>

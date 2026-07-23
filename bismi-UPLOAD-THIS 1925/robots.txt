@@ -1,0 +1,27 @@
+User-agent: *
+Allow: /
+Allow: /catalogue.html
+Allow: /customer.html
+Disallow: /admin.html
+Disallow: /catalogue-admin.html
+Disallow: /login.html
+Disallow: /kitchen.html
+Disallow: /delivery.html
+Disallow: /counter.html
+Disallow: /api/
+
+Sitemap: https://bismitreats.online/sitemap.xml
+
+# AI Search Engines
+User-agent: GPTBot
+Allow: /catalogue.html
+Allow: /customer.html
+
+User-agent: PerplexityBot
+Allow: /catalogue.html
+
+User-agent: anthropic-ai
+Allow: /catalogue.html
+
+User-agent: Bingbot
+Allow: /

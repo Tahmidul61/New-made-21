@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html lang="pt">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bismi Treats — Login</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FFFDF7;--card:#FFFFFF;--card2:#FAEDCD;
+  --accent:#D4A373;--accent2:#CB997E;--accent-dark:#b5845a;
+  --text:#3A3A3A;--text2:#7a6a58;--border:#e8d9c0;
+}
+body{background:linear-gradient(135deg,#FAEDCD,#FFFDF7,#f5e4c0);min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:'Segoe UI',Georgia,sans-serif;padding:16px}
+.login-wrapper{width:100%;max-width:420px}
+.brand{text-align:center;margin-bottom:28px}
+.brand-icon{width:72px;height:72px;background:linear-gradient(135deg,var(--accent-dark),var(--accent2));border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;margin:0 auto 14px;box-shadow:0 8px 24px rgba(212,163,115,0.35)}
+.brand-name{font-family:Georgia,serif;font-size:1.8rem;color:var(--accent-dark);font-weight:700}
+.brand-sub{color:var(--text2);font-size:0.82rem;margin-top:4px;letter-spacing:.04em;text-transform:uppercase}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:28px;box-shadow:0 8px 40px rgba(212,163,115,0.18)}
+.step{display:none}
+.step.active{display:block}
+.step-title{font-size:1rem;font-weight:700;color:var(--accent-dark);margin-bottom:6px;font-family:Georgia,serif}
+.step-sub{font-size:0.82rem;color:var(--text2);margin-bottom:20px}
+
+/* PROFILE GRID */
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.profile-btn{background:var(--card2);border:1.5px solid var(--border);border-radius:12px;padding:16px 12px;cursor:pointer;text-align:center;transition:all .2s;position:relative}
+.profile-btn:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 16px rgba(212,163,115,0.2)}
+.profile-btn.selected{border-color:var(--accent);background:linear-gradient(135deg,#D4A37318,#FAEDCD)}
+.profile-role-icon{font-size:1.8rem;margin-bottom:6px}
+.profile-name{font-size:0.88rem;font-weight:700;color:var(--text);margin-bottom:2px}
+.profile-role{font-size:0.72rem;color:var(--text2);text-transform:uppercase;letter-spacing:.04em}
+.profile-role-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.68rem;font-weight:600;margin-top:4px}
+
+/* PIN PAD */
+.pin-display{display:flex;justify-content:center;gap:10px;margin:20px 0}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all .2s}
+.pin-dot.filled{background:var(--accent);border-color:var(--accent)}
+.pin-input-wrapper{position:relative;margin-bottom:16px}
+.pin-input{width:100%;background:var(--card2);border:1.5px solid var(--border);color:var(--text);padding:12px 16px;border-radius:10px;font-size:1.2rem;letter-spacing:.3em;text-align:center;outline:none;font-family:inherit;transition:border-color .2s}
+.pin-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(212,163,115,0.15)}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.pin-key{background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:14px;font-size:1.1rem;font-weight:600;cursor:pointer;text-align:center;transition:all .2s;color:var(--text);font-family:inherit}
+.pin-key:hover{background:var(--accent);border-color:var(--accent);color:white}
+.pin-key.del{background:white;color:var(--text2)}
+.pin-key.del:hover{background:#c0544a;border-color:#c0544a;color:white}
+.pin-key.clear{background:white;color:var(--text2);font-size:0.8rem}
+
+.selected-profile-info{display:flex;align-items:center;gap:12px;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:20px}
+.selected-profile-avatar{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.selected-profile-name{font-weight:700;font-size:0.9rem;color:var(--text)}
+.selected-profile-role{font-size:0.75rem;color:var(--text2)}
+
+.error-msg{background:#c0544a18;border:1px solid #c0544a30;color:#c0544a;padding:10px 14px;border-radius:8px;font-size:0.82rem;margin-bottom:12px;display:none}
+.timeout-msg{background:#c9853a18;border:1px solid #c9853a30;color:#c9853a;padding:10px 14px;border-radius:8px;font-size:0.82rem;margin-bottom:16px;display:none}
+
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border:none;padding:13px;border-radius:10px;font-size:0.95rem;font-weight:700;cursor:pointer;width:100%;font-family:inherit;transition:all .2s;margin-bottom:8px}
+.btn-primary:hover{opacity:.9;box-shadow:0 4px 16px rgba(212,163,115,0.35)}
+.btn-back{background:white;border:1.5px solid var(--border);color:var(--text2);padding:10px;border-radius:10px;font-size:0.85rem;cursor:pointer;width:100%;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-back:hover{border-color:var(--accent);color:var(--accent-dark)}
+
+.customer-link{text-align:center;margin-top:16px}
+.customer-link a{color:var(--accent-dark);font-size:0.82rem;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.customer-link a:hover{text-decoration:underline}
+
+.footer{text-align:center;margin-top:20px;color:var(--text2);font-size:0.78rem}
+</style>
+</head>
+<body>
+<div class="login-wrapper">
+<div class="brand">
+<div class="brand-icon">🎂</div>
+<div class="brand-name">Bismi Treats</div>
+<div class="brand-sub">Staff Portal</div>
+</div>
+<div class="card">
+<div class="timeout-msg" id="timeoutMsg">⏱️ Sessão expirada por inatividade. Por favor faça login novamente.</div>
+<!-- STEP 1: SELECT PROFILE -->
+<div class="step active" id="step1">
+<div class="step-title">Quem é você?</div>
+<div class="step-sub">Selecione o seu perfil para continuar</div>
+<div class="profile-grid" id="profileGrid"></div>
+</div>
+<!-- STEP 2: ENTER PIN -->
+<div class="step" id="step2">
+<div class="step-title">Introduzir PIN</div>
+<div class="step-sub">Introduza o seu PIN para aceder</div>
+<div class="selected-profile-info" id="selectedProfileInfo"></div>
+<div class="error-msg" id="pinError"></div>
+<div class="pin-display" id="pinDisplay">
+<div class="pin-dot" id="dot0"></div>
+<div class="pin-dot" id="dot1"></div>
+<div class="pin-dot" id="dot2"></div>
+<div class="pin-dot" id="dot3"></div>
+<div class="pin-dot" id="dot4"></div>
+<div class="pin-dot" id="dot5"></div>
+<div class="pin-dot" id="dot6"></div>
+<div class="pin-dot" id="dot7"></div>
+</div>
+<div class="pin-pad" id="pinPad">
+<button class="pin-key" data-key="1">1</button>
+<button class="pin-key" data-key="2">2</button>
+<button class="pin-key" data-key="3">3</button>
+<button class="pin-key" data-key="4">4</button>
+<button class="pin-key" data-key="5">5</button>
+<button class="pin-key" data-key="6">6</button>
+<button class="pin-key" data-key="7">7</button>
+<button class="pin-key" data-key="8">8</button>
+<button class="pin-key" data-key="9">9</button>
+<button class="pin-key clear" data-key="clear">CLR</button>
+<button class="pin-key" data-key="0">0</button>
+<button class="pin-key del" data-key="del"><i class="fas fa-backspace"></i></button>
+</div>
+<button class="btn-primary" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+<button class="btn-back" id="backBtn"><i class="fas fa-arrow-left"></i> Voltar</button>
+</div>
+</div>
+<div class="customer-link">
+<a href="customer.html"><i class="fas fa-shopping-cart"></i> Fazer uma encomenda como cliente</a>
+</div>
+<div class="footer">❤️ Bismi Treats — Sistema de Gestão</div>
+</div>
+<script src="auth.js"></script>
+<script>
+let selectedProfileId = null;
+let pinValue = '';
+
+// Check if already logged in
+const existingSession = AUTH.checkSession();
+if (existingSession) {
+  redirectByRole(existingSession.role);
+}
+
+// Check timeout message
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('reason') === 'timeout') {
+  document.getElementById('timeoutMsg').style.display = 'block';
+}
+
+// ─── RENDER PROFILES ─────────────────────────────────────────
+function renderProfiles() {
+  const grid = document.getElementById('profileGrid');
+  const profiles = AUTH.getProfiles().filter(p => p.active);
+  const roleColors = { admin: '#b5845a', counter: '#5a85b0', kitchen: '#6a9e6a', delivery: '#c9853a' };
+  const roleIcons = { admin: '👑', counter: '🧾', kitchen: '👨‍🍳', delivery: '🚚' };
+  const roleLabels = { admin: 'Admin', counter: 'Counter', kitchen: 'Kitchen', delivery: 'Delivery' };
+
+  grid.innerHTML = profiles.map(p => `
+    <div class="profile-btn" onclick="selectProfile('${p.id}')">
+      <div class="profile-role-icon">${roleIcons[p.role] || '👤'}</div>
+      <div class="profile-name">${p.name}</div>
+      <div class="profile-role">${roleLabels[p.role] || p.role}</div>
+      <div class="profile-role-badge" style="background:${roleColors[p.role]}20;color:${roleColors[p.role]}">${roleLabels[p.role]}</div>
+    </div>`).join('');
+}
+
+function selectProfile(profileId) {
+  selectedProfileId = profileId;
+  pinValue = '';
+  updatePinDisplay();
+  const profiles = AUTH.getProfiles();
+  const profile = profiles.find(p => p.id === profileId);
+  if (!profile) return;
+
+  // Check if locked
+  const lockStatus = AUTH.isLocked(profileId);
+  if (lockStatus.locked) {
+    alert(`Este perfil está bloqueado por ${lockStatus.remaining} minuto(s). Demasiadas tentativas incorretas.`);
+    return;
+  }
+
+  const roleColors = { admin: '#b5845a', counter: '#5a85b0', kitchen: '#6a9e6a', delivery: '#c9853a' };
+  const roleIcons = { admin: '👑', counter: '🧾', kitchen: '👨‍🍳', delivery: '🚚' };
+  const roleLabels = { admin: 'Admin', counter: 'Counter', kitchen: 'Kitchen', delivery: 'Delivery' };
+
+  document.getElementById('selectedProfileInfo').innerHTML = `
+    <div class="selected-profile-avatar" style="background:${roleColors[profile.role]}20">${roleIcons[profile.role]}</div>
+    <div>
+      <div class="selected-profile-name">${profile.name}</div>
+      <div class="selected-profile-role">${roleLabels[profile.role]}</div>
+    </div>`;
+
+  document.getElementById('pinError').style.display = 'none';
+  document.getElementById('step1').classList.remove('active');
+  document.getElementById('step2').classList.add('active');
+  setTimeout(() => document.getElementById('pinPad').querySelector('[data-key="1"]').focus(), 100);
+}
+
+// ─── PIN PAD ─────────────────────────────────────────────────
+function updatePinDisplay() {
+  const dots = document.querySelectorAll('.pin-dot');
+  dots.forEach((dot, i) => dot.classList.toggle('filled', i < pinValue.length));
+}
+
+document.getElementById('pinPad').addEventListener('click', e => {
+  const key = e.target.closest('.pin-key')?.dataset.key;
+  if (!key) return;
+  if (key === 'del') { pinValue = pinValue.slice(0, -1); }
+  else if (key === 'clear') { pinValue = ''; }
+  else if (pinValue.length < 8) { pinValue += key; }
+  updatePinDisplay();
+  if (pinValue.length >= 4) {
+    // Auto-attempt login for short PINs (4 digits)
+    const profiles = AUTH.getProfiles();
+    const profile = profiles.find(p => p.id === selectedProfileId);
+    if (profile && profile.pin.length === pinValue.length) {
+      attemptLogin();
+    }
+  }
+});
+
+// Keyboard support
+document.addEventListener('keydown', e => {
+  if (document.getElementById('step2').classList.contains('active')) {
+    if (e.key >= '0' && e.key <= '9' && pinValue.length < 8) { pinValue += e.key; updatePinDisplay(); }
+    else if (e.key === 'Backspace') { pinValue = pinValue.slice(0, -1); updatePinDisplay(); }
+    else if (e.key === 'Enter') { attemptLogin(); }
+  }
+});
+
+function attemptLogin() {
+  if (!selectedProfileId || !pinValue) return;
+  const result = AUTH.login(selectedProfileId, pinValue);
+  if (result.success) {
+    redirectByRole(result.session.role);
+  } else {
+    document.getElementById('pinError').textContent = result.error;
+    document.getElementById('pinError').style.display = 'block';
+    pinValue = '';
+    updatePinDisplay();
+  }
+}
+
+document.getElementById('loginBtn').addEventListener('click', attemptLogin);
+document.getElementById('backBtn').addEventListener('click', () => {
+  selectedProfileId = null; pinValue = '';
+  document.getElementById('step2').classList.remove('active');
+  document.getElementById('step1').classList.add('active');
+  document.getElementById('pinError').style.display = 'none';
+});
+
+function redirectByRole(role) {
+  const pages = { admin: 'admin.html', counter: 'admin.html', kitchen: 'kitchen.html', delivery: 'delivery.html' };
+  window.location.href = pages[role] || 'admin.html';
+}
+
+renderProfiles();
+</script>
+</body>
+</html>
